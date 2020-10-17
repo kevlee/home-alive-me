@@ -73,6 +73,9 @@
     <Content Include="babel.config.js">
       <Publish>True</Publish>
     </Content>
+    <Content Include="src\router.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\main.js">
       <Publish>True</Publish>
     </Content>
