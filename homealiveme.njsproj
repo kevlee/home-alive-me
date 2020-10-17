@@ -33,7 +33,9 @@
   <ItemGroup>
     <Content Include="public\favicon.ico" />
     <Content Include="public\index.html" />
-    <Content Include="src\App.vue" />
+    <Content Include="src\App.vue">
+      <Publish>True</Publish>
+    </Content>
     <Content Include="src\assets\fonts\roboto-regular.ttf" />
     <Content Include="src\assets\images\background.png" />
     <Content Include="src\assets\images\background1.png" />
@@ -42,13 +44,21 @@
     <Content Include="src\assets\images\name.png" />
     <Content Include="src\components\background.vue">
       <SubType>Code</SubType>
+      <Publish>True</Publish>
     </Content>
     <Content Include="src\components\configsidebar.vue">
       <SubType>Code</SubType>
+      <Publish>True</Publish>
     </Content>
-    <Content Include="src\components\Home.vue" />
-    <Content Include="package.json" />
-    <Content Include="README.md" />
+    <Content Include="src\components\Home.vue">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="package.json">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="README.md">
+      <Publish>True</Publish>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dist\" />
@@ -60,8 +70,12 @@
     <Folder Include="src\components\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="babel.config.js" />
-    <Content Include="src\main.js" />
+    <Content Include="babel.config.js">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="src\main.js">
+      <Publish>True</Publish>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>
