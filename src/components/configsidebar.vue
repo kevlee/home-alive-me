@@ -63,7 +63,6 @@
             searchdevice: function (controler_type = "zwave") {
                 if (controler_type == "zwave") {
                     this.spinner = true;
-
                     
                 }
                 return;
