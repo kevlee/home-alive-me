@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30517.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "homealiveme", "homealiveme.njsproj", "{1BEE1C55-B40B-4E25-8809-83C3DD7C62B3}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "API", "..\API\API.njsproj", "{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{1BEE1C55-B40B-4E25-8809-83C3DD7C62B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BEE1C55-B40B-4E25-8809-83C3DD7C62B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BEE1C55-B40B-4E25-8809-83C3DD7C62B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

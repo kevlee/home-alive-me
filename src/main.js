@@ -9,8 +9,8 @@ import router from './router.js';
 
 
 
-Vue.use(VueMaterial);
 
+Vue.use(VueMaterial);
 
 Vue.config.productionTip = true;
 
