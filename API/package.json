@@ -1,0 +1,13 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "description": "API",
+  "main": "app.js",
+  "author": {
+    "name": ""
+  },
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "openzwave-shared": "^1.7.1"
+  }
+}

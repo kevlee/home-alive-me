@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30517.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "homealiveme", "homealiveme.njsproj", "{1BEE1C55-B40B-4E25-8809-83C3DD7C62B3}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "API", "..\API\API.njsproj", "{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "API", "API\API.njsproj", "{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
