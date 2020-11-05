@@ -7,6 +7,7 @@
     "name": ""
   },
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "mysql": "^2.18.1",
     "openzwave-shared": "^1.7.1"
   }
