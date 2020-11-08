@@ -6,7 +6,10 @@ var reqlib = require('app-root-path').require,
     OpenZWave = require('openzwave-shared'),
     inherits = require('util').inherits,
     EventEmitter = require('events'),
-    debug = reqlib('/lib/debug')('Zwave')
+    debug = reqlib('./lib/debug')('Zwave'),
+    DBClient = new (reqlib('./lib/dbclient.js'))
+
+debug.color = 6
 
 const ZWAVE_STATUS = {
     0: 'driverReady',
@@ -102,8 +105,8 @@ async function init(cfg) {
 
     // Full option list: https://github.com/OpenZWave/open-zwave/wiki/Config-Options
     var options = {
-        Logging: cfg.logging,
-        ConsoleOutput: cfg.consoleoutput,
+        Logging: cfg.Logging,
+        ConsoleOutput: cfg.ConsoleOutput,
         //QueueLogLevel: cfg.queueloglevel ? 8 : 6,
         //UserPath: storeDir, // where to store config files
         DriverMaxAttempts: 9999,
@@ -284,12 +287,16 @@ function nodeAvailable(nodeid, nodeinfo) {
     if (ozwnode) {
         this.initNode(ozwnode, nodeinfo)
         debug(
-            'node %d AVAILABLE: %s - %s (%s)',
+            'node %d uid %s AVAILABLE: %s - %s - (%s)',
             nodeid,
+            getDeviceID(ozwnode),
             nodeinfo.manufacturer,
             nodeinfo.product,
             nodeinfo.type || 'Unknown'
         )
+        // add node to the homealiveme db
+        console.log(getDeviceID(ozwnode))
+        DBClient.addclient(getDeviceID(ozwnode).toString(), nodeid)
     }
 }
 
@@ -299,94 +306,10 @@ function valueAdded(nodeid, comclass, valueId) {
     if (!ozwnode) {
         debug('ValueAdded: no such node: ' + nodeid, 'error')
     } else {
-        // if (comclass === 0x86) {
-        //   valueId = {
-        //     "value_id": nodeid+"-112-1-48",
-        //     "node_id": 5,
-        //     "class_id": 112,
-        //     "type": "bitset",
-        //     "genre": "config",
-        //     "instance": 1,
-        //     "index": 48,
-        //     "label": "Enable/disable to send a report on Threshold",
-        //     "units": "",
-        //     "help": "Enable/disable to send a report when the measurement is more than the upper limit value or less than the lower limit value. Note: If USB power, the Sensor will check the limit every 10 seconds. If battery power, the Sensor will check the limit when it is waken up.",
-        //     "read_only": false,
-        //     "write_only": false,
-        //     "min": 0,
-        //     "max": 0,
-        //     "is_polled": false,
-        //     "bitSetIds": {
-        //       "1": {
-        //         "help": "Lower Temperature Threshold",
-        //         "label": "Lower Temperature",
-        //         "value": false
-        //       },
-        //       "2": {
-        //         "help": "Lower Humdity Threshold",
-        //         "label": "Lower Humidity",
-        //         "value": false
-        //       },
-        //       "3": {
-        //         "help": "Lower Luminance Threshold",
-        //         "label": "Lower Luminance",
-        //         "value": false
-        //       },
-        //       "4": {
-        //         "help": "Lower Ultraviolet Threshold",
-        //         "label": "Lower Ultraviolet",
-        //         "value": false
-        //       },
-        //       "5": {
-        //         "help": "Upper Temerature Threshold",
-        //         "label": "Upper Temperature",
-        //         "value": false
-        //       },
-        //       "6": {
-        //         "help": "Upper Humdity Threshold",
-        //         "label": "Upper Humidity",
-        //         "value": false
-        //       },
-        //       "7": {
-        //         "help": "Upper Luminance Threshold",
-        //         "label": "Upper Luminance",
-        //         "value": false
-        //       },
-        //       "8": {
-        //         "help": "Upper Ultraviolet Threshold",
-        //         "label": "Upper Ultraviolet",
-        //         "value": false
-        //       }
-        //     },
-        //     "bitMask": 255,
-        //     "value": 0
-        //   }
-        // }
-
-        // if (comclass === 94 && valueId.instance === 1 && valueId.index === 0) {
-        //   valueId = {
-        //     'value_id': nodeid + '-49-1-1',
-        //     'node_id': nodeid,
-        //     'class_id': 49,
-        //     'index': 1,
-        //     'type': 'decimal',
-        //     'genre': 'user',
-        //     'instance': 1,
-        //     'label': 'Temperature',
-        //     'units': '°C',
-        //     'help': 'Test temperature',
-        //     'read_only': true,
-        //     'write_only': false,
-        //     'min': 0,
-        //     'max': 40,
-        //     'is_polled': false,
-        //     'value': 28
-        //   }
-        // }
 
         parseValue(valueId)
 
-        debug('ValueAdded: %s %s', valueId.value_id, valueId.label)
+        debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label , valueId.value)
         var id = getValueID(valueId)
 
         ozwnode.values[id] = valueId

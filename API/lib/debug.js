@@ -9,7 +9,9 @@ function init() {
 
     debug.log = console.log.bind(console)
 }
+
 init()
+
 module.exports = function (namespace) {
     return debug.extend(namespace)
 }
