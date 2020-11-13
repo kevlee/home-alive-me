@@ -394,7 +394,10 @@ function valueChanged(nodeid, comclass, valueId) {
             )
             // update cache
             ozwnode.values[value_id] = valueId
-            this.emit('value changed', valueId, comclass, getDeviceID(ozwnode))
+            // avoid changed value mesure to 0 on wake up device: to be check with not battery device
+            if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.value !== 0 ) {
+                this.emit('value changed', valueId, comclass, getDeviceID(ozwnode))
+            }
         }
 
         // update last active timestamp
