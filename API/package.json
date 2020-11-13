@@ -11,6 +11,7 @@
     "debug": "^4.2.0",
     "express": "^4.17.1",
     "mysql": "^2.18.1",
-    "openzwave-shared": "^1.7.1"
+    "openzwave-shared": "^1.7.1",
+    "wait-for-event": "^2.0.1"
   }
 }

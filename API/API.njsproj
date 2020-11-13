@@ -36,11 +36,18 @@
     <Content Include="lib\dbclient.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="lib\classcom.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="lib\task.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="lib\zwaveclient.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="sql\homealivemedb.sql" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lib\" />

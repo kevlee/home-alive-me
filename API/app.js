@@ -1,9 +1,10 @@
 'use strict';
 
+
 var OpenZWave = require('./lib/zwaveclient');
 var zwave;
+var DBClient;
 
-var DBClient = new (require('./lib/dbclient.js'));
 
 
 function zwaveconnect() {
@@ -13,9 +14,11 @@ function zwaveconnect() {
         port: '\\\\.\\COM4'
     });
     zwave.connect();
+    DBClient = new (require('./lib/dbclient.js'))(zwave); 
 }
 
-zwaveconnect();
+zwaveconnect()
+
 
 process.on('SIGINT', function () {
     console.log('disconnecting...');

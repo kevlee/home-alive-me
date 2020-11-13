@@ -6,8 +6,8 @@ var reqlib = require('app-root-path').require,
     OpenZWave = require('openzwave-shared'),
     inherits = require('util').inherits,
     EventEmitter = require('events'),
-    debug = reqlib('./lib/debug')('Zwave'),
-    DBClient = new (reqlib('./lib/dbclient.js'))
+    debug = reqlib('./lib/debug')('Zwave')
+    
 
 debug.color = 6
 
@@ -107,13 +107,14 @@ async function init(cfg) {
     var options = {
         Logging: cfg.Logging,
         ConsoleOutput: cfg.ConsoleOutput,
+        AssumeAwake: true,
         //QueueLogLevel: cfg.queueloglevel ? 8 : 6,
         //UserPath: storeDir, // where to store config files
         DriverMaxAttempts: 9999,
         //SaveConfiguration: Boolean(cfg.saveConfig),
-        //  RetryTimeout: 10000,
+        //RetryTimeout: 10000,
         //  IntervalBetweenPolls: true,
-        //PollInterval: cfg.pollInterval || process.env.OZW_POLL_INTERVAL,
+        PollInterval: 500,// cfg.pollInterval || process.env.OZW_POLL_INTERVAL,
         //AutoUpdateConfigFile: Boolean(cfg.autoUpdateConfig)
         // SuppressValueRefresh: true,
     } 
@@ -278,6 +279,7 @@ function nodeAdded(nodeid) {
     }
     this.addEmptyNodes()
     debug('Node added', nodeid)
+    
 }
 
 // Triggered after node added event when the node info are firstly loaded
@@ -294,9 +296,8 @@ function nodeAvailable(nodeid, nodeinfo) {
             nodeinfo.product,
             nodeinfo.type || 'Unknown'
         )
-        // add node to the homealiveme db
-        console.log(getDeviceID(ozwnode))
-        DBClient.addclient(getDeviceID(ozwnode).toString(), nodeid)
+
+        this.emit('node available', nodeid, getDeviceID(ozwnode), nodeinfo.product)
     }
 }
 
@@ -309,7 +310,7 @@ function valueAdded(nodeid, comclass, valueId) {
 
         parseValue(valueId)
 
-        debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label , valueId.value)
+        
         var id = getValueID(valueId)
 
         ozwnode.values[id] = valueId
@@ -324,7 +325,11 @@ function valueAdded(nodeid, comclass, valueId) {
             ozwnode.secure = valueId.value
         }
 
-        this.emit('valueChanged', valueId, ozwnode)
+        this.emit('value added', valueId, comclass, getDeviceID(ozwnode))
+        
+        debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label, valueId.value)
+        
+
     }
 }
 
@@ -358,9 +363,9 @@ function nodeReady(nodeid, nodeinfo) {
         }*/
 
         // Update values and subscribe for changes
-        for (const id in ozwnode.values) {
-            this.emit('valueChanged', ozwnode.values[id], ozwnode)
-        }
+        //for (const id in ozwnode.values) {
+            //this.emit('valueChanged', ozwnode.values[id], ozwnode)
+        //}
 
         this.emit('nodeStatus', ozwnode)
 
@@ -378,22 +383,20 @@ function nodeReady(nodeid, nodeinfo) {
 function valueChanged(nodeid, comclass, valueId) {
     var ozwnode = this.nodes[nodeid]
     var value_id = getValueID(valueId)
-
     parseValue(valueId)
-
     if (!ozwnode) {
         debug('valueChanged: no such node: ' + nodeid, 'error')
     } else {
-        var oldst
-        if (ozwnode.ready) {
-            oldst = ozwnode.values[value_id].value
+        var oldst = ozwnode.values[value_id].value
+        if (ozwnode.ready && oldst !== valueId.value) {
             debug(
                 `zwave node ${nodeid}: changed: ${value_id}:${valueId.label}:${oldst} -> ${valueId.value}`
             )
-            this.emit('valueChanged', valueId, ozwnode, oldst !== valueId.value)
+            // update cache
+            ozwnode.values[value_id] = valueId
+            this.emit('value changed', valueId, comclass, getDeviceID(ozwnode))
         }
-        // update cache
-        ozwnode.values[value_id] = valueId
+
         // update last active timestamp
         ozwnode.lastActive = Date.now()
     }
@@ -462,6 +465,7 @@ function notification(nodeid, notif, help) {
 }
 
 function scanComplete() {
+
     this.scanComplete = true
 
     this.status = ZWAVE_STATUS[2]
@@ -479,6 +483,8 @@ function scanComplete() {
     }*/
 
     debug('Network scan complete. Found:', nodes.length, 'nodes')
+    this.emit('scan complete')
+    
 }
 
 function controllerCommand(nodeid, state, errcode, help) {
@@ -506,7 +512,7 @@ function controllerCommand(nodeid, state, errcode, help) {
  * Get the device id of a specific node
  *
  * @param {Object} ozwnode Zwave node Object
- * @returns A string in the format `<manufacturerId>-<productId>-<producttype>` that unique identifhy a zwave device
+ * @returns A string in the format `<manufacturerId>-<productId>-<producttype>` that unique identify a zwave device
  */
 function getDeviceID(ozwnode) {
     if (!ozwnode) return ''
