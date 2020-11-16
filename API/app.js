@@ -4,7 +4,7 @@
 var OpenZWave = require('./lib/zwaveclient');
 var zwave;
 var DBClient;
-
+var task;
 
 
 function zwaveconnect() {
@@ -18,10 +18,12 @@ function zwaveconnect() {
 }
 
 zwaveconnect()
+task = new (require('./lib/task.js'));
 
 
 process.on('SIGINT', function () {
     console.log('disconnecting...');
     zwave.close();
+    DBClient.closeconnection();
     process.exit();
 });
