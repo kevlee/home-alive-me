@@ -106,12 +106,12 @@ function addvalue(self, valueId, comclass, uid) {
 }
 
 DBClient.prototype.addtemplog = async function (_callback) {
-    const db = this.db
-    var now = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    const sql = 'SELECT *  FROM ' + COMCLASS[49] + " WHERE label LIKE 'Air Temperature%' ORDER BY nodeuid, label"
-    var data = {}
-    var struct = {}
-    var sql_push
+    let db = this.db
+    let now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    let sql = 'SELECT *  FROM ' + COMCLASS[49] + " WHERE label LIKE 'Air Temperature%' ORDER BY nodeuid, label"
+    let data = {}
+    let struct = {}
+    let sql_push
 
     db.query(sql, function (err, result, fields) {
         if (err) throw err;
@@ -122,7 +122,7 @@ DBClient.prototype.addtemplog = async function (_callback) {
             data[row.nodeuid] = struct
         }
 
-        var promises = []
+        let promises = []
         for (const [key, value] of Object.entries(data)) {
             sql_push = 'INSERT INTO Temperature (nodeuid,value,units,date) values ' +
                 "('" + key + "','" + value['Air Temperature'] + "','" +
@@ -141,8 +141,34 @@ DBClient.prototype.addtemplog = async function (_callback) {
 
 }
 
+DBClient.prototype.gettempstat = async function (_callback,param) {
+    let db = this.db
+    let id = db.escape(param.nodeuid)
+    let sql
+    var sql_result
+    
+    if (!id)
+        sql = 'SELECT *  FROM Temperature'
+    else
+        sql = 'SELECT *  FROM Temperature WHERE nodeuid =' + id
+
+
+    let promise = new Promise((resolve) => {
+        db.query(sql, function (err, result, fields) {
+            resolve(result)
+        })
+    })
+
+    promise.then((result) => {
+        _callback()
+        sql_result = result
+    })
+    await promise
+    return sql_result
+}
+
+
 DBClient.prototype.closeconnection = function () {
-    console.log('close db')
     this.db.end()
 }
 
