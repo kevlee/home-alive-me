@@ -9,7 +9,7 @@
         data() {
             return {
                 image: {
-                    backgroundImage: 'url(' + require('../assets/images/background.png') + ')',
+                    backgroundImage: 'url(' + require('../assets/images/background.png') + ')'
                 }
             };
         },
@@ -20,10 +20,10 @@
 
 
     #background {
-        background-size: contain;
-        background: no-repeat;
-        min-width: 100%;
-        min-height: 100%;
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 100%;
         position: absolute;
         z-index: 1;
     }

@@ -7,10 +7,8 @@ import 'vue-material/dist/theme/default.css';
 
 import router from './router.js';
 
-
-
-
 Vue.use(VueMaterial);
+
 
 Vue.config.productionTip = true;
 

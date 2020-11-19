@@ -61,21 +61,8 @@
         methods: {
             searchdevice: function (controler_type = "zwave") {
                 if (controler_type == "zwave") {
-                    this.spinner = true;
-                    console.log("OK");
-                    var fs = require('fs');
-                    fs.existsSync('test');
-                    console.log(fs);
-                    
-                    /*var OpenZWave = require('openzwave-shared');
-                    var zwave = new OpenZWave({
-                        Logging: false,     // disable file logging (OZWLog.txt)
-                        ConsoleOutput: true // enable console logging
-                    });
-                    zwave.connect('\\\\.\\COM4');
-                    
-                    zwave.disconnect('\\\\.\\COM4');
-                    this.spinner = false;*/
+                    this.spinner = true
+                    //this.spinner = false
                 }
                 return;
             },

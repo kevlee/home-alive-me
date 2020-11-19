@@ -30,6 +30,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.js" />
+    <Content Include="lib\api.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="lib\debug.js">
       <SubType>Code</SubType>
     </Content>
@@ -40,6 +43,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="lib\task.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="lib\tools.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="package.json" />

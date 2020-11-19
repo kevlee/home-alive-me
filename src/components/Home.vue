@@ -7,7 +7,12 @@
         </div>
         <div id="homebutton">
             <md-button class="md-icon-button md-raised">
-                <md-icon class="md-size">home</md-icon>
+                <md-icon class="md-size-5x">home</md-icon>
+            </md-button>
+        </div>
+        <div id="stats">
+            <md-button class="md-icon-button md-raised">
+                <md-icon class="md-size-5x">bar_chart</md-icon>
             </md-button>
         </div>
     </div>
@@ -17,7 +22,6 @@
 
     import background from "./background.vue";
     import configsidebar from "./configsidebar.vue"
-
 
 
     export default {
@@ -42,6 +46,15 @@
         width:12%;
         z-index: 2;
         position:fixed;
+    }
+    #stats {
+        display: flex;
+        top: 40%;
+        left: 40%;
+        height: 20%;
+        width: 12%;
+        z-index: 2;
+        position: fixed;
     }
     #myconfigsidebar {
         display: flex;
