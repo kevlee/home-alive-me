@@ -6,6 +6,8 @@
 
 <script>
     import Chart from "chart.js";
+    import Request from "request"
+
 
 
     let ckeditor = document.createElement('script');
@@ -19,7 +21,21 @@
 
     window.onload = (() => { createchart() })
 
-    function createchart() {
+    async function createchart() {
+
+        const request = new Request(
+            "http://localhost/tempstat/?nodeuid=600-4237-3",
+            {
+                method: "GET",
+                cache: "default"
+            }
+        )
+        console.log(request)
+        const res = await fetch(request)
+        console.log(res)
+        const data = await res.json()
+        alert(data)
+
         var ctx = document.getElementById('myChart');
         var myChart = new Chart(ctx, {
             type: 'line',
