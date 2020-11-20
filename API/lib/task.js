@@ -3,7 +3,7 @@
 var reqlib = require('app-root-path').require
     
 
-const minutes = 1;
+const minutes = 60;
 const interval = minutes * 60 * 1000;
 
 function Task() {

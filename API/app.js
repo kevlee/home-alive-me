@@ -21,16 +21,16 @@ function zwaveconnect() {
 }
 
 zwaveconnect()
-//task = new (require('./lib/task.js'));
+task = new (require('./lib/task.js'));
 api = new(require('./lib/api.js'))
 
-/*api.listen(80, () =>
+api.listen(80, () =>
     console.log(`Example app listening on port ${process.env.PORT}!`),
 );
 
 api.get('/test', (req, res) => {
     return res.send('GET HTTP test');
-})*/
+})
 
 
 process.on('SIGINT', function () {
