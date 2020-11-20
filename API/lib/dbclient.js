@@ -117,7 +117,6 @@ DBClient.prototype.addtemplog = async function (_callback) {
         if (err) throw err;
         for (var i of result) {
             var row = Object.assign({}, i)
-            console.log(row)
             struct[row.label] = row.value
             data[row.nodeuid] = struct
         }
@@ -155,7 +154,16 @@ DBClient.prototype.gettempstat = async function (_callback,param) {
 
     let promise = new Promise((resolve) => {
         db.query(sql, function (err, result, fields) {
-            resolve(result)
+            let data = {}
+            let struct = []
+            for (var i of result) {
+                var row = Object.assign({}, i)
+                struct.push({
+                    value: row.value, units: row.units, date: row.date
+                })
+                data[row.nodeuid] = struct
+            }
+            resolve(data)
         })
     })
 
