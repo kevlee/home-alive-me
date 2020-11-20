@@ -74,7 +74,14 @@
                         time: {
                             unit: 'day'
                         }
-                    }]
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            suggestedMax: 30,
+                            beginAtZero: true
+                        }
+                    }
+                    ]
                 }
             }
         });
@@ -90,12 +97,16 @@
 
 <style scoped>
     #chartcontainer {
-        display: flex;
-        top: 40%;
-        left: 10%;
-        height: 400px;
-        width: 400px;
+        display: block;
+        height: 50%;
+        width: 50%;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
         z-index: 2;
-        position: relative;
+
     }
 </style>
