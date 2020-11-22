@@ -37,7 +37,7 @@
                 <md-step id="first" md-label="First Step">
                     <p>Select the device </p>
                 </md-step>
-                <md-step id="Second" md-label="Second Step" :function="searchdevice('zwave')">
+                <md-step id="Second" md-label="Second Step" @click="searchdevice('zwave')">
                     <md-progress-spinner v-if="spinner" md-mode="indeterminate"></md-progress-spinner>
                 </md-step>
             </md-steppers>
@@ -46,6 +46,8 @@
 </template>
 
 <script>
+    import * as tools from '../../lib/tools.js'
+
     export default {
         name: 'configsidebar',
         data: () => ({
@@ -59,22 +61,13 @@
             ],
         }),
         methods: {
-            searchdevice: function (controler_type = "zwave") {
-                if (controler_type == "zwave") {
-                    this.spinner = true
-                    //this.spinner = false
-                }
+            searchdevice(controler_type = "zwave") {
+                this.spinner = true
+                tools.searchdevice(controler_type)
                 return;
             },
         },
     }
-
-   /* function searchdevice(controler_type = "zwave") {
-        if (controler_type == "zwave") {
-            document.getSelection.spinner = true;
-        }
-        return;
-    }*/
     
 </script>
 

@@ -6,7 +6,7 @@
 
 <script>
     import Chart from "chart.js"
-
+    import * as tools from '../../lib/tools.js'
 
 
     let ckeditor = document.createElement('script');
@@ -22,24 +22,8 @@
 
     async function createchart() {
 
-        const url = "http://localhost/tempstat/?nodeuid=600-4237-3"
-        const payload = 
-            {
-                method: "GET",
-                cache: "default",
-                headers: {
-                    'Accept-Type': 'application/json'
-                }
-            }
-        const response = await fetch(url, payload)
-        const contentType = response.headers.get("content-type");
-        let body
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            body = await response.json()
-        } else {
-            console.log("Oops, nous n'avons pas du JSON!");
-        }
 
+        const body = await tools.gettempdata()
 
         var datachar = []
         for (var keys in body) {
