@@ -38,6 +38,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
     #homebutton {
         display: flex;
         top: 40%;

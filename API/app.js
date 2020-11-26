@@ -14,15 +14,19 @@ function zwaveconnect() {
     zwave = new OpenZWave({
         Logging: false,     // disable file logging (OZWLog.txt)
         ConsoleOutput: false, // enable console logging
-        port: '\\\\.\\COM4'
-    });
+        NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
+        port: '\\\\.\\COM4',
+        commandsTimeout: 30, // set time to 30 second
+        ConfigPath : './config'
+    })
     zwave.connect();
-    DBClient = new (require('./lib/dbclient.js'))(zwave); 
+    DBClient = new (require('./lib/dbclient.js'))(zwave)
+    api = new (require('./lib/api.js'))(zwave)
+    task = new (require('./lib/task.js'))
 }
 
 zwaveconnect()
-task = new (require('./lib/task.js'));
-api = new(require('./lib/api.js'))
+
 
 
 process.on('SIGINT', function () {

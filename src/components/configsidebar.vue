@@ -33,20 +33,14 @@
             </md-list>
         </md-drawer>
         <md-dialog :md-active.sync="showaddstepper">
-            <md-steppers>
-                <md-step id="first" md-label="First Step">
-                    <p>Select the device </p>
-                </md-step>
-                <md-step id="Second" md-label="Second Step" @click="searchdevice('zwave')">
-                    <md-progress-spinner v-if="spinner" md-mode="indeterminate"></md-progress-spinner>
-                </md-step>
-            </md-steppers>
+            <adddevicestepper/>
         </md-dialog>
     </div>
 </template>
 
 <script>
     import * as tools from '../../lib/tools.js'
+    import adddevicestepper from "./adddevicestepper.vue";
 
     export default {
         name: 'configsidebar',
@@ -60,13 +54,9 @@
                 ['mdi-clock-start', 'Clock-in'],
             ],
         }),
-        methods: {
-            searchdevice(controler_type = "zwave") {
-                this.spinner = true
-                tools.searchdevice(controler_type)
-                return;
-            },
-        },
+        components: {
+            adddevicestepper
+        }
     }
     
 </script>

@@ -40,11 +40,17 @@
       <Publish>True</Publish>
     </Content>
     <Content Include="src\assets\fonts\roboto-regular.ttf" />
+    <Content Include="src\assets\icons\shuttericon.png" />
+    <Content Include="src\assets\icons\shuttericon.svg" />
+    <Content Include="src\assets\icons\switchicon.svg" />
     <Content Include="src\assets\images\background.png" />
     <Content Include="src\assets\images\background1.png" />
     <Content Include="src\assets\images\background2.png" />
     <Content Include="src\assets\images\ICON.png" />
     <Content Include="src\assets\images\name.png" />
+    <Content Include="src\components\adddevicestepper.vue">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\background.vue">
       <SubType>Code</SubType>
       <Publish>True</Publish>
@@ -52,6 +58,9 @@
     <Content Include="src\components\configsidebar.vue">
       <SubType>Code</SubType>
       <Publish>True</Publish>
+    </Content>
+    <Content Include="src\components\devicetypeselector.vue">
+      <SubType>Code</SubType>
     </Content>
     <Content Include="src\components\Home.vue">
       <Publish>True</Publish>
@@ -70,13 +79,17 @@
     <Folder Include="src\" />
     <Folder Include="src\assets\" />
     <Folder Include="src\assets\fonts\" />
+    <Folder Include="src\assets\icons\" />
     <Folder Include="src\assets\images\" />
     <Folder Include="src\components\" />
+    <Folder Include="src\components\icons\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="babel.config.js">
       <Publish>True</Publish>
     </Content>
+    <Content Include="src\components\icons\shuttericon.js" />
+    <Content Include="src\components\icons\switchicon.js" />
     <Content Include="src\components\stats.vue">
       <SubType>Code</SubType>
     </Content>

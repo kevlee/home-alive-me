@@ -98,6 +98,8 @@ function ZwaveClient(config) {
 inherits(ZwaveClient, EventEmitter)
 
 async function init(cfg) {
+    this.inclusion = false
+    this.exclusion = false 
     this.cfg = cfg
 
     this.closed = false
@@ -109,9 +111,10 @@ async function init(cfg) {
         ConsoleOutput: cfg.ConsoleOutput,
         AssumeAwake: true,
         //QueueLogLevel: cfg.queueloglevel ? 8 : 6,
-        //UserPath: storeDir, // where to store config files
+        UserPath: cfg.ConfigPath, 
+        ConfigPath: cfg.ConfigPath, 
         DriverMaxAttempts: 9999,
-        //SaveConfiguration: Boolean(cfg.saveConfig),
+        SaveConfiguration: true,
         //RetryTimeout: 10000,
         //  IntervalBetweenPolls: true,
         PollInterval: 500,// cfg.pollInterval || process.env.OZW_POLL_INTERVAL,
@@ -122,13 +125,13 @@ async function init(cfg) {
 
 // secure connection todo
 
-    //cfg.networkKey = cfg.networkKey || process.env.OZW_NETWORK_KEY
+    cfg.networkKey = cfg.networkKey || process.env.OZW_NETWORK_KEY
 
-    /*if (cfg.networkKey) {
-        options.NetworkKey = cfg.networkKey.replace(/\s/g, '')
+    if (cfg.NetworkKey) {
+        options.NetworkKey = cfg.NetworkKey.replace(/\s/g, '')
     }
 
-    if (cfg.configPath) {
+    /*if (cfg.configPath) {
         options.ConfigPath = cfg.configPath || process.env.OZW_CONFIG_PATH
     }
 
@@ -185,13 +188,13 @@ async function driverReady(homeid) {
     this.status = ZWAVE_STATUS[0]
 
     // this.zwcfg_nodes = jsonStore.get(store.nodes) change by the BDD
-
     // pre-load nodes properties by reading zwcfg xml file
-   /* if (this.zwcfg_nodes.length === 0) {
+     /*if (this.zwcfg_nodes.length === 0) {
         try {
             var zwcfg = await readFile(
-                utils.joinPath(storeDir, 'zwcfg_' + homeHex + '.xml')
+                utils.joinPath(cfg.ConfigPath, 'zwcfg_' + homeHex + '.xml')
             )
+            console.log('loading file')
 
             var matches
             // Fails if name or location contains " char
@@ -325,7 +328,7 @@ function valueAdded(nodeid, comclass, valueId) {
             ozwnode.secure = valueId.value
         }
 
-        this.emit('value added', valueId, comclass, getDeviceID(ozwnode))
+        this.emit('value added', valueId, comclass, nodeid, getDeviceID(ozwnode))
         
         debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label, valueId.value)
         
@@ -336,6 +339,7 @@ function valueAdded(nodeid, comclass, valueId) {
 // Triggered after all values have been added
 function nodeReady(nodeid, nodeinfo) {
     var ozwnode = this.nodes[nodeid]
+
     if (ozwnode) {
         // When a node is added 'on fly' it never triggers 'node available'
         if (!ozwnode.available) {
@@ -362,12 +366,8 @@ function nodeReady(nodeid, nodeinfo) {
             }
         }*/
 
-        // Update values and subscribe for changes
-        //for (const id in ozwnode.values) {
-            //this.emit('valueChanged', ozwnode.values[id], ozwnode)
-        //}
 
-        this.emit('nodeStatus', ozwnode)
+        this.emit('node ready', ozwnode)
 
         debug(
             'node %d ready: %s - %s (%s)',
@@ -507,6 +507,7 @@ function controllerCommand(nodeid, state, errcode, help) {
     }
 
     this.emitEvent('CONTROLLER_CMD', obj)
+    this.emit('command controller', obj)
 }
 
 // ------- Utils ------------------------
@@ -657,6 +658,7 @@ ZwaveClient.prototype.updateDevice = function (
     nodeId,
     deleteDevice
 ) {
+    console.log('my function')
     var node = nodeId >= 0 ? this.nodes[nodeId] : null
 
     // check for existing node and node hassdevice with given id
@@ -691,6 +693,7 @@ ZwaveClient.prototype.addDevice = function (hassDevice, nodeId) {
 
         this.emitEvent('NODE_UPDATED', node)
     }
+    console.log(node.hassDevices)
 }
 
 /**
@@ -1147,7 +1150,8 @@ ZwaveClient.prototype.getInfo = function () {
 }
 
 ZwaveClient.prototype.startInclusion = function (secure) {
-    if (this.client && !this.closed) {
+    if (this.client && !this.closed && !this.inclusion) {
+        this.inclusion = true
         if (this.commandsTimeout) {
             clearTimeout(this.commandsTimeout)
             this.commandsTimeout = null
@@ -1176,13 +1180,16 @@ ZwaveClient.prototype.startExclusion = function () {
     }
 }
 
-ZwaveClient.prototype.stopControllerCommand = function () {
+ZwaveClient.prototype.stopControllerCommand = async function () {
     if (this.client && !this.closed) {
         if (this.commandsTimeout) {
             clearTimeout(this.commandsTimeout)
             this.commandsTimeout = null
         }
-        this.client.cancelControllerCommand()
+        await this.client.cancelControllerCommand()
+        this.inclusion = false
+        this.exclusion = false
+        
     }
 }
 

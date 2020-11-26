@@ -5,7 +5,9 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "icons": "vsvg -s src/assets/icons -t src/components/icons",
+    "prebuild": "npm run icons"
   },
   "description": "VuejsApp1",
   "author": {
@@ -19,7 +21,8 @@
     "vue": "2.5.17",
     "vue-chartjs": "^3.5.1",
     "vue-expandable-image": "^0.1.0",
-    "vue-material": "^1.0.0-beta-15"
+    "vue-material": "^1.0.0-beta-15",
+    "vue-svgicon": "^3.2.9"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.6",

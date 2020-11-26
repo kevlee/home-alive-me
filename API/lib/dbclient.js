@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 'use strict'
 var mysql = require('mysql');
+const util = require('util');
 var reqlib = require('app-root-path').require
 const COMCLASS = reqlib('./lib/classcom.js')
 
@@ -13,7 +14,8 @@ function DBClient(zwave) {
     init.call(this, zwave)
 }
 
-function init(zwave) {
+async function init(zwave) {
+    this.addedclient = false
     this.zwave = zwave
     this.db = mysql.createPool({
         host: "localhost",
@@ -24,11 +26,14 @@ function init(zwave) {
         multipleStatements: true
     });
 
+    this.query = util.promisify(this.db.query).bind(this.db);
+
+
     if (zwave) {
         
         var self = this
 
-        createtable(self)
+        await createtable(self)
 
         // add node zwave if exist
         this.zwave.on('node available', function (nodeid, deviceid, name) {
@@ -36,8 +41,8 @@ function init(zwave) {
             addclient(self, deviceid.toString(), nodeid, name)
         })
 
-        this.zwave.on('value added', function (valueId, comclass, deviceid) {
-            addvalue(self, valueId, comclass, deviceid)
+        this.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
+            addvalue(self, valueId, comclass, nodeid +"-"+ deviceid )
         })
 
         this.zwave.on('value changed', function (valueId, comclass, deviceid) {
@@ -45,42 +50,87 @@ function init(zwave) {
         })
 
         this.zwave.on('scan complete', function () {
-            zwave.writeValue({ node_id: 2, class_id: 112, instance: 1, index: 9 }, 20)
+            zwave.client.requestAllConfigParams(8)
+            zwave.client.requestAllConfigParams(7)
+            zwave.client.requestAllConfigParams(4)
+        })
+
+        this.zwave.on('node ready', function (ozwnode) {
+            if (self.addedclient == true) {
+                updatetaskstatus(self, 'AddDevice', 'Completed', { 'node_uid': ozwnode.node_id + "-" + ozwnode.device_id })
+                self.addedclient = false
+            }
+        })
+        
+        this.zwave.on('command controller', (obj) => {
+            console.log(obj.help)
+            switch (true) {
+                case obj.help.includes('AddDevice'):
+                    switch (true) {
+                        case obj.help.includes('Canceled'):
+                            updatetaskstatus(self,'AddDevice','Canceled')
+                            break
+                        case obj.help.includes('Failed'):
+                            updatetaskstatus(self,'AddDevice', 'Failed')
+                            break
+                        case obj.help.includes('Completed'):
+                            if (obj.nodeid > 1 && obj.nodeid < 255) {
+                                this.addedclient = true
+                            }
+                            break
+                        default:
+                    }
+                    break
+                case obj.help.includes('RemoveDevice'):
+                    switch (true) {
+                        case obj.help.includes('Canceled'):
+                            updatetaskstatus(self, 'RemoveDevice', 'Canceled')
+                            break
+                        case obj.help.includes('Failed'):
+                            updatetaskstatus(self, 'RemoveDevice', 'Failed')
+                            break
+                        case obj.help.includes('Completed'):
+                            if (obj.nodeid > 1 && obj.nodeid < 255) {
+                                updatetaskstatus(self, 'RemoveDevice', 'Completed')
+                                removeclient(self,obj.nodeid)
+                            }
+                            break
+                        default:
+                    }
+                    break
+                default:
+                    console.log('not device added notification ' + obj.help)
+            }
         })
 
     }}
 
-function addclient(self,uid, nodeid, name) {
-    // don't change databases if node exist
-    self.db.query("INSERT INTO nodes (nodeid,nodeuid,productname)  values ('" + nodeid + "','" + uid + "','" + name + "') ON DUPLICATE KEY UPDATE nodeuid = nodeuid");
-}
-
-
 
 function createtable(self) {
 
-    console.log('init db conection')
     self.db.query('CREATE TABLE IF NOT EXISTS nodes ' +
         '(nodeid INT NOT NULL,' +
         'nodeuid VARCHAR(32) PRIMARY KEY,' +
         'productname MEDIUMTEXT DEFAULT NULL)')
 
     Object.keys(COMCLASS).forEach(function (id) {
-        self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] + 
+        self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] +
             '(nodeuid VARCHAR(32) NOT NULL,' +
             'valueid VARCHAR(32) PRIMARY KEY, ' +
             'label TINYTEXT DEFAULT NULL,' +
             'value TINYTEXT DEFAULT NULL,' +
-            'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid))')
+            'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
+
     })
 
-    self.db.query('CREATE TABLE IF NOT EXISTS Temperature '+
+    self.db.query('CREATE TABLE IF NOT EXISTS Temperature ' +
         '(nodeuid VARCHAR(32) NOT NULL,' +
         'label TINYTEXT DEFAULT NULL,' +
         'value TINYTEXT DEFAULT NULL,' +
         'units VARCHAR(32) DEFAULT NULL, ' +
         'date DATETIME DEFAULT NULL, ' +
-        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid))')
+        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
+
 
     self.db.query('CREATE TABLE IF NOT EXISTS Lux ' +
         '(nodeuid VARCHAR(32) NOT NULL,' +
@@ -88,9 +138,31 @@ function createtable(self) {
         'value TINYTEXT DEFAULT NULL,' +
         'units VARCHAR(32) DEFAULT NULL, ' +
         'date DATETIME DEFAULT NULL, ' +
-        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid))')   
+        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
+
+    self.db.query('CREATE TABLE IF NOT EXISTS Task ' +
+        '(id VARCHAR(36) PRIMARY KEY,' +
+        "taskname VARCHAR(36) DEFAULT NULL," +
+        "status TINYTEXT," +
+        'result JSON,' +
+        'date DATETIME DEFAULT NULL )')
+
+    //self.db.query('TRUNCATE task');
 
 }
+
+function addclient(self,uid, nodeid, name) {
+    // don't change databases if node exist
+    self.db.query("INSERT INTO nodes (nodeid,nodeuid,productname)  values ('" + nodeid + "','" + nodeid + "-" + uid + "','" + name + "') ON DUPLICATE KEY UPDATE nodeuid = nodeuid ");
+}
+
+function removeclient(self, nodeid) {
+    const sql = "DELETE FROM nodes WHERE nodeid = '" + nodeid + "'"
+    console.log(sql)
+    self.db.query(sql)  
+}
+
+
 
 function addvalue(self, valueId, comclass, uid) {
     try {
@@ -103,6 +175,19 @@ function addvalue(self, valueId, comclass, uid) {
         console.error(error);
         console.log(comclass);
     }
+}
+
+
+
+function updatetaskstatus(self, type, status, result=null) {
+    let sql = "UPDATE task SET status = '" +
+        status + "' WHERE taskname = '" + type + "'"
+    if (result) {
+        sql = "UPDATE task SET status = '" + status +
+            "', result = '" + JSON.stringify(result) +
+            "' WHERE taskname = '" + type + "'"
+    }
+    self.db.query(sql)
 }
 
 DBClient.prototype.addtemplog = async function (_callback) {
@@ -173,6 +258,35 @@ DBClient.prototype.gettempstat = async function (_callback,param) {
     })
     await promise
     return sql_result
+}
+
+DBClient.prototype.inittask = async function (_callback,uuid,type) {
+    let db = this.db
+    let now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+    let sql = "INSERT INTO task (id,taskname,status,result,date) values " +
+        "('" + uuid + "','" + type + "','processing','{}','" + now + "')"
+    console.log(sql)
+    await db.query(sql)
+}
+
+DBClient.prototype.gettaskstatus = async function (_callback, uuid) {
+    let db = this.db
+    let id = db.escape(uuid)
+    const sql = "SELECT * FROM task WHERE id =" + id 
+    console.log(sql)
+    let result = await this.query(sql)
+    _callback()
+    result[0].result = JSON.parse(result[0].result)
+    return result[0]
+
+}
+
+DBClient.prototype.removetask = async function (_callback, uuid) {
+    let db = this.db
+    let id = db.escape(uuid)
+    const sql = "DELETE FROM task WHERE id =" + id
+    let result = await this.query(sql)
+
 }
 
 

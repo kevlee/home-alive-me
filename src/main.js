@@ -7,7 +7,12 @@ import 'vue-material/dist/theme/default.css';
 
 import router from './router.js';
 
+import * as svgicon from 'vue-svgicon';
+
 Vue.use(VueMaterial);
+Vue.use(svgicon, {
+    classPrefix: 'AppIcon-',
+});
 
 
 Vue.config.productionTip = true;
