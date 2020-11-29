@@ -88,6 +88,7 @@
     <Content Include="babel.config.js">
       <Publish>True</Publish>
     </Content>
+    <Content Include="src\components\icons\index.js" />
     <Content Include="src\components\icons\shuttericon.js" />
     <Content Include="src\components\icons\switchicon.js" />
     <Content Include="src\components\stats.vue">

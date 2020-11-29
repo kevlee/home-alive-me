@@ -1,5 +1,5 @@
 {
-  "name": "vuejs-app1",
+  "name": "HomeAliveme",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "icons": "vsvg -s src/assets/icons -t src/components/icons",
     "prebuild": "npm run icons"
   },
-  "description": "VuejsApp1",
+  "description": "HomeAliveme",
   "author": {
     "name": ""
   },
@@ -28,13 +28,19 @@
     "@vue/cli-plugin-babel": "^4.5.6",
     "@vue/cli-plugin-eslint": "3.0.4",
     "@vue/cli-service": "^4.5.6",
+    "css-loader": "^5.0.1",
     "debug": "^4.2.0",
     "eslint": "5.6.0",
     "eslint-plugin-vue": "4.7.1",
-    "sass": "^1.26.11",
+    "fibers": "^5.0.0",
+    "mini-css-extract-plugin": "^1.3.1",
+    "node-sass": "^5.0.0",
+    "sass-loader": "^10.1.0",
+    "style-loader": "^2.0.0",
     "vue-router": "^3.4.5",
     "vue-template-compiler": "2.5.17",
-    "webpack": "^4.44.2"
+    "webpack": "^4.44.2",
+    "webpack-cli": "^4.2.0"
   },
   "eslintConfig": {
     "root": true,

@@ -1,3 +1,3 @@
 /* eslint-disable */
 require('./shuttericon')
-require('./switchicon')
+require('./switch_off-512')

@@ -1,6 +1,6 @@
 <template>
-    <div id="chartcontainer">
-        <canvas id="myChart"></canvas>
+    <div id="chartcontainer" >
+        <canvas id="myChart">{{chartdata}}</canvas>
     </div>
 </template>
 
@@ -18,7 +18,13 @@
     document.head.appendChild(ckeditor);
 
 
-    window.onload = (() => { createchart() })
+    /*document.addEventListener('DOMContentLoaded', (() => {
+        console.log(document.getElementById('myChart'))
+        if (document.readyState == "complete") { 
+            createchart()
+            console.log('loading data')
+        }
+    }))*/
 
     async function createchart() {
 
@@ -74,7 +80,11 @@
     }
 
     export default {
-        name: 'tempchart'
+        name: 'tempchart',
+        computed: {
+            chartdata: function () { createchart() }
+        }
+
     }
 
 </script>

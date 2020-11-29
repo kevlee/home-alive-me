@@ -1,11 +1,11 @@
 <template>
     <div id="parentx">
 
-        <md-button @click="showNavigation = true" color="primary" type="filled">
+        <md-button @click="showNavigation = true" color="primary" type="filled" md-theme="drawer-toolsbar">
             <md-icon class="md-size-100x">menu</md-icon>
         </md-button>
 
-        <md-drawer :md-active.sync="showNavigation" md-swipeable md-right md-fixed>
+        <md-drawer :md-active.sync="showNavigation" md-swipeable md-right md-fixed md-theme="drawer-toolsbar">
             <md-toolbar class="md-transparent" md-elevation="0">
                 <span class="md-title">Configuration</span>
             </md-toolbar>
@@ -60,6 +60,15 @@
     }
     
 </script>
+
+<style lang="scss">
+    @import "~vue-material/dist/theme/engine";
+
+    @include md-register-theme("drawer-toolsbar", (
+        icon-on-background: md-get-palette-color(lightblue, 800),
+    ));
+    @import "~vue-material/dist/theme/all";
+</style>
 
 <style scoped>
 

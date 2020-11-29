@@ -1,10 +1,13 @@
 <template>
     <md-content class="md-scrollbar">
-        <md-steppers class="adddevicestepper md-scrollbar">
-            <md-step id="first" md-label="First Step">
-                <devicetypeselector />
+        <md-steppers class="adddevicestepper">
+            <md-step id="first" md-label="Choose Module Type">
+                <devicetypeselector @type="settype" />
             </md-step>
-            <md-step id="Second" md-label="Second Step" @click="searchdevice('zwave')">
+            <md-step id="Second" md-label="Waiting Getway Response" @click="searchdevice('zwave')">
+                <md-progress-spinner v-if="spinner" md-mode="indeterminate"></md-progress-spinner>
+            </md-step>
+            <md-step id="Third" md-label="Configure Device" @click="searchdevice('zwave')">
                 <md-progress-spinner v-if="spinner" md-mode="indeterminate"></md-progress-spinner>
             </md-step>
         </md-steppers>
@@ -17,25 +20,20 @@
     export default {
         name: 'adddevicestepper',
         data: () => ({
-            spinner: false
+            spinner: false,
+            devicetype: null,
+            node_uid : null
         }),
         methods: {
-            searchdevice(controler_type = "zwave") {
+            async searchdevice(controler_type = "zwave") {
                 this.spinner = true
-                setTimeout(() => {
-                    this.spinner = false
-                    alert('no device find')
-                }, 30000)
                 //tools.searchdevice(controler_type)
+                this.node_uid = await tools.fetchsynctask("6f5ad5e4-ac47-49a4-b27d-b4115859f32b")
+                this.spinner = false
                 return;
             },
-        },
-        computed: {
-            mycss() {
-                return {
-                    'max-height': '${screen.height}px',
-                    'max-width': '${screen.max-width}px'
-                }
+            settype(value) {
+                this.devicetype = value
             }
         },
         components: {

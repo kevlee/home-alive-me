@@ -1,33 +1,44 @@
 <template>
     <div class="typelist">
-        <div class="switch">
+        <md-button class="switch" @click="type = 'switch'; emitvalue('switch')">
             <div class="left">
                 <svgicon name="switchicon" class='switchicon'></svgicon>
             </div>
             <div class="right">
                 <span> Switch </span>
             </div>
-        </div>
-        <div class="shutter">
+        </md-button>
+        <md-button class="shutter" @click="type = 'shutter'; emitvalue('shutter')">
             <div class="left">
                 <svgicon name="shuttericon" class='shuttericon'></svgicon>
             </div>
             <div class="right">
                 <span> Shutter </span>
             </div>
-        </div>
+        </md-button>
     </div>
 </template>
 
 <script>
     import('./icons/')
     export default {
+        data: () => ({
+            type: null
+        }),
         name: 'devicetypeselector',
-        data() {
-            return {
-                shuttericons: require('../assets/icons/shuttericon.svg')
-            };
-        },
+        methods: {
+            emitvalue(type) {
+                Object.entries(document.getElementsByClassName('typelist')[0].childNodes).forEach(([key, children]) => {
+                    if (children.className && children.className.includes('md-button')) {
+                        children.style.backgroundColor = 'unset'
+                        
+                    }
+                })
+
+                document.getElementsByClassName(type)[0].style.backgroundColor='lightgrey'
+                this.$emit('type', this.type)
+            }
+        }
     };
 </script>
 
@@ -48,11 +59,14 @@
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
+        height: 25vh;
     }
     .shutter {
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
+        height: 25vh;
+        background-color: none;
     }
    
     .shuttericon {

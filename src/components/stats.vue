@@ -3,7 +3,6 @@
         <background />
         <tempchart></tempchart>
     </div>
-
 </template>
 
 <script>
@@ -33,4 +32,5 @@
         z-index: 2;
         position: fixed;
     }
+
 </style>
