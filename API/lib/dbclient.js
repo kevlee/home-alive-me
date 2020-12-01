@@ -38,15 +38,15 @@ async function init(zwave) {
         // add node zwave if exist
         this.zwave.on('node available', function (nodeid, deviceid, name) {
             // add node to the homealiveme db
-            addclient(self, deviceid.toString(), nodeid, name)
+            addclient(self, deviceid.toString(), nodeid, name, devicetype)
         })
 
         this.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
-            addvalue(self, valueId, comclass, nodeid +"-"+ deviceid )
+            
         })
 
-        this.zwave.on('value changed', function (valueId, comclass, deviceid) {
-            addvalue(self, valueId, comclass, deviceid)
+        this.zwave.on('value changed', function (valueId, comclass, nodeid, deviceid) {
+            addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
         })
 
         this.zwave.on('scan complete', function () {
@@ -56,6 +56,9 @@ async function init(zwave) {
         })
 
         this.zwave.on('node ready', function (ozwnode) {
+            for (let [key, value] of Object.entries(ozwnode.values)) {
+                addvalue(self, value, value.class_id, ozwnode.node_id + "-" + ozwnode.device_id)
+            }
             if (self.addedclient == true) {
                 updatetaskstatus(self, 'AddDevice', 'Completed', { 'node_uid': ozwnode.node_id + "-" + ozwnode.device_id })
                 self.addedclient = false
@@ -110,7 +113,8 @@ function createtable(self) {
     self.db.query('CREATE TABLE IF NOT EXISTS nodes ' +
         '(nodeid INT NOT NULL,' +
         'nodeuid VARCHAR(32) PRIMARY KEY,' +
-        'productname MEDIUMTEXT DEFAULT NULL)')
+        'productname MEDIUMTEXT DEFAULT NULL,'+
+        'type TINYTEXT DEFAULT NULL)')
 
     Object.keys(COMCLASS).forEach(function (id) {
         self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] +
@@ -152,9 +156,12 @@ function createtable(self) {
 
 }
 
-function addclient(self,uid, nodeid, name) {
+function addclient(self,uid, nodeid, name, type) {
     // don't change databases if node exist
-    self.db.query("INSERT INTO nodes (nodeid,nodeuid,productname)  values ('" + nodeid + "','" + nodeid + "-" + uid + "','" + name + "') ON DUPLICATE KEY UPDATE nodeuid = nodeuid ");
+    let sql = "INSERT INTO nodes (nodeid,nodeuid,productname,type)  values ('"
+        + nodeid + "','" + nodeid + "-" + uid + "','" + name + "','" + type +
+        "') ON DUPLICATE KEY UPDATE nodeuid = nodeuid "
+    self.db.query(sql);
 }
 
 function removeclient(self, nodeid) {
@@ -170,10 +177,12 @@ function addvalue(self, valueId, comclass, uid) {
         if (valueId.values) {
             choices = JSON.stringify(Object.assign({},valueId.values))
         }
-        self.db.query('INSERT INTO ' + COMCLASS[comclass] +
+        let sql = 'INSERT INTO ' + COMCLASS[comclass] +
             ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
-            "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices +"')" +
-            "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'")
+            "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices + "')" +
+            "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'"
+        console.log(sql)
+        self.db.query(sql)
 
     } catch (error) {
         console.error(error);
@@ -269,7 +278,7 @@ DBClient.prototype.inittask = async function (_callback,uuid,type) {
     let now = new Date().toISOString().slice(0, 19).replace('T', ' ')
     let sql = "INSERT INTO task (id,taskname,status,result,date) values " +
         "('" + uuid + "','" + type + "','processing','{}','" + now + "')"
-    console.log(sql)
+    console.log(global.devicetype)
     await db.query(sql)
 }
 

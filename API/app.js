@@ -9,7 +9,6 @@ var api
 
 
 
-
 function zwaveconnect() {
     zwave = new OpenZWave({
         Logging: false,     // disable file logging (OZWLog.txt)

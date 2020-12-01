@@ -328,7 +328,6 @@ function valueAdded(nodeid, comclass, valueId) {
             ozwnode.secure = valueId.value
         }
 
-
         this.emit('value added', valueId, comclass, nodeid, getDeviceID(ozwnode))
         
         debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label, valueId.value)
@@ -397,7 +396,7 @@ function valueChanged(nodeid, comclass, valueId) {
             ozwnode.values[value_id] = valueId
             // avoid changed value mesure to 0 on wake up device: to be check with not battery device
             if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.value !== 0 ) {
-                this.emit('value changed', valueId, comclass, getDeviceID(ozwnode))
+                this.emit('value changed', valueId, comclass, nodeid,getDeviceID(ozwnode))
             }
         }
 

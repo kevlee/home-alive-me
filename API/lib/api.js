@@ -1,9 +1,11 @@
 const Express = require('express')
 const cors = require('cors')
 const reqlib = require('app-root-path').require
-const bodyParser = require('body-parser');
-const { v4: uuidv4 } = require('uuid');
+const bodyParser = require('body-parser')
+const { v4: uuidv4 } = require('uuid')
 const tools = require('./tools.js')
+
+global.devicetype = null
 
 function API(zwavecontroller) {
     if (!(this instanceof API)) {
@@ -42,8 +44,9 @@ function init(zwavecontroller) {
     this.api.post('/adddevice/', async (req, res) => {
         if (req.body.type) {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+            global.devicetype = req.body.type
             let uuid = uuidv4()
-            res.status(200).send({ 'msg': 'start enrolling', 'task_id' : uuid })
+            res.status(200).json({ 'msg': 'start enrolling', 'task_id' : uuid })
             this.zwave.startInclusion(true)
             result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "AddDevice")
         } else {
