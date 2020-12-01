@@ -1,6 +1,6 @@
 <template>
 
-    <md-dialog ref="diagcontent" class="md-scrollbar md-content diagcontent" :md-active.sync="showaddstepper" md-dialog-content>
+    <md-dialog ref="diagcontent" class="md-scrollbar md-content diagcontent" :md-active.sync="showaddstepper" md-dialog-content :md-click-outside-to-close="false" @md-clicked-outside="close()">
         <md-content class="scroller md-scrollbar">
             <md-dialog-content class="steppercontainer">
                 <md-steppers class="adddevicestepper md-alternative" :md-active-step.sync="currentstep" md-linear>
@@ -21,7 +21,7 @@
                         <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
                         <div class="processbuttton">
                             <md-button class="md-raised md-primary"
-                                       @click.native="savenodeconfig()">
+                                       @click="savenodeconfig();close()">
                                 SAVE
                             </md-button>
                         </div>
@@ -60,9 +60,9 @@
         methods: {
             async searchdevice(controler_type = "zwave") {
                 this.spinner = true
-                const taskid = await tools.searchdevice(controler_type, this.devicetype)
-                console.log(taskid)
-                this.node_uid = await tools.fetchsynctask(taskid)
+                //const taskid = await tools.searchdevice(controler_type, this.devicetype)
+                //this.node_uid = await tools.fetchsynctask(taskid)
+                this.node_uid = await tools.fetchsynctask("07c125b3-ccb0-4f6d-8c06-72f483fcf31e")
                 this.configs = await tools.fetchconfig(this.node_uid)
                 for (var config in this.configs) {
                     var label = this.configs[config].label
@@ -94,9 +94,12 @@
             },
             async savenodeconfig() {
                 await tools.sendconfig(this.configs, this.node_uid)
+            },
+            close() {
                 this.$emit('saved')
                 Object.assign(this.$data, initialState());
-            },
+            }
+
         },
         components: {
             devicetypeselector,
