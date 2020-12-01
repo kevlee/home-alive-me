@@ -35,7 +35,9 @@
                 <md-list-item @click="showaddstepper = true; showNavigation= false">
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add device</span>
-                    <adddevicestepper v-bind:showaddstepper="showaddstepper" @saved="showaddstepper = false" />
+                    <adddevicestepper v-bind:showaddstepper="showaddstepper" 
+                                      @saved="showaddstepper = false" 
+                                      @nodevice="showalert"/>
                 </md-list-item>
 
                 <md-list-item>
@@ -67,6 +69,11 @@
         }),
         components: {
             adddevicestepper
+        },
+        methods: {
+            showalert(msg) {
+                alert(msg)
+            }
         }
     }
     

@@ -60,9 +60,13 @@
         methods: {
             async searchdevice(controler_type = "zwave") {
                 this.spinner = true
-                //const taskid = await tools.searchdevice(controler_type, this.devicetype)
-                //this.node_uid = await tools.fetchsynctask(taskid)
-                this.node_uid = await tools.fetchsynctask("07c125b3-ccb0-4f6d-8c06-72f483fcf31e")
+                const taskid = await tools.searchdevice(controler_type, this.devicetype)
+                this.node_uid = await tools.fetchsynctask(taskid)
+                if (!this.node_uid) {
+                    this.close()
+                    this.$emit('nodevice', 'no device find')
+                    
+                }
                 this.configs = await tools.fetchconfig(this.node_uid)
                 for (var config in this.configs) {
                     var label = this.configs[config].label
