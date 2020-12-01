@@ -63,7 +63,6 @@ async function init(zwave) {
         })
         
         this.zwave.on('command controller', (obj) => {
-            console.log(obj.help)
             switch (true) {
                 case obj.help.includes('AddDevice'):
                     switch (true) {
@@ -119,6 +118,8 @@ function createtable(self) {
             'valueid VARCHAR(32) PRIMARY KEY, ' +
             'label TINYTEXT DEFAULT NULL,' +
             'value TINYTEXT DEFAULT NULL,' +
+            'typevalue TINYTEXT DEFAULT NULL,' +
+            'availablevalue JSON DEFAULT NULL,' +
             'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
 
     })
@@ -158,7 +159,6 @@ function addclient(self,uid, nodeid, name) {
 
 function removeclient(self, nodeid) {
     const sql = "DELETE FROM nodes WHERE nodeid = '" + nodeid + "'"
-    console.log(sql)
     self.db.query(sql)  
 }
 
@@ -166,9 +166,13 @@ function removeclient(self, nodeid) {
 
 function addvalue(self, valueId, comclass, uid) {
     try {
+        let choices = {}
+        if (valueId.values) {
+            choices = JSON.stringify(Object.assign({},valueId.values))
+        }
         self.db.query('INSERT INTO ' + COMCLASS[comclass] +
-            ' (nodeuid,valueid,label,value)  values ' +
-            "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "')" +
+            ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
+            "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices +"')" +
             "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'")
 
     } catch (error) {
@@ -273,7 +277,6 @@ DBClient.prototype.gettaskstatus = async function (_callback, uuid) {
     let db = this.db
     let id = db.escape(uuid)
     const sql = "SELECT * FROM task WHERE id =" + id 
-    console.log(sql)
     let result = await this.query(sql)
     _callback()
     result[0].result = JSON.parse(result[0].result)
@@ -286,6 +289,20 @@ DBClient.prototype.removetask = async function (_callback, uuid) {
     let id = db.escape(uuid)
     const sql = "DELETE FROM task WHERE id =" + id
     let result = await this.query(sql)
+
+}
+
+DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
+    let db = this.db
+    let id = db.escape(uuid)
+    const sql = "SELECT * FROM " + COMCLASS[112] + " WHERE nodeuid =" + id
+    console.log(sql)
+    let result = await this.query(sql)
+    _callback()
+    for (var row in result) {
+       result[row].availablevalue = JSON.parse(result[row].availablevalue)
+    }
+    return result
 
 }
 

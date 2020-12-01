@@ -20,7 +20,7 @@
         name: 'App',
         data: () => {
             return {
-                theme: 'green'
+                theme: 'blue'
             }
         },
         components: {

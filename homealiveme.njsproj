@@ -55,6 +55,9 @@
       <SubType>Code</SubType>
       <Publish>True</Publish>
     </Content>
+    <Content Include="src\components\configeditor.vue">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\configsidebar.vue">
       <SubType>Code</SubType>
       <Publish>True</Publish>

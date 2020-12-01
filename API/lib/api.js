@@ -3,6 +3,7 @@ const cors = require('cors')
 const reqlib = require('app-root-path').require
 const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
+const tools = require('./tools.js')
 
 function API(zwavecontroller) {
     if (!(this instanceof API)) {
@@ -66,7 +67,6 @@ function init(zwavecontroller) {
         if (req.params.uuid) {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)
             result = await DBClient.gettaskstatus(() => { DBClient.closeconnection() }, req.params.uuid)
-            console.log(result)
             res.status(200).json(result)
         } else {
             res.status(400).send({ error: 'no uuid in query' })
@@ -78,7 +78,6 @@ function init(zwavecontroller) {
         if (req.params.uuid) {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)
             result = await DBClient.removetask(() => { DBClient.closeconnection() }, req.params.uuid)
-            console.log(result)
             res.status(200)
         } else {
             res.status(400).send({ error: 'no uuid in query' })
@@ -86,6 +85,26 @@ function init(zwavecontroller) {
 
     })
 
+    this.api.get('/getnodeconfig/:uuid', async (req, res) => {
+        if (req.params.uuid) {
+            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+            result = await DBClient.getnodeconfig(() => { DBClient.closeconnection() }, req.params.uuid)
+            res.status(200).json(result)
+        } else {
+            res.status(400).send({ error: 'no uuid in query' })
+        }
+
+    })
+
+    this.api.post('/:uuid/config/', async (req, res) => {
+        if (req.params.uuid) {
+            tools.writeconfig(this.zwave,req.body)
+            res.status(200)
+        } else {
+            res.status(400).send({ error: 'no uuid in query' })
+        }
+
+    })
 
 
 }

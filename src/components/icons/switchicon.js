@@ -1,7 +1,7 @@
 /* eslint-disable */
 var icon = require('vue-svgicon')
 icon.register({
-  'switch_off-512': {
+  'switchicon': {
     width: 682.667,
     height: 682.667,
     viewBox: '0 0 512 512',

@@ -11,35 +11,51 @@
             </md-toolbar>
 
             <md-list>
-                <md-list-item @click="showaddstepper = true; showNavigation= false">
-                    <md-icon>add</md-icon>
-                    <span class="md-list-item-text">Add device</span>
-                </md-list-item>
 
+                <md-subheader>Rooms</md-subheader>
+                <md-divider></md-divider>
                 <md-list-item>
-                    <md-icon>send</md-icon>
-                    <span class="md-list-item-text">Sent Mail</span>
+                    <md-icon>add</md-icon>
+                    <span class="md-list-item-text">Add room</span>
                 </md-list-item>
 
                 <md-list-item>
                     <md-icon>delete</md-icon>
-                    <span class="md-list-item-text">Trash</span>
+                    <span class="md-list-item-text">Remove room</span>
                 </md-list-item>
 
                 <md-list-item>
-                    <md-icon>error</md-icon>
-                    <span class="md-list-item-text">Spam</span>
+                    <md-icon>list</md-icon>
+                    <span class="md-list-item-text">Room list</span>
                 </md-list-item>
+
+                <md-subheader>Devices</md-subheader>
+                <md-divider></md-divider>
+
+                <md-list-item @click="showaddstepper = true; showNavigation= false">
+                    <md-icon>add</md-icon>
+                    <span class="md-list-item-text">Add device</span>
+                    <adddevicestepper v-bind:showaddstepper="showaddstepper" @saved="showaddstepper = false" />
+                </md-list-item>
+
+                <md-list-item>
+                    <md-icon>delete</md-icon>
+                    <span class="md-list-item-text">Remove device</span>
+                </md-list-item>
+
+
+                <md-list-item>
+                    <md-icon>list</md-icon>
+                    <span class="md-list-item-text">Device list</span>
+                </md-list-item>
+
             </md-list>
         </md-drawer>
-        <md-dialog :md-active.sync="showaddstepper">
-            <adddevicestepper/>
-        </md-dialog>
+        
     </div>
 </template>
 
 <script>
-    import * as tools from '../../lib/tools.js'
     import adddevicestepper from "./adddevicestepper.vue";
 
     export default {
@@ -48,11 +64,6 @@
             spinner : false,
             showaddstepper: false,
             showNavigation: false,
-            items: [
-                ['mdi-email', 'Inbox'],
-                ['mdi-account-supervisor-circle', 'Supervisors'],
-                ['mdi-clock-start', 'Clock-in'],
-            ],
         }),
         components: {
             adddevicestepper

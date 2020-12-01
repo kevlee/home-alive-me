@@ -328,6 +328,7 @@ function valueAdded(nodeid, comclass, valueId) {
             ozwnode.secure = valueId.value
         }
 
+
         this.emit('value added', valueId, comclass, nodeid, getDeviceID(ozwnode))
         
         debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label, valueId.value)
@@ -658,7 +659,6 @@ ZwaveClient.prototype.updateDevice = function (
     nodeId,
     deleteDevice
 ) {
-    console.log('my function')
     var node = nodeId >= 0 ? this.nodes[nodeId] : null
 
     // check for existing node and node hassdevice with given id
@@ -693,7 +693,6 @@ ZwaveClient.prototype.addDevice = function (hassDevice, nodeId) {
 
         this.emitEvent('NODE_UPDATED', node)
     }
-    console.log(node.hassDevices)
 }
 
 /**
