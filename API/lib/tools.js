@@ -8,4 +8,9 @@ function writeconfig(zwavecontroler,configs) {
     }
 }
 
-module.exports = { writeconfig }
+function writedata(zwavecontroler, data) {
+    let valueid = data.valueid.split('-')
+    zwavecontroler.writeValue({ node_id: valueid[0], class_id: valueid[1], instance: valueid[2], index: valueid[3] }, data.value)
+}
+
+module.exports = { writeconfig, writedata }

@@ -310,15 +310,25 @@ DBClient.prototype.getnodes = async function (_callback, uuid) {
 
 }
 
+DBClient.prototype.getcurtainlevel = async function (_callback, uuid) {
+    let db = this.db
+    let id = db.escape(uuid)
+    const sql = "SELECT * FROM " + COMCLASS[38] + " WHERE nodeuid =" + id +
+        " and label='level'"
+    let result = await this.query(sql)
+    _callback()
+    return result[0]
+
+}
+
 DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
     let db = this.db
     let id = db.escape(uuid)
     const sql = "SELECT * FROM " + COMCLASS[112] + " WHERE nodeuid =" + id
-    console.log(sql)
     let result = await this.query(sql)
     _callback()
     for (var row in result) {
-       result[row].availablevalue = JSON.parse(result[row].availablevalue)
+        result[row].availablevalue = JSON.parse(result[row].availablevalue)
     }
     return result
 

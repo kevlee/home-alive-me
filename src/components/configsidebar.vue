@@ -57,7 +57,7 @@
                     <md-icon>list</md-icon>
                     <span class="md-list-item-text">Device list</span>
                     <devicelist v-bind:devicelist="showdeviceslist"
-                                @saved="showdeviceslist = false"/>
+                                @closed="showdeviceslist = false"/>
                 </md-list-item>
 
                 <md-list-item>

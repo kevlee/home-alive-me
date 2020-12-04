@@ -27,7 +27,10 @@
                         <tr v-if="mustshow(infos.nodeid)">
                             <td :colspan="getlenght(infos)" rowspan="1">
                                 <listnodeinfo v-bind:nodeinfo="infos" 
-                                              v-bind:configs="configs" @newconfig="fetchconfig"/>
+                                              v-bind:configs="configs"
+                                              v-bind:curtainlvl="curtainlvl"
+                                              @newconfig="fetchconfig"
+                                              @newdata="fetchcurtainlvl"/>
                             </td>
                         </tr>
                     </template>
@@ -43,8 +46,9 @@
         return {
             list: {},
             showdetail: [],
-            clicked: null,
-            configs:[],
+            clicked: 0,
+            configs: [],
+            curtainlvl: 0,
         }
     }
     export default {
@@ -75,8 +79,11 @@
                     this.clicked = 0
                 } else {
                     this.clicked = event.nodeid
+                    this.fetchconfig(event.nodeuid)
+                    if (event.type == 'shutter') {
+                        this.curtainlvl = this.fetchcurtainlvl(event.nodeuid)
+                    }
                 }
-                this.fetchconfig(event.nodeuid)
             },
             mustshow(nodeid) {
                 return (this.clicked == nodeid)
@@ -85,10 +92,13 @@
             async fetchconfig(nodeuid) {
                 this.configs = await tools.fetchconfig(nodeuid)
             },
+            async fetchcurtainlvl(nodeuid) {
+                this.curtainlvl = await tools.fetchcurtainlvl(nodeuid)
+            },
 
             close() {
-                this.$emit('saved')
                 Object.assign(this.$data, initialState());
+                this.$emit('closed')
             },
 
         },

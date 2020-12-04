@@ -5,7 +5,7 @@
                 <md-content>
                     <label for="curtainposition">Curtain Position</label>
                     <input type="range" id="curtainposition" name="curtainposition"
-                           min="0" max="100" value="0" step="25" @change="lvl = $event.target.value">
+                           min="0" max="100" :value="lvl" step="25" @change="changelvl($event.target.value)">
                     <output id="value">{{lvl}}%</output>
 
                 </md-content>
@@ -30,7 +30,15 @@
     function initialState() {
         return {
             newconfig: { 'update': true },
-            lvl: "0",
+            lvl: 0,
+            matchinglvl: {
+                0: 0xFF,
+                25: 0x54,
+                50: 0x45,
+                75: 0x20,
+                100:0x00
+            },
+            delay : null,
         }
     }
     export default {
@@ -39,6 +47,7 @@
         props: [
             'nodeinfo',
             'configs',
+            'curtainlvl'
         ],
         watch: {
             configs: function (configs) {
@@ -50,15 +59,52 @@
                         this.newconfig[label] = false
                     }
                 }
-            }
+            },
+            curtainlvl: function (curtainlvl) {
+                this.getcurtainlvl(curtainlvl.value)
+            },
         },
         methods: {
             setcurtain(value) {
-                console.log(value)
+                //console.log(value)
+            },
+            getcurtainlvl(value) {
+                switch (true) {
+                    case value > this.matchinglvl[25]:
+                        this.lvl = 0
+                        break
+                    case value > this.matchinglvl[50]:
+                        this.lvl = 25
+                        break
+                    case value > this.matchinglvl[75]:
+                        this.lvl = 50
+                        break
+                    case value > this.matchinglvl[100]:
+                        this.lvl = 75
+                        break
+                    default:
+                        this.lvl = 100
+                }
+            },
+            changelvl(value) {
+                this.lvl = value
+                this.curtainlvl.value = this.matchinglvl[value]
+                if (!this.delay) {
+                    this.delay = setTimeout(() => {
+                        console.log(this.curtainlvl)
+                        tools.senddata(this.curtainlvl, this.nodeinfo.nodeuid)
+                    }, 3000)
+                } else {
+                    clearTimeout(this.delay)
+                    this.delay = setTimeout(() => {
+                        console.log(this.curtainlvl)
+                        tools.senddata(this.curtainlvl, this.nodeinfo.nodeuid)
+                    }, 3000)
+                }
             },
             async savenodeconfig() {
-                await tools.sendconfig(this.configs, this.node_uid)
-                this.$emit('newconfig', this.node_uid)
+                await tools.sendconfig(this.configs, this.nodeinfo.nodeuid)
+                this.$emit('newconfig', this.nodeinfo.nodeuid)
             },
         },
         components: {

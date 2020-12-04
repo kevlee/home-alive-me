@@ -106,6 +106,15 @@ function init(zwavecontroller) {
         } else {
             res.status(400).send({ error: 'no uuid in query' })
         }
+    })
+
+    this.api.post('/:uuid/data/', async (req, res) => {
+        if (req.params.uuid) {
+            tools.writedata(this.zwave, req.body)
+            res.status(200)
+        } else {
+            res.status(400).send({ error: 'no uuid in query' })
+        }
 
     })
 
@@ -115,6 +124,18 @@ function init(zwavecontroller) {
         result = await DBClient.getnodes(() => { DBClient.closeconnection() }, req.query)
         res.status(200)
         return res.json(result);
+
+    })
+
+    this.api.get('/curtainlevel/:uuid',async (req, res) => {
+        if (req.params.uuid) {
+            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+            result = await DBClient.getcurtainlevel(() => { DBClient.closeconnection() }, req.params.uuid)
+            res.status(200).json(result)
+        } else {
+            res.status(400).send({ error: 'no uuid in query' })
+        }
+
 
     })
 
