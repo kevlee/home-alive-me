@@ -1,7 +1,12 @@
 <template>
     <div id="parentx">
 
-        <md-button @click="showNavigation = true" color="primary" type="filled" md-theme="drawer-toolsbar">
+        <md-button @click="
+                   showNavigation = true;
+                   showaddstepper = false;
+                   showdeviceslist = false;
+                   " 
+                   color="primary" type="filled" md-theme="drawer-toolsbar">
             <md-icon class="md-size-100x">menu</md-icon>
         </md-button>
 
@@ -32,23 +37,32 @@
                 <md-subheader>Devices</md-subheader>
                 <md-divider></md-divider>
 
-                <md-list-item @click="showaddstepper = true; showNavigation= false">
+                <md-list-item @click="
+                              showaddstepper = true;
+                              showNavigation = false;
+                              showdeviceslist = false;
+                              ">
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add device</span>
-                    <adddevicestepper v-bind:showaddstepper="showaddstepper" 
-                                      @saved="showaddstepper = false" 
-                                      @nodevice="showalert"/>
+                    <adddevicestepper v-bind:showaddstepper="showaddstepper"
+                                      @saved="showaddstepper = false"
+                                      @nodevice="showalert" />
+                </md-list-item>
+
+                <md-list-item @click="
+                              showaddstepper = false;
+                              showNavigation = false;
+                              showdeviceslist = true;
+                              ">
+                    <md-icon>list</md-icon>
+                    <span class="md-list-item-text">Device list</span>
+                    <devicelist v-bind:devicelist="showdeviceslist"
+                                @saved="showdeviceslist = false"/>
                 </md-list-item>
 
                 <md-list-item>
                     <md-icon>delete</md-icon>
                     <span class="md-list-item-text">Remove device</span>
-                </md-list-item>
-
-
-                <md-list-item>
-                    <md-icon>list</md-icon>
-                    <span class="md-list-item-text">Device list</span>
                 </md-list-item>
 
             </md-list>
@@ -59,6 +73,7 @@
 
 <script>
     import adddevicestepper from "./adddevicestepper.vue";
+    import devicelist from "./devicelist.vue";
 
     export default {
         name: 'configsidebar',
@@ -66,9 +81,11 @@
             spinner : false,
             showaddstepper: false,
             showNavigation: false,
+            showdeviceslist: false,
         }),
         components: {
-            adddevicestepper
+            adddevicestepper,
+            devicelist,
         },
         methods: {
             showalert(msg) {

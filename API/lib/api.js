@@ -109,6 +109,14 @@ function init(zwavecontroller) {
 
     })
 
+    this.api.get('/nodes/', async (req, res) => {
+        let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+        let result
+        result = await DBClient.getnodes(() => { DBClient.closeconnection() }, req.query)
+        res.status(200)
+        return res.json(result);
+
+    })
 
 }
 

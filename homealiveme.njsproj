@@ -62,6 +62,7 @@
       <SubType>Code</SubType>
       <Publish>True</Publish>
     </Content>
+    <Content Include="src\components\devicelist.vue" />
     <Content Include="src\components\devicetypeselector.vue">
       <SubType>Code</SubType>
     </Content>
@@ -94,6 +95,9 @@
     <Content Include="src\components\icons\index.js" />
     <Content Include="src\components\icons\shuttericon.js" />
     <Content Include="src\components\icons\switchicon.js" />
+    <Content Include="src\components\listnodeinfo.vue">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\stats.vue">
       <SubType>Code</SubType>
     </Content>

@@ -302,6 +302,14 @@ DBClient.prototype.removetask = async function (_callback, uuid) {
 
 }
 
+DBClient.prototype.getnodes = async function (_callback, uuid) {
+    const sql = "SELECT * FROM nodes"
+    let result = await this.query(sql)
+    _callback()
+    return result
+
+}
+
 DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
     let db = this.db
     let id = db.escape(uuid)
