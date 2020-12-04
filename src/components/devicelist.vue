@@ -16,7 +16,7 @@
                             {{key}}
                         </md-table-head>
                     </md-table-row>
-                    <template v-for="infos in list">
+                    <template v-for="(infos,index) in list">
                         <md-table-row class="data"
                                       @click="clickrow(infos)"
                                       :style="onSelect(infos)">
@@ -26,7 +26,7 @@
                         </md-table-row>
                         <tr v-if="mustshow(infos.nodeid)">
                             <td :colspan="getlenght(infos)" rowspan="1">
-                                <listnodeinfo v-bind:nodeuid="infos.nodeuid" 
+                                <listnodeinfo v-bind:nodeinfo="infos" 
                                               v-bind:configs="configs" @newconfig="fetchconfig"/>
                             </td>
                         </tr>
