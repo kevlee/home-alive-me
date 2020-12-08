@@ -13,8 +13,8 @@
     "express": "^4.17.1",
     "mysql": "^2.18.1",
     "openzwave-shared": "^1.7.2",
+    "serialport": "^9.0.3",
     "util": "^0.12.3",
-    "uuid": "^8.3.1",
-    "wait-for-event": "^2.0.1"
+    "uuid": "^8.3.1"
   }
 }
