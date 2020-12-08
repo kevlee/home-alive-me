@@ -125,7 +125,7 @@ async function init(cfg) {
 
 // secure connection todo
 
-    cfg.networkKey = cfg.networkKey || process.env.OZW_NETWORK_KEY
+    cfg.NetworkKey = cfg.NetworkKey || process.env.OZW_NETWORK_KEY
 
     if (cfg.NetworkKey) {
         options.NetworkKey = cfg.NetworkKey.replace(/\s/g, '')

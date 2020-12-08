@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 'use strict'
 
+var USB = require('usb')
+
 function writeconfig(zwavecontroler,configs) {
     for (var [index, config] of Object.entries(configs)) {
         let valueid = config.valueid.split('-')
@@ -13,4 +15,9 @@ function writedata(zwavecontroler, data) {
     zwavecontroler.writeValue({ node_id: valueid[0], class_id: valueid[1], instance: valueid[2], index: valueid[3] }, data.value)
 }
 
-module.exports = { writeconfig, writedata }
+function getusblist() {
+    return USB.getDeviceList() 
+}
+
+
+module.exports = { writeconfig, writedata, getusblist }

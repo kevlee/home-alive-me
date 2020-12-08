@@ -7,17 +7,17 @@ const tools = require('./tools.js')
 
 global.devicetype = null
 
-function API(zwavecontroller) {
+function API() {
     if (!(this instanceof API)) {
-        return new API(zwavecontroller)
+        return new API()
     }
-    init.call(this, zwavecontroller)
+    init.call(this)
 }
 
 
-function init(zwavecontroller) {
+function init() {
 
-    this.zwave = zwavecontroller
+    this.zwave = null,
     this.api = Express()
     this.api.use(cors())
     this.api.use(bodyParser.urlencoded({ extended: true }))
@@ -137,6 +137,12 @@ function init(zwavecontroller) {
         }
 
 
+    })
+
+    this.api.get('/usblist/', async (req, res) => {
+        let result = tools.getusblist()
+        console.log(result)
+        res.status(200).json(result)
     })
 
 }

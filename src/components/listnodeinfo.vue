@@ -4,8 +4,8 @@
             <md-tab id="tab-manage" md-label="manage" v-if="nodeinfo.type == 'shutter'">
                 <md-content>
                     <label for="curtainposition">Curtain Position</label>
-                    <input type="range" id="curtainposition" name="curtainposition"
-                           min="0" max="100" :value="lvl" step="25" @change="changelvl($event.target.value)">
+                    <md-input type="range" id="curtainposition" name="curtainposition"
+                           min="0" max="100" :value="lvl" step="25" @change="changelvl($event.target.value)"/>
                     <output id="value">{{lvl}}%</output>
 
                 </md-content>
@@ -93,13 +93,13 @@
                     this.delay = setTimeout(() => {
                         console.log(this.curtainlvl)
                         tools.senddata(this.curtainlvl, this.nodeinfo.nodeuid)
-                    }, 3000)
+                    }, 2000)
                 } else {
                     clearTimeout(this.delay)
                     this.delay = setTimeout(() => {
                         console.log(this.curtainlvl)
                         tools.senddata(this.curtainlvl, this.nodeinfo.nodeuid)
-                    }, 3000)
+                    }, 2000)
                 }
             },
             async savenodeconfig() {
