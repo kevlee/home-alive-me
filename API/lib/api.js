@@ -145,6 +145,20 @@ function init() {
         res.status(200).json(result)
     })
 
+    this.api.post('/addmodule/', async (req, res) => {
+        if (req.body.port && req.body.type) {
+            let { err, portconfig, type } = await tools.setport(req.body.type, req.body.port, process.platform, this.zwave)
+            if (!err) {
+                let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+                await DBClient.setport(req.body.type, req.body.port)
+                DBClient.closeconnection()
+            }
+            res.status(200).json(process.platform)
+        } else {
+            res.status(400).send({ error: 'missing param' })
+        }
+    })
+
 }
 
 module.exports = API

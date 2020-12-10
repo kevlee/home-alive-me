@@ -10,6 +10,7 @@ var api = new (require('./lib/api.js'))
 
 
 function zwaveconnect() {
+
     zwave = new OpenZWave({
         Logging: false,     // disable file logging (OZWLog.txt)
         ConsoleOutput: false, // enable console logging

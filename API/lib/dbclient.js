@@ -152,6 +152,10 @@ function createtable(self) {
         'result JSON,' +
         'date DATETIME DEFAULT NULL )')
 
+    self.db.query('CREATE TABLE IF NOT EXISTS Connection ' +
+        '(type VARCHAR(36) PRIMARY KEY,' +
+        "port VARCHAR(36) NOT NULL )")
+
     //self.db.query('TRUNCATE task');
 
 }
@@ -330,6 +334,14 @@ DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
     for (var row in result) {
         result[row].availablevalue = JSON.parse(result[row].availablevalue)
     }
+    return result
+
+}
+
+DBClient.prototype.setport = async function (type,port) {
+    const sql = "INSERT INTO connection (type,port) values ('" + type + "','" + port +
+        "') ON DUPLICATE KEY UPDATE port = '" + port + "'"
+    let result = await this.query(sql)
     return result
 
 }
