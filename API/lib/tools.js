@@ -75,7 +75,8 @@ async function launchregistreddevice(eventEmitter) {
     for (var obj of modules) {
         switch (obj.type) {
             case 'zwave':
-                if (obj.port in availabledevice) {
+                if (availabledevice.includes(obj.port)) {
+                    
                     connections.zwave = new OpenZWave({
                         Logging: false,     // disable file logging (OZWLog.txt)
                         ConsoleOutput: false, // enable console logging
@@ -85,6 +86,7 @@ async function launchregistreddevice(eventEmitter) {
                         ConfigPath: './config'
                     })
                     connections.zwave.connect()
+                    console.log(connections)
                 }
                 break
             default:

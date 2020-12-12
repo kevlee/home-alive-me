@@ -17,7 +17,7 @@ function API() {
 
 function init() {
 
-    this.connection = {},
+    this.connections = {},
     this.api = Express()
     this.api.use(cors())
     this.api.use(bodyParser.urlencoded({ extended: true }))

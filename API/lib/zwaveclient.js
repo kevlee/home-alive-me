@@ -176,7 +176,7 @@ async function init(cfg) {
 // catch all events
 function onEvent(name, ...args) {
     this.lastUpdate = Date.now()
-    this.emit('event', name, ...args)
+    emitters.zwave.emit('event', name, ...args)
 }
 
 async function driverReady(homeid) {
@@ -225,7 +225,7 @@ async function driverReady(homeid) {
             debug('Error while reading zwcfg file', error.message)
         }
     }*/
-
+    emitters.zwave.emit('zwave connection',this)
     debug('Scanning network with homeid:', homeHex)
 
 }
@@ -460,7 +460,7 @@ function notification(nodeid, notif, help) {
             ozwnode.ready = ready
 
             if (ozwnode.available) {
-                this.emit('nodeStatus', ozwnode)
+                emitters.zwave.emit('nodeStatus', ozwnode)
             }
     }
 

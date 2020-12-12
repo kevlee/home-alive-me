@@ -13,14 +13,10 @@ var emitters = require('./lib/globalemitters')
 
 async function init() {
     let { err, connections } = await tools.launchregistreddevice()
-    console.log(err)
-    console.log(connections)
-    api.connections.zwave = connections.zwave
-
-    console.log(emitters.zwave)
-    emitters.zwave.on('zwave connection', () => {
+    emitters.zwave.on('zwave connection', (zwave) => {
         if (DBClient) DBClient.closeconnection()
-        DBClient = new (require('./lib/dbclient.js'))(connections.zwave)
+        DBClient = new (require('./lib/dbclient.js'))(zwave)
+        api.connections.zwave = zwave
         task = new (require('./lib/task.js'))
     })
 
