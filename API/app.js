@@ -15,9 +15,14 @@ async function init() {
     let { err, connections } = await tools.launchregistreddevice()
     emitters.zwave.on('zwave connection', (zwave) => {
         if (DBClient) DBClient.closeconnection()
-        DBClient = new (require('./lib/dbclient.js'))(zwave)
+        DBClient = new (require('./lib/dbclient.js'))(true)
         api.connections.zwave = zwave
         task = new (require('./lib/task.js'))
+    })
+    emitters.zwave.on('scan complete', function (zwave) {
+        zwave.client.requestAllConfigParams(8)
+        zwave.client.requestAllConfigParams(7)
+        zwave.client.requestAllConfigParams(4)
     })
 
 }

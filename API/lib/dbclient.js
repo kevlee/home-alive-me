@@ -4,19 +4,18 @@ var mysql = require('mysql');
 const util = require('util');
 var reqlib = require('app-root-path').require
 const COMCLASS = reqlib('./lib/classcom.js')
+var emitters = reqlib('./lib/globalemitters')
 
 
-
-function DBClient(zwave) {
+function DBClient(master) {
     if (!(this instanceof DBClient)) {
-        return new DBClient(zwave)
+        return new DBClient(master)
     }
-    init.call(this, zwave)
+    init.call(this, master)
 }
 
-async function init(zwave) {
+async function init(master) {
     this.addedclient = false
-    this.zwave = zwave
     this.db = mysql.createPool({
         host: "localhost",
         user: "zwave",
@@ -29,33 +28,28 @@ async function init(zwave) {
     this.query = util.promisify(this.db.query).bind(this.db);
 
 
-    if (zwave) {
+    if (master) {
         
         var self = this
 
         await createtable(self)
 
         // add node zwave if exist
-        this.zwave.on('node available', function (nodeid, deviceid, name) {
+        emitters.zwave.on('node available', function (nodeid, deviceid, name) {
             // add node to the homealiveme db
             addclient(self, deviceid.toString(), nodeid, name, devicetype)
         })
 
-        this.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
+        emitters.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
             
         })
 
-        this.zwave.on('value changed', function (valueId, comclass, nodeid, deviceid) {
+        emitters.zwave.on('value changed', function (valueId, comclass, nodeid, deviceid) {
             addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
         })
+        
 
-        this.zwave.on('scan complete', function () {
-            zwave.client.requestAllConfigParams(8)
-            zwave.client.requestAllConfigParams(7)
-            zwave.client.requestAllConfigParams(4)
-        })
-
-        this.zwave.on('node ready', function (ozwnode) {
+        emitters.zwave.on('node ready', function (ozwnode) {
             for (let [key, value] of Object.entries(ozwnode.values)) {
                 addvalue(self, value, value.class_id, ozwnode.node_id + "-" + ozwnode.device_id)
             }
@@ -65,7 +59,7 @@ async function init(zwave) {
             }
         })
         
-        this.zwave.on('command controller', (obj) => {
+        emitters.zwave.on('command controller', (obj) => {
             switch (true) {
                 case obj.help.includes('AddDevice'):
                     switch (true) {

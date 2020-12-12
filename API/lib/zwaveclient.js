@@ -486,7 +486,7 @@ function scanComplete() {
     }*/
 
     debug('Network scan complete. Found:', nodes.length, 'nodes')
-    emitters.zwave.emit('scan complete')
+    emitters.zwave.emit('scan complete',this)
     
 }
 
