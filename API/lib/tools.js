@@ -4,6 +4,7 @@ const reqlib = require('app-root-path').require
 const OpenZWave = reqlib('./lib/zwaveclient')
 const SerialPort = require('serialport')
 
+
 var config = {
     Logging: false,     // disable file logging (OZWLog.txt)
     ConsoleOutput: false, // enable console logging
@@ -52,7 +53,7 @@ function setport(type, port, os, connections) {
         default:
     }
 
-    if (connections.zwave) {
+    if (connections.hasOwnProperty('zwave') && connections.zwave) {
         connections.zwave.close()
         config = zwave.cfg
     }
@@ -64,7 +65,7 @@ function setport(type, port, os, connections) {
     
 }
 
-async function launchregistreddevice() {
+async function launchregistreddevice(eventEmitter) {
     var connections = {},
         err = null
     let DBClient = new (reqlib('./lib/dbclient.js'))(null)

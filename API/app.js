@@ -10,12 +10,17 @@ const tools = require('./lib/tools.js')
 
 
 
+
 async function init() {
-    let { err, connections } = await tools.launchregistreddevice()
-    
-    DBClient = new (require('./lib/dbclient.js'))(connections.zwave)
+    let { err, connections } = await tools.launchregistreddevice(eventEmitter)
     api.connections.zwave = connections.zwave
-    task = new (require('./lib/task.js'))
+
+    eventEmitter.on('zwave connection', (() => {
+        if (DBClient) DBClient.closeconnection()
+        DBClient = new (require('./lib/dbclient.js'))(connections.zwave)
+        task = new (require('./lib/task.js'))
+    }))
+
 }
 
 init()
@@ -24,7 +29,7 @@ init()
 
 process.on('SIGINT', function () {
     console.log('disconnecting...');
-    zwave.close();
+    connections.zwave.close();
     DBClient.closeconnection();
     process.exit();
 });
