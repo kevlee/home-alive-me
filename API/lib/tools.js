@@ -1,8 +1,16 @@
 /* eslint-disable camelcase */
 'use strict'
+const reqlib = require('app-root-path').require
+const OpenZWave = reqlib('./lib/zwaveclient')
+const SerialPort = require('serialport')
 
-var OpenZWave = require('./zwaveclient')
-var SerialPort = require('serialport')
+var config = {
+    Logging: false,     // disable file logging (OZWLog.txt)
+    ConsoleOutput: false, // enable console logging
+    NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
+    commandsTimeout: 30, // set time to 30 second
+    ConfigPath: './config'
+}
 
 function writeconfig(zwavecontroler,configs) {
     for (var [index, config] of Object.entries(configs)) {
@@ -24,11 +32,10 @@ async function getusblist() {
         rObj = obj.path
         return rObj;
     });
-    console.log(tabport)
     return tabport
 }
 
-function setport(type, port, os, zwave) {
+function setport(type, port, os, connections) {
     let portconfig = null
     let err = null
     if (type != "zwave") {
@@ -45,14 +52,52 @@ function setport(type, port, os, zwave) {
         default:
     }
 
-    zwave.close()
-    zwave.cfg.port = portconfig
-    zwave = new OpenZWave(zwave.cfg)
-    zwave.connect()
-    return { err, portconfig, type }
+    if (connections.zwave) {
+        connections.zwave.close()
+        config = zwave.cfg
+    }
+    config.port = portconfig
+    connections.zwave = new OpenZWave(config)
+    connections.zwave.connect()
+    return { err, portconfig, type, connections }
     
     
 }
 
+async function launchregistreddevice() {
+    var connections = {},
+        err = null
+    let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+    let modules = await DBClient.getmodulesconfigs()
+    DBClient.closeconnection()
+    let availabledevice = await getusblist()
+    for (var obj of modules) {
+        switch (obj.type) {
+            case 'zwave':
+                if (obj.port in availabledevice) {
+                    connections.zwave = new OpenZWave({
+                        Logging: false,     // disable file logging (OZWLog.txt)
+                        ConsoleOutput: false, // enable console logging
+                        NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
+                        port: '\\\\.\\' + obj.port,
+                        commandsTimeout: 30, // set time to 30 second
+                        ConfigPath: './config'
+                    })
+                    connections.zwave.connect()
+                }
+                break
+            default:
+                err = 'module config not supported yet'
+        }
+    }
+    return { err, connections}
+}
 
-module.exports = { writeconfig, writedata, getusblist, setport }
+
+module.exports = {
+    writeconfig,
+    writedata,
+    getusblist,
+    setport,
+    launchregistreddevice
+}

@@ -3,7 +3,7 @@ const cors = require('cors')
 const reqlib = require('app-root-path').require
 const bodyParser = require('body-parser')
 const { v4: uuidv4 } = require('uuid')
-const tools = require('./tools.js')
+const tools = reqlib('./lib/tools.js')
 
 global.devicetype = null
 
@@ -17,7 +17,7 @@ function API() {
 
 function init() {
 
-    this.zwave = null,
+    this.connection = {},
     this.api = Express()
     this.api.use(cors())
     this.api.use(bodyParser.urlencoded({ extended: true }))
@@ -47,7 +47,7 @@ function init() {
             global.devicetype = req.body.type
             let uuid = uuidv4()
             res.status(200).json({ 'msg': 'start enrolling', 'task_id' : uuid })
-            this.zwave.startInclusion(true)
+            this.connections.zwave.startInclusion(true)
             result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "AddDevice")
         } else {
             res.status(400).send({ error:  'no type in query' })
@@ -59,7 +59,7 @@ function init() {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)
             let uuid = uuidv4()
             res.status(200).send({ 'msg': 'start removed', 'task_id': uuid })
-            this.zwave.startExclusion(true)
+            this.connections.zwave.startExclusion(true)
             result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "RemoveDevice")
         } else {
             res.status(400).send({ error: 'no type in query' })
@@ -101,7 +101,7 @@ function init() {
 
     this.api.post('/:uuid/config/', async (req, res) => {
         if (req.params.uuid) {
-            tools.writeconfig(this.zwave,req.body)
+            tools.writeconfig(this.connections.zwave,req.body)
             res.status(200)
         } else {
             res.status(400).send({ error: 'no uuid in query' })
@@ -110,7 +110,7 @@ function init() {
 
     this.api.post('/:uuid/data/', async (req, res) => {
         if (req.params.uuid) {
-            tools.writedata(this.zwave, req.body)
+            tools.writedata(this.connections.zwave, req.body)
             res.status(200)
         } else {
             res.status(400).send({ error: 'no uuid in query' })
@@ -147,16 +147,27 @@ function init() {
 
     this.api.post('/addmodule/', async (req, res) => {
         if (req.body.port && req.body.type) {
-            let { err, portconfig, type } = await tools.setport(req.body.type, req.body.port, process.platform, this.zwave)
+            let { err, portconfig, type, connection } = await tools.setport(req.body.type, req.body.port, process.platform, this.connections)
             if (!err) {
                 let DBClient = new (reqlib('./lib/dbclient.js'))(null)
                 await DBClient.setport(req.body.type, req.body.port)
                 DBClient.closeconnection()
+                this.connection = connection
+            } else {
+                res.status(400).send({ error: err })
             }
             res.status(200).json(process.platform)
         } else {
             res.status(400).send({ error: 'missing param' })
         }
+    })
+
+    this.api.get('/modules/', async (req, res) => {
+        let modulelist = {}
+        if (this.connections.zwave) {
+            modulelist.zwave = this.connections.zwave
+        }
+        res.status(200).json(this.connections)
     })
 
 }
