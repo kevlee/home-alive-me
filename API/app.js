@@ -7,19 +7,22 @@ var DBClient
 var task
 const api = new (require('./lib/api.js'))
 const tools = require('./lib/tools.js')
-
+var emitters = require('./lib/globalemitters')
 
 
 
 async function init() {
-    let { err, connections } = await tools.launchregistreddevice(eventEmitter)
+    let { err, connections } = await tools.launchregistreddevice()
+    console.log(err)
+    console.log(connections)
     api.connections.zwave = connections.zwave
 
-    eventEmitter.on('zwave connection', (() => {
+    console.log(emitters.zwave)
+    emitters.zwave.on('zwave connection', () => {
         if (DBClient) DBClient.closeconnection()
         DBClient = new (require('./lib/dbclient.js'))(connections.zwave)
         task = new (require('./lib/task.js'))
-    }))
+    })
 
 }
 

@@ -1458,7 +1458,7 @@
     <Content Include="lib\classcom.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="lib\globalemitter.js">
+    <Content Include="lib\globalemitters.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="lib\task.js">

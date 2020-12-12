@@ -8,6 +8,7 @@ var reqlib = require('app-root-path').require,
     EventEmitter = require('events'),
     debug = reqlib('./lib/debug')('Zwave')
     
+var emitters = require('./globalemitters')
 
 debug.color = 6
 
@@ -91,11 +92,11 @@ function ZwaveClient(config) {
     if (!(this instanceof ZwaveClient)) {
         return new ZwaveClient(config)
     }
-    EventEmitter.call(this)
+    //EventEmitter.call(this)
     init.call(this, config)
 }
 
-inherits(ZwaveClient, EventEmitter)
+//inherits(ZwaveClient, EventEmitter)
 
 async function init(cfg) {
     this.inclusion = false
@@ -240,7 +241,7 @@ function connected(version) {
     debug('Zwave connected, Openzwave version:', version)
     this.status = ZWAVE_STATUS[1]
 
-    this.emitEvent('CONNECTED', this.ozwConfig)
+    //this.emitEvent('CONNECTED', this.ozwConfig)
 }
 
 function nodeRemoved(nodeid) {
@@ -251,10 +252,9 @@ function nodeRemoved(nodeid) {
     }
     debug('Node removed', nodeid)
 
-    this.emit('nodeRemoved', node)
+    emitters.zwave.emit('nodeRemoved', node)
 
     this.addEmptyNodes()
-    this.emitEvent('NODE_REMOVED', this.nodes[nodeid])
 }
 
 // Triggered when a node is added
@@ -300,7 +300,7 @@ function nodeAvailable(nodeid, nodeinfo) {
             nodeinfo.type || 'Unknown'
         )
 
-        this.emit('node available', nodeid, getDeviceID(ozwnode), nodeinfo.product)
+        emitters.zwave.emit('node available', nodeid, getDeviceID(ozwnode), nodeinfo.product)
     }
 }
 
@@ -328,7 +328,7 @@ function valueAdded(nodeid, comclass, valueId) {
             ozwnode.secure = valueId.value
         }
 
-        this.emit('value added', valueId, comclass, nodeid, getDeviceID(ozwnode))
+        emitters.zwave.emit('value added', valueId, comclass, nodeid, getDeviceID(ozwnode))
         
         debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label, valueId.value)
         
@@ -367,7 +367,7 @@ function nodeReady(nodeid, nodeinfo) {
         }*/
 
 
-        this.emit('node ready', ozwnode)
+        emitters.zwave.emit('node ready', ozwnode)
 
         debug(
             'node %d ready: %s - %s (%s)',
@@ -396,7 +396,7 @@ function valueChanged(nodeid, comclass, valueId) {
             ozwnode.values[value_id] = valueId
             // avoid changed value mesure to 0 on wake up device: to be check with not battery device
             if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.value !== 0 ) {
-                this.emit('value changed', valueId, comclass, nodeid,getDeviceID(ozwnode))
+                emitters.zwave.emit('value changed', valueId, comclass, nodeid,getDeviceID(ozwnode))
             }
         }
 
@@ -407,7 +407,7 @@ function valueChanged(nodeid, comclass, valueId) {
     // check if node is added as secure node
     if (comclass === 0x98 && valueId.index === 0) {
         ozwnode.secure = valueId.value
-        this.emit('nodeStatus', ozwnode)
+        emitters.zwave.emit('nodeStatus', ozwnode)
     }
 }
 
@@ -428,12 +428,12 @@ function valueRemoved(nodeid, comclass, instance, index) {
 
 function nodeEvent(nodeid, evtcode) {
     debug('node event', nodeid, evtcode)
-    this.emit('nodeSceneEvent', 'node', this.nodes[nodeid], evtcode)
+    emitters.zwave.emit('nodeSceneEvent', 'node', this.nodes[nodeid], evtcode)
 }
 
 function sceneEvent(nodeid, sceneCode) {
     debug('scene event', nodeid, sceneCode)
-    this.emit('nodeSceneEvent', 'scene', this.nodes[nodeid], sceneCode)
+    emitters.zwave.emit('nodeSceneEvent', 'scene', this.nodes[nodeid], sceneCode)
 }
 
 function notification(nodeid, notif, help) {
@@ -486,7 +486,7 @@ function scanComplete() {
     }*/
 
     debug('Network scan complete. Found:', nodes.length, 'nodes')
-    this.emit('scan complete')
+    emitters.zwave.emit('scan complete')
     
 }
 
@@ -506,8 +506,8 @@ function controllerCommand(nodeid, state, errcode, help) {
         nodeRemoved.call(this, nodeid)
     }
 
-    this.emitEvent('CONTROLLER_CMD', obj)
-    this.emit('command controller', obj)
+    //this.emitEvent('CONTROLLER_CMD', obj)
+    emitters.zwave.emit('command controller', obj)
 }
 
 // ------- Utils ------------------------
