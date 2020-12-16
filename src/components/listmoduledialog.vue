@@ -4,7 +4,7 @@
                md-dialog-content
                :md-click-outside-to-close="false"
                @md-clicked-outside="close()"
-               @md-opened="nodeslist()">
+               @md-opened="modulelist()">
         <md-content class="scroller md-scrollbar">
             <md-dialog-content class="list">
                 <md-table class="md-scrollbar" md-card>
@@ -26,33 +26,23 @@
                         </md-table-row>
                         <tr v-if="mustshow(infos.nodeid)">
                             <td :colspan="getlenght(infos)" rowspan="1">
-                                <listnodeinfo v-bind:nodeinfo="infos" 
+                                <listnodeinfo v-bind:nodeinfo="infos"
                                               v-bind:configs="configs"
                                               v-bind:curtainlvl="curtainlvl"
                                               @newconfig="fetchconfig"
-                                              @newdata="fetchcurtainlvl"/>
+                                              @newdata="fetchcurtainlvl" />
                             </td>
                         </tr>
                     </template>
-            </md-table>
-        </md-dialog-content>
+                </md-table>
+            </md-dialog-content>
         </md-content>
+
     </md-dialog>
 </template>
+
 <script>
-    import * as tools from '../../lib/tools.js'
-    import listnodeinfo from "./listnodeinfo.vue";
-    function initialState() {
-        return {
-            list: {},
-            showdetail: [],
-            clicked: 0,
-            configs: [],
-            curtainlvl: {},
-        }
-    }
-    export default {
-        name: 'devicelist',
+     name: 'devicelist',
         data: () => (initialState()),
         props: [
             'devicelist'
@@ -81,7 +71,7 @@
                     this.clicked = event.nodeid
                     this.fetchconfig(event.nodeuid)
                     if (event.type == 'shutter') {
-                        this.fetchcurtainlvl(event.nodeuid)
+                        this.curtainlvl = this.fetchcurtainlvl(event.nodeuid)
                     }
                 }
             },
@@ -105,27 +95,27 @@
         components: {
             listnodeinfo
         },
-        beforeMount() {
-            this.nodeslist()
-        }
-    }
 </script>
+
 <style scoped lang="scss">
-    @import "~vue-material/dist/theme/engine";
     .scroller {
         overflow: auto;
         width: 100%;
     }
+
     .diagcontent {
         overflow: auto;
         z-index: 1200;
     }
+
     .md-dialog /deep/ .md-dialog-container {
         min-width: 90%;
         min-height: 90%;
     }
+
     .md-dialog /deep/ .data {
     }
+
     .md-dialog /deep/ .md-table {
         width: 100%;
         height: 100%;

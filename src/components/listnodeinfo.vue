@@ -4,7 +4,7 @@
             <md-tab id="tab-manage" md-label="manage" v-if="nodeinfo.type == 'shutter'">
                 <md-content>
                     <label for="curtainposition">Curtain Position</label>
-                    <md-input type="range" id="curtainposition" name="curtainposition"
+                    <input type="range" id="curtainposition" name="curtainposition"
                            min="0" max="100" :value="lvl" step="25" @change="changelvl($event.target.value)"/>
                     <output id="value">{{lvl}}%</output>
 
@@ -61,7 +61,10 @@
                 }
             },
             curtainlvl: function (curtainlvl) {
-                this.getcurtainlvl(curtainlvl.value)
+                console.log(curtainlvl.value)
+                if (curtainlvl) {
+                    this.lvl = this.getcurtainlvl(curtainlvl.value)
+                }
             },
         },
         methods: {
@@ -69,38 +72,39 @@
                 //console.log(value)
             },
             getcurtainlvl(value) {
+                var lvl
                 switch (true) {
                     case value > this.matchinglvl[25]:
-                        this.lvl = 0
+                        lvl = 0
                         break
                     case value > this.matchinglvl[50]:
-                        this.lvl = 25
+                        lvl = 25
                         break
                     case value > this.matchinglvl[75]:
-                        this.lvl = 50
+                        lvl = 50
                         break
                     case value > this.matchinglvl[100]:
-                        this.lvl = 75
+                        lvl = 75
                         break
                     default:
-                        this.lvl = 100
+                        lvl = 100
                 }
+                return lvl
             },
             changelvl(value) {
                 this.lvl = value
                 this.curtainlvl.value = this.matchinglvl[value]
                 if (!this.delay) {
                     this.delay = setTimeout(() => {
-                        console.log(this.curtainlvl)
                         tools.senddata(this.curtainlvl, this.nodeinfo.nodeuid)
                     }, 2000)
                 } else {
                     clearTimeout(this.delay)
                     this.delay = setTimeout(() => {
-                        console.log(this.curtainlvl)
                         tools.senddata(this.curtainlvl, this.nodeinfo.nodeuid)
                     }, 2000)
                 }
+                
             },
             async savenodeconfig() {
                 await tools.sendconfig(this.configs, this.nodeinfo.nodeuid)

@@ -5,6 +5,7 @@
                    showNavigation = true;
                    showaddstepper = false;
                    showdeviceslist = false;
+                   showaddmodule = false;
                    " 
                    color="primary" type="filled" md-theme="drawer-toolsbar">
             <md-icon class="md-size-100x">menu</md-icon>
@@ -41,6 +42,7 @@
                               showaddstepper = true;
                               showNavigation = false;
                               showdeviceslist = false;
+                              showaddmodule = false;
                               ">
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add device</span>
@@ -53,17 +55,34 @@
                               showaddstepper = false;
                               showNavigation = false;
                               showdeviceslist = true;
+                              showaddmodule = false;
                               ">
                     <md-icon>list</md-icon>
                     <span class="md-list-item-text">Device list</span>
                     <devicelist v-bind:devicelist="showdeviceslist"
-                                @closed="showdeviceslist = false"/>
+                                @closed="showdeviceslist = false" />
                 </md-list-item>
 
                 <md-list-item>
                     <md-icon>delete</md-icon>
                     <span class="md-list-item-text">Remove device</span>
                 </md-list-item>
+
+                <md-subheader>Modules</md-subheader>
+                <md-divider></md-divider>
+                <md-list-item @click="
+                              showaddstepper = false;
+                              showNavigation = false;
+                              showdeviceslist = false;
+                              showaddmodule = true;
+                              ">
+                    <md-icon>add</md-icon>
+                    <span class="md-list-item-text">Add module</span>
+                    <addmodules v-bind:showaddmodule="showaddmodule"
+                                      @saved="showaddstepper = false"
+                                      @nodevice="showalert" />
+                </md-list-item>
+
 
             </md-list>
         </md-drawer>
@@ -74,6 +93,7 @@
 <script>
     import adddevicestepper from "./adddevicestepper.vue";
     import devicelist from "./devicelist.vue";
+    import addmodules from "./addmodules.vue";
 
     export default {
         name: 'configsidebar',
@@ -82,10 +102,12 @@
             showaddstepper: false,
             showNavigation: false,
             showdeviceslist: false,
+            showaddmodule: false,
         }),
         components: {
             adddevicestepper,
             devicelist,
+            addmodules,
         },
         methods: {
             showalert(msg) {

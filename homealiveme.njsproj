@@ -58,6 +58,9 @@
     <Content Include="src\components\configeditor.vue">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\components\listmoduledialog.vue">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\configsidebar.vue">
       <SubType>Code</SubType>
       <Publish>True</Publish>
@@ -96,6 +99,9 @@
     <Content Include="src\components\icons\shuttericon.js" />
     <Content Include="src\components\icons\switchicon.js" />
     <Content Include="src\components\listnodeinfo.vue">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\components\addmodules.vue">
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\components\stats.vue">
