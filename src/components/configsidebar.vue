@@ -80,8 +80,7 @@
                     <span class="md-list-item-text">Add module</span>
                     <addmodules v-bind:showaddmodule="showaddmodule"
                                       @saved="showaddmodule = false"
-                                      @closed="showaddmodule = false"
-                                      @nodevice="showalert" />
+                                      @closed="showaddmodule = false" />
                 </md-list-item>
 
 

@@ -26,6 +26,13 @@
                         </v-combobox>
                     </v-col>
                 </v-row>
+                <v-row justify="end">
+                    <v-btn depressed
+                           color="primary"
+                           @click="">
+                        SAVE
+                    </v-btn>
+                </v-row>
             </v-container>
         </v-card>
     </v-dialog>
@@ -67,6 +74,10 @@
                 Object.assign(this.$data, initialState());
                 this.$emit('closed')
             },
+            save() {
+                this.close()
+            }
+
         }
     }
 </script>
