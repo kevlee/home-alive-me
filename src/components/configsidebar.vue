@@ -79,7 +79,8 @@
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add module</span>
                     <addmodules v-bind:showaddmodule="showaddmodule"
-                                      @saved="showaddstepper = false"
+                                      @saved="showaddmodule = false"
+                                      @closed="showaddmodule = false"
                                       @nodevice="showalert" />
                 </md-list-item>
 

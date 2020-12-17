@@ -45,10 +45,14 @@
         primary: md-get-palette-color(green, 800)
     ));
     @import "~vue-material/dist/theme/all";
+
+
 </style>
 
 <style>
     @import url("https://fonts.googleapis.com/css?family=Material+Icons");
+    @import url("https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900");
+    @import url("https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css");
 
     #app {
         margin: 0px;
@@ -57,6 +61,10 @@
 
     body {
         margin: 0px;
+    }
+
+    html.md-theme-default {
+        overflow-y: hidden;
     }
 
     #navbar {
@@ -76,5 +84,23 @@
         right: 0px;
         z-index: 1200;
     }
+
+    ::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #e6e6e6;
+        border-left: 1px solid #dadada;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #757575;
+        border: solid 1px #e6e6e6;
+        border-radius: 10px;
+    }
+
+
+    
 </style>
 

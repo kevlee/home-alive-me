@@ -22,6 +22,7 @@
     "vue-chartjs": "^3.5.1",
     "vue-expandable-image": "^0.1.0",
     "vue-material": "^1.0.0-beta-15",
+    "vue-style-loader": "^4.1.2",
     "vue-svgicon": "^3.2.9",
     "vuetify": "^2.3.21"
   },
@@ -36,7 +37,6 @@
     "fibers": "^5.0.0",
     "node-sass": "^5.0.0",
     "sass-loader": "^10.1.0",
-    "style-loader": "^2.0.0",
     "vue-router": "^3.4.9",
     "vue-template-compiler": "^2.6.12",
     "webpack": "^4.44.2"

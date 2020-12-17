@@ -6,7 +6,7 @@
                     <label for="curtainposition">Curtain Position</label>
                     <v-slider thumb-label ticks id="curtainposition" name="curtainposition"
                               min="0" max="100" v-model="lvl" step="25" 
-                              @end="changelvl($number)" />
+                              @input="changelvl($event)" />
                     <output id="value">{{lvl}}%</output>
 
                 </md-content>
@@ -90,7 +90,6 @@
                 return lvl
             },
             changelvl(value) {
-                console.log(value)
                 this.lvl = value
                 this.curtainlvl.value = this.matchinglvl[value]
                 if (!this.delay) {
