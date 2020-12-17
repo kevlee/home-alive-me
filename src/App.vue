@@ -1,18 +1,23 @@
 <template>
     <div id="app">
-        <div id="myconfigsidebar">
-            <configsidebar />
-        </div>
-        <router-view></router-view>
-        <div id="navbar">
-            <md-bottom-bar md-type="shift" md-sync-route :md-theme="'bottom-bar-' + theme" md-fixed>
-                <md-bottom-bar-item to="/homepage/" exact md-label="Home" md-icon="home" @click.native="theme = 'blue'"></md-bottom-bar-item>
-                <md-bottom-bar-item to="/stats/" exact md-label="stats" md-icon="bar_chart" @click.native="theme = 'green'"></md-bottom-bar-item>
-            </md-bottom-bar>
-        </div>
+        <v-app>
+            <div id="myconfigsidebar">
+                <configsidebar />
+            </div>
+            <router-view></router-view>
+            <div id="navbar">
+                <md-bottom-bar md-type="shift" md-sync-route :md-theme="'bottom-bar-' + theme" md-fixed>
+                    <md-bottom-bar-item to="/homepage/" exact md-label="Home" md-icon="home" @click.native="theme = 'blue'"></md-bottom-bar-item>
+                    <md-bottom-bar-item to="/stats/" exact md-label="stats" md-icon="bar_chart" @click.native="theme = 'green'"></md-bottom-bar-item>
+                </md-bottom-bar>
+            </div>
+        </v-app>
     </div>
-    
+
 </template>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 
 <script>
     import configsidebar from "./components/configsidebar.vue"
@@ -44,6 +49,7 @@
 
 <style>
     @import url("https://fonts.googleapis.com/css?family=Material+Icons");
+
     #app {
         margin: 0px;
         padding: 0px;
@@ -52,6 +58,7 @@
     body {
         margin: 0px;
     }
+
     #navbar {
         display: inline-flex;
         align-items: flex-end;
@@ -61,11 +68,12 @@
         width: 100%;
         z-index: 1000;
     }
+
     #myconfigsidebar {
         display: flex;
         flex-direction: row-reverse;
         position: absolute;
-        right:0px;
+        right: 0px;
         z-index: 1200;
     }
 </style>

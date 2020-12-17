@@ -8,10 +8,11 @@
         <md-content class="scroller md-scrollbar">
             <md-dialog-content class="addmodule">
                 <md-field>
-                    <label for="moduletype">Module Type</label>
-                    <md-select v-model="moduletype" name="moduletype" id="moduletype">
-                        <md-option value="zwave">zwave</md-option>
-                    </md-select>
+                    <v-select :items="items"
+                              label="Outlined style"
+                              v-model="moduletype"
+                              outlined>
+                    </v-select>
                 </md-field>
             </md-dialog-content>
         </md-content>
@@ -27,6 +28,7 @@
             availablemodule: null,
             portlist: null,
             moduletype: null,
+            items: ["zwave"]
         }
     }
 
@@ -60,9 +62,8 @@
         z-index: 1200;
     }
 
-        .diagcontent /deep/ * {
-            overflow: auto;
-            z-index: 1200;
-        }
+    .md-option {
+        z-index: 1200 !important;
+    }
 
 </style>

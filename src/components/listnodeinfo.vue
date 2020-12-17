@@ -4,8 +4,9 @@
             <md-tab id="tab-manage" md-label="manage" v-if="nodeinfo.type == 'shutter'">
                 <md-content>
                     <label for="curtainposition">Curtain Position</label>
-                    <input type="range" id="curtainposition" name="curtainposition"
-                           min="0" max="100" :value="lvl" step="25" @change="changelvl($event.target.value)"/>
+                    <v-slider thumb-label ticks id="curtainposition" name="curtainposition"
+                              min="0" max="100" v-model="lvl" step="25" 
+                              @end="changelvl($number)" />
                     <output id="value">{{lvl}}%</output>
 
                 </md-content>
@@ -61,10 +62,7 @@
                 }
             },
             curtainlvl: function (curtainlvl) {
-                console.log(curtainlvl.value)
-                if (curtainlvl) {
-                    this.lvl = this.getcurtainlvl(curtainlvl.value)
-                }
+                this.lvl = this.getcurtainlvl(curtainlvl.value)
             },
         },
         methods: {
@@ -92,6 +90,7 @@
                 return lvl
             },
             changelvl(value) {
+                console.log(value)
                 this.lvl = value
                 this.curtainlvl.value = this.matchinglvl[value]
                 if (!this.delay) {
