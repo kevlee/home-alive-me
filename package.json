@@ -1,5 +1,5 @@
 {
-  "name": "HomeAliveme",
+  "name": "HomeAliveMe",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,9 +9,9 @@
     "icons": "vsvg -s src/assets/icons -t src/components/icons",
     "prebuild": "npm run icons"
   },
-  "description": "HomeAliveme",
+  "description": "HomeAliveMe",
   "author": {
-    "name": ""
+    "name": "Kévin TEMIN"
   },
   "dependencies": {
     "chart.js": "^2.9.4",
