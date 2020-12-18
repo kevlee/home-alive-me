@@ -1,17 +1,22 @@
 <template>
     <v-dialog content-class="dialog"
-              v-model="showaddmodule"
+              v-model="requireaddmodule"
+              :persistent="ispersistant()"
               @click:outside="close()">
         <v-card class="diagcontent">
             <v-card-title>
                 <span class="headline">Add Module</span>
             </v-card-title>
             <v-container class="moduleconfig">
+                <v-form ref="form" name="form"
+                        v-model="valid"
+                        lazy-validation>
                 <v-row>
                     <v-col class="d-flex" md="6">
                         <v-combobox :items="items"
                                     label="Module type"
                                     v-model="moduletype"
+                                    :rules="[v => !!v || 'Item is required']"
                                     outlined
                                     required>
                         </v-combobox>
@@ -21,6 +26,7 @@
                                     :items="portlist"
                                     label="Select port"
                                     v-model="port"
+                                    :rules="[v => !!v || 'Item is required']"
                                     outlined
                                     required>
                         </v-combobox>
@@ -29,10 +35,11 @@
                 <v-row justify="end">
                     <v-btn depressed
                            color="primary"
-                           @click="">
+                           @click="validate()">
                         SAVE
                     </v-btn>
                 </v-row>
+                </v-form>
             </v-container>
         </v-card>
     </v-dialog>
@@ -48,7 +55,9 @@
             portlist: [],
             moduletype: null,
             port: null,
-            items: ["zwave"]
+            items: ["zwave"],
+            valid: false,
+            requireaddmodule: false,
         }
     }
 
@@ -56,29 +65,45 @@
         name: 'addmodules',
         data: () => (initialState()),
         props: [
-            'showaddmodule'
+            'showaddmodule',
         ],
         watch: {
             showaddmodule: function (showaddmodule) {
                 if (showaddmodule) {
-                    this.getmodule()
+                    this.getport()
+                    this.requireaddmodule = true
                 }
             },
         },
+        mounted:
+            async function () {
+                this.getport()
+                await tools.getallmodules()
+                this.requireaddmodule = Object.keys(tools.modules).length == 0 || this.showaddmodule
+            },
         methods: {
-            async getmodule() {
-                this.availablemodule = await tools.getallmodules()
+            async getport() {
                 this.portlist = await tools.getallports()
             },
             close() {
-                Object.assign(this.$data, initialState());
-                this.$emit('closed')
+                if (!this.ispersistant()) { 
+                    this.$emit('closed')
+                    this.$refs.['form'].resetValidation()
+                    Object.assign(this.$data, initialState());
+                }
             },
-            save() {
-                this.close()
+            async validate() {
+                if (this.$refs.['form'].validate()) {
+                    await tools.setmodule(this.moduletype, this.port)
+                    await tools.getallmodules()
+                    this.close()
+                }
+                
+            },
+            ispersistant() {
+                return Object.keys(tools.modules).length == 0
             }
-
-        }
+        },
     }
 </script>
 

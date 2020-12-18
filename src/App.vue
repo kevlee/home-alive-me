@@ -21,6 +21,7 @@
 
 <script>
     import configsidebar from "./components/configsidebar.vue"
+    import * as tools from '../lib/tools.js'
     export default {
         name: 'App',
         data: () => {
@@ -30,6 +31,9 @@
         },
         components: {
             configsidebar
+        },
+        mounted: async function () {
+            await tools.getallmodules()
         }
     };
 </script>

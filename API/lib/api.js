@@ -141,7 +141,6 @@ function init() {
 
     this.api.get('/usblist/', async (req, res) => {
         let result = await tools.getusblist()
-        console.log(result)
         res.status(200).json(result)
     })
 

@@ -79,8 +79,8 @@
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add module</span>
                     <addmodules v-bind:showaddmodule="showaddmodule"
-                                      @saved="showaddmodule = false"
-                                      @closed="showaddmodule = false" />
+                                @saved="showaddmodule = false"
+                                @closed="showaddmodule = false" />
                 </md-list-item>
 
 
@@ -109,10 +109,11 @@
             devicelist,
             addmodules,
         },
+
         methods: {
             showalert(msg) {
                 alert(msg)
-            }
+            },
         }
     }
     

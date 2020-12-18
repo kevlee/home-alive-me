@@ -54,8 +54,9 @@ function setport(type, port, os, connections) {
     }
 
     if (connections.hasOwnProperty('zwave') && connections.zwave) {
+        config = connections.zwave.cfg
         connections.zwave.close()
-        config = zwave.cfg
+        
     }
     config.port = portconfig
     connections.zwave = new OpenZWave(config)
