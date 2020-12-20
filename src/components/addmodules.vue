@@ -88,12 +88,12 @@
             close() {
                 if (!this.ispersistant()) { 
                     this.$emit('closed')
-                    this.$refs.['form'].resetValidation()
+                    this.$refs.form.resetValidation()
                     Object.assign(this.$data, initialState());
                 }
             },
             async validate() {
-                if (this.$refs.['form'].validate()) {
+                if (this.$refs.form.validate()) {
                     await tools.setmodule(this.moduletype, this.port)
                     await tools.getallmodules()
                     this.close()

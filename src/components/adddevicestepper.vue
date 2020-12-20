@@ -9,7 +9,7 @@
                         <div class="processbuttton">
                             <md-button class="md-raised md-primary"
                                        @click.native="setDone('first', 'second');searchdevice()"
-                                       :disabled.native="!devicetype">
+                                       :disabled="!devicetype">
                                 Next
                             </md-button>
                         </div>

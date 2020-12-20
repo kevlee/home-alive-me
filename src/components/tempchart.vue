@@ -41,7 +41,6 @@
             }
         }
 
-        console.log(datachar)
 
         var ctx = document.getElementById('myChart');
         var myChart = new Chart(ctx, {
@@ -82,7 +81,10 @@
     export default {
         name: 'tempchart',
         computed: {
-            chartdata: function () { createchart() }
+            chartdata: function () {
+                createchart()
+                return
+            }
         }
 
     }
