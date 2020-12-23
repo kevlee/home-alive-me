@@ -31,10 +31,19 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".dockerignore">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include=".env.development">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Dockerfile">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="lib\tools.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="nginx.conf">
       <SubType>Code</SubType>
     </Content>
     <Content Include="public\favicon.ico" />
