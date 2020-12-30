@@ -1,10 +1,13 @@
 {
-  "name": "api",
-  "version": "0.0.0",
-  "description": "API",
+  "name": "ham_api",
+  "version": "1.0.0",
+  "description": "HomeAliveMe API",
   "main": "app.js",
   "author": {
-    "name": ""
+    "name": "Kévin TEMIN"
+  },
+  "scripts": {
+    "start": "node server.js"
   },
   "dependencies": {
     "app-root-path": "^3.0.0",

@@ -31,13 +31,12 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include=".dockerignore">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include=".env.development">
-      <SubType>Code</SubType>
-    </Content>
+    <Content Include=".dockerignore" />
+    <Content Include=".env.development" />
     <Content Include="Dockerfile">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="hooks\post_checkout">
       <SubType>Code</SubType>
     </Content>
     <Content Include="lib\tools.js">
@@ -94,6 +93,7 @@
   <ItemGroup>
     <Folder Include="dist\" />
     <Folder Include="lib\" />
+    <Folder Include="hooks\" />
     <Folder Include="public\" />
     <Folder Include="src\" />
     <Folder Include="src\assets\" />

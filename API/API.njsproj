@@ -1446,6 +1446,12 @@
     <Content Include="config\zwp\PA-100.xml" />
     <Content Include="config\zwp\WD-100.xml" />
     <Content Include="config\zwscene.xsd" />
+    <Content Include="Dockerfile">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="hooks\post_checkout">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="lib\api.js">
       <SubType>Code</SubType>
     </Content>
@@ -1470,6 +1476,9 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="lib\zwaveclient.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="sql\.dockerignore">
       <SubType>Code</SubType>
     </Content>
     <Content Include="sql\homealivemedb.sql" />
@@ -1706,6 +1715,7 @@
     <Folder Include="config\zwave.me\" />
     <Folder Include="config\zwp\" />
     <Folder Include="lib\" />
+    <Folder Include="hooks\" />
     <Folder Include="sql\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
