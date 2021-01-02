@@ -1,6 +1,6 @@
 [submodule "API/config"]
 	path = API/config
-	url = https://github.com/OpenZWave/open-zwave.git
+	url = https://github.com/kevlee/open-zwave.git
 [submodule "API/open-zwave"]
 	path = API/open-zwave
-	url = https://github.com/OpenZWave/open-zwave.git
+	url = https://github.com/kevlee/open-zwave.git

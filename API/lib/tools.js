@@ -10,7 +10,7 @@ var config = {
     ConsoleOutput: false, // enable console logging
     NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
     commandsTimeout: 30, // set time to 30 second
-    ConfigPath: './config'
+    ConfigPath: './config/config'
 }
 
 function writeconfig(zwavecontroler,configs) {
