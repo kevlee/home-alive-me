@@ -1,4 +1,4 @@
-FROM node-red:latest as build-stage
+FROM nodered/node-red:latest as build-stage
 WORKDIR /home-alive-me
 COPY package*.json ./
 RUN npm install
