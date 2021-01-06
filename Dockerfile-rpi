@@ -1,4 +1,6 @@
 FROM arm32v7/node as build-stage
+ENV TOOL_NODE_FLAGS="--max-old-space-size=2048"
+ENV npm_config_arch=arm32v7
 WORKDIR /home-alive-me
 COPY package*.json ./
 RUN npm install
