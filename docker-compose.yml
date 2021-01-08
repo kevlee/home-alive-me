@@ -1,22 +1,22 @@
 version: '3.8'
 
 services:
-	ham-web:
-	image: kevlee/ham-web-rpi
-	container_name: ham-web
-	ports:
-    - 80:80
+    ham-web:
+    image: kevlee/ham-web-rpi
+    container_name: ham-web
+    ports:
+        - 80:80
     networks:
-      lan:
+        lan:
         ipv4_address: 192.168.1.2
 
 
 networks:
-  lan:
-    name: lan
-    driver: macvlan
-    driver_opts:
-      parent: wlan0 #your wifi interface
-    ipam:
-      config:
-        - subnet: 192.168.1.0/24
+    lan:
+        name: lan
+        driver: macvlan
+        driver_opts:
+            parent: wlan0 #your wifi interface
+        ipam:
+            config:
+                - subnet: 192.168.1.0/24
