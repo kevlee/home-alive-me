@@ -33,6 +33,9 @@
   <ItemGroup>
     <Content Include=".dockerignore" />
     <Content Include=".env.development" />
+    <Content Include="docker-compose.yml">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="Dockerfile">
       <SubType>Code</SubType>
     </Content>

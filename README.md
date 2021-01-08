@@ -1,5 +1,10 @@
 # VuejsApp1
 
+
+Generate images for rasbian
+
+docker buildx build --platform linux/arm/v7 -f .\Dockerfile-rpi -t ham-web-rpi .
+
 prepare the raspberry
 
 
@@ -11,6 +16,7 @@ sudo apt-get install matchbox-window-manager
 sudo apt-get install lightdm
 
 sudo apt-get install docker
+sudo apt-get install docker-compose
 
 
 edit the startup config
