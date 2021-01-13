@@ -28,3 +28,16 @@ sudo raspi-config
 go to menu 3 Boot Options
 go to menu B1 Choose whether to boot into a desktop environment or the command line 
 Select B4 Desktop Autologin Desktop GUI, automatically logged in as 'pi' user 
+
+
+create docker network
+pi@raspberrypi:~ $ docker network create -d macvlan --subnet=192.168.1.192/24 --gateway=192.168.1.254 --ip-range=192.168.1.192/27 --aux-address='host=192.168.1.192' -o parent=wlan0 -o macvlan_mode=bridge vlan
+5838671ecb94916d749c3c9281a6c5c1744a910035f271277a28cebf5384c9dd
+pi@raspberrypi:~ $ sudo ip link add vlan link wlan0 type macvlan mode bridge
+pi@raspberrypi:~ $ sudo ip addr add 192.168.1.192/27 dev vlan metric 300
+pi@raspberrypi:~ $ sudo ifconfig vlan up
+pi@raspberrypi:~ $ docker run -d --net=vlan --ip 192.168.1.193 -p 192.168.1.193:80:80 --expose=80 kevlee/ham-web-rpi
+
+
+workarround use ip addr add directly on wlan0 (durty solution)
+
