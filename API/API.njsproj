@@ -1448,6 +1448,9 @@
     <Content Include="Dockerfile">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Dockerfile-rpi">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="hooks\post_checkout">
       <SubType>Code</SubType>
     </Content>

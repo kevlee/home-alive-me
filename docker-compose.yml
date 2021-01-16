@@ -3,11 +3,13 @@ version: '2.3'
 services:
  ham-web:
   image: kevlee/ham-web-rpi
+  restart: unless-stopped
   container_name: ham-web
   ports:
    - 192.168.1.193:80:80
  ham-api:
   image: kevlee/ham-api-rpi
+  restart: unless-stopped
   container_name: ham-api
   ports:
    - 192.168.1.194:80:80
