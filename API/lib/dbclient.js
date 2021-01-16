@@ -17,10 +17,10 @@ function DBClient(master) {
 async function init(master) {
     this.addedclient = false
     this.db = mysql.createPool({
-        host: "localhost",
-        user: "zwave",
-        password: "ppI3h4uwaz*UgT#s",
-        database: "homealiveme",
+        host: process.env.MYSQL_HOST ||"localhost",
+        user: process.env.MYSQL_USER || "zwave",
+        password: process.env.MYSQL_PASSWORD || "ppI3h4uwaz*UgT#s",
+        database: process.env.MYSQL_DATABASE || "homealiveme",
         connectionLimit: 100, 
         multipleStatements: true
     });

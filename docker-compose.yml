@@ -1,22 +1,29 @@
-version: '3.8'
+version: '2.3'
 
 services:
-    ham-web:
-    image: kevlee/ham-web-rpi
-    container_name: ham-web
-    ports:
-        - 80:80
-    networks:
-        lan:
-        ipv4_address: 192.168.1.2
-
-
-networks:
-    lan:
-        name: lan
-        driver: macvlan
-        driver_opts:
-            parent: wlan0 #your wifi interface
-        ipam:
-            config:
-                - subnet: 192.168.1.0/24
+ ham-web:
+  image: kevlee/ham-web-rpi
+  container_name: ham-web
+  ports:
+   - 192.168.1.193:80:80
+ ham-api:
+  image: kevlee/ham-api-rpi
+  container_name: ham-api
+  ports:
+   - 192.168.1.194:80:80
+  privileged: true
+  devices:
+   - '/dev:/dev'
+  env_file:
+   -./API/env.production
+ db:
+  image: mysql:5.7
+  restart: unless-stopped
+  env_file:
+   -./API/env.production
+  ports:
+   - '192.168.1.195:3306:3306'
+  expose:
+   - '3306'
+  volumes:
+   - my-db:/var/lib/mysql

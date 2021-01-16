@@ -29,6 +29,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".env.production">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="app.js" />
     <Content Include="config\config\2gig\ct100.xml" />
     <Content Include="config\config\2gig\ct101.xml" />

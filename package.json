@@ -11,7 +11,7 @@
   },
   "description": "HomeAliveMe",
   "author": {
-    "name": "K�vin TEMIN"
+    "name": "Kevin TEMIN"
   },
   "dependencies": {
     "chart.js": "^2.9.4",

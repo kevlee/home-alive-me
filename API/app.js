@@ -8,6 +8,7 @@ var task
 const api = new (require('./lib/api.js'))
 const tools = require('./lib/tools.js')
 var emitters = require('./lib/globalemitters')
+const env = require('dotenv-flow').config()
 
 
 

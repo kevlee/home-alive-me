@@ -30,7 +30,7 @@ go to menu B1 Choose whether to boot into a desktop environment or the command l
 Select B4 Desktop Autologin Desktop GUI, automatically logged in as 'pi' user 
 
 
-create docker network
+create docker network warning only work with eth no tested yet
 pi@raspberrypi:~ $ docker network create -d macvlan --subnet=192.168.1.192/24 --gateway=192.168.1.254 --ip-range=192.168.1.192/27 --aux-address='host=192.168.1.192' -o parent=wlan0 -o macvlan_mode=bridge vlan
 5838671ecb94916d749c3c9281a6c5c1744a910035f271277a28cebf5384c9dd
 pi@raspberrypi:~ $ sudo ip link add vlan link wlan0 type macvlan mode bridge
