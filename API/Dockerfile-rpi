@@ -1,13 +1,21 @@
-FROM arm32v7/node
+FROM chrisns/openzwave:debian as build
+
+FROM arm32v7/node:buster
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # Install app dependencies
 
+COPY --from=build /openzwave/libopenzwave.so* /lib/
+COPY --from=build /openzwave/config /usr/local/etc/openzwave
+COPY --from=build /usr/local/include/openzwave /usr/local/include/openzwave
+
+ENV LD_LIBRARY_PATH /lib
+
 COPY . .
 
-RUN npm install
+RUN npm install --unsafe-perm --no-update-notifier --no-fund --only=production
 
 EXPOSE 80
-CMD [ "npm", "start" ]
+CMD [ "npm" , "run" , "start" ]

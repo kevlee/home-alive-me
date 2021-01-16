@@ -29,6 +29,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".dockerignore">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include=".env.production">
       <SubType>Code</SubType>
     </Content>
