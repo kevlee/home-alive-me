@@ -104,12 +104,6 @@ async function init(master) {
 
 function createtable(self) {
 
-    self.db.query('CREATE TABLE IF NOT EXISTS nodes ' +
-        '(nodeid INT NOT NULL,' +
-        'nodeuid VARCHAR(32) PRIMARY KEY,' +
-        'productname MEDIUMTEXT DEFAULT NULL,'+
-        'type TINYTEXT DEFAULT NULL)')
-
     Object.keys(COMCLASS).forEach(function (id) {
         self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] +
             '(nodeuid VARCHAR(32) NOT NULL,' +
@@ -121,34 +115,6 @@ function createtable(self) {
             'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
 
     })
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Temperature ' +
-        '(nodeuid VARCHAR(32) NOT NULL,' +
-        'label TINYTEXT DEFAULT NULL,' +
-        'value TINYTEXT DEFAULT NULL,' +
-        'units VARCHAR(32) DEFAULT NULL, ' +
-        'date DATETIME DEFAULT NULL, ' +
-        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
-
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Lux ' +
-        '(nodeuid VARCHAR(32) NOT NULL,' +
-        'label TINYTEXT DEFAULT NULL,' +
-        'value TINYTEXT DEFAULT NULL,' +
-        'units VARCHAR(32) DEFAULT NULL, ' +
-        'date DATETIME DEFAULT NULL, ' +
-        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Task ' +
-        '(id VARCHAR(36) PRIMARY KEY,' +
-        "taskname VARCHAR(36) DEFAULT NULL," +
-        "status TINYTEXT," +
-        'result JSON,' +
-        'date DATETIME DEFAULT NULL )')
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Connection ' +
-        '(type VARCHAR(36) PRIMARY KEY,' +
-        "port VARCHAR(36) NOT NULL )")
 
     //self.db.query('TRUNCATE task');
 

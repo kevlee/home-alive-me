@@ -1483,9 +1483,6 @@
     <Content Include="lib\zwaveclient.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="sql\.dockerignore">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="sql\homealivemedb.sql" />
   </ItemGroup>
   <ItemGroup>
