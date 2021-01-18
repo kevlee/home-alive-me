@@ -20,8 +20,6 @@ services:
    ./API/.env.production
   depends_on:
    - db
-  links:
-   - db:ham-db
  db:
   image: hypriot/rpi-mysql
   container_name: ham-db

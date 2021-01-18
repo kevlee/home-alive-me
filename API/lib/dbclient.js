@@ -342,7 +342,12 @@ DBClient.prototype.setport = async function (type,port) {
 
 DBClient.prototype.getmodulesconfigs = async function () {
     const sql = "SELECT * FROM connection"
-    let result = await this.query(sql)
+    let result 
+    try {
+        result = await this.query(sql)
+    } catch (error) {
+        return []
+    }
     return result
 
 }
