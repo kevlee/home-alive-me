@@ -29,7 +29,7 @@ services:
    ham-network:
     ipv4_address: '192.168.2.3'
  ham-db:
-  image: hypriot/rpi-mysql
+  image: yobasystems/alpine-mariadb
   container_name: ham-db
   restart: unless-stopped
   env_file:

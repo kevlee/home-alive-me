@@ -1,7 +1,7 @@
 CREATE DATABASE  IF NOT EXISTS `homealiveme`;
 USE `homealiveme`;
 
-GRANT ALL PRIVILEGES ON homealiveme.* TO 'zwave'@'%' IDENTIFIED BY 'password';
+
 -- MySQL dump 10.13  Distrib 8.0.22, for Win64 (x86_64)
 --
 -- Host: localhost    Database: homealiveme
@@ -66,10 +66,10 @@ CREATE TABLE IF NOT EXISTS `task` (
 );
 
 --
--- Table structure for table `Connection`
+-- Table structure for table `connection`
 --
 
-CREATE TABLE IF NOT EXISTS `Connection` (
+CREATE TABLE IF NOT EXISTS `connection` (
   `type` varchar(36) NOT NULL,
   `port` varchar(36) NOT NULL,
   PRIMARY KEY (`type`)
