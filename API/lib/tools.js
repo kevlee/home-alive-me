@@ -66,7 +66,7 @@ function setport(type, port, os, connections) {
     
 }
 
-async function launchregistreddevice(eventEmitter) {
+async function launchregistreddevice(os) {
     var connections = {},
         err = null
     let DBClient = new (reqlib('./lib/dbclient.js'))(null)
@@ -78,14 +78,23 @@ async function launchregistreddevice(eventEmitter) {
             switch (obj.type) {
                 case 'zwave':
                     if (availabledevice.includes(obj.port)) {
-
+                        var portconfig = null
+                        switch (os) {
+                            case 'win32':
+                                portconfig = '\\\\.\\' + obj.port
+                                break
+                            case 'linux':
+                                portconfig = obj.port
+                                break
+                            default:
+                        }
                         connections.zwave = new OpenZWave({
                             Logging: false,     // disable file logging (OZWLog.txt)
                             ConsoleOutput: false, // enable console logging
                             NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
-                            port: '\\\\.\\' + obj.port,
+                            port: portconfig,
                             commandsTimeout: 30, // set time to 30 second
-                            ConfigPath: './config'
+                            ConfigPath: './config/config'
                         })
                         connections.zwave.connect()
                         console.log(connections)
