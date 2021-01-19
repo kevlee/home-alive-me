@@ -14,9 +14,12 @@ const env = require('dotenv-flow').config()
 
 async function init() {
     let { err, connections } = await tools.launchregistreddevice()
-    emitters.zwave.on('scan complete', function (zwave) {
+    emitters.zwave.on('zwave connection', function () {
         if (DBClient) DBClient.closeconnection()
         DBClient = new (require('./lib/dbclient.js'))(true)
+    })
+    emitters.zwave.on('scan complete', function (zwave) {
+
         api.connections.zwave = zwave
         task = new (require('./lib/task.js'))
         zwave.client.requestAllConfigParams(8)
