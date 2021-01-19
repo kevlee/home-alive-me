@@ -22,7 +22,7 @@ services:
   env_file:
    ./API/.env.production
   depends_on:
-   - db
+   - ham-db
   links:
    - ham-db:mysqldb
   networks:
