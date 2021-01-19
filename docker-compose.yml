@@ -7,6 +7,9 @@ services:
   container_name: ham-web
   ports:
    - 192.168.1.193:80:80
+  networks:
+   ham-network:
+    ipv4_address: '192.168.2.2'
  ham-api:
   image: kevlee/ham-api-rpi
   restart: unless-stopped
@@ -20,7 +23,12 @@ services:
    ./API/.env.production
   depends_on:
    - db
- db:
+  links:
+   - ham-db:mysqldb
+  networks:
+   ham-network:
+    ipv4_address: '192.168.2.3'
+ ham-db:
   image: hypriot/rpi-mysql
   container_name: ham-db
   restart: unless-stopped
@@ -31,8 +39,18 @@ services:
   expose:
    - 3306
   volumes:
-   - my-db:/var/lib/mysql
+   - ham-db:/var/lib/mysql
    - ./API/sql:/docker-entrypoint-initdb.d
+  networks:
+   ham-network:
+    ipv4_address: '192.168.2.4'
 
 volumes:
-  my-db:
+  ham-db:
+
+networks:
+  ham-network:
+   ipam:
+    driver: default
+     config:
+      - subnet: 192.168.2.0/24

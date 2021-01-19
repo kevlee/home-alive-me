@@ -7,6 +7,8 @@ WORKDIR /usr/src/app
 
 # Install app dependencies
 
+RUN apt-get update && apt-get install -y udev
+
 COPY --from=build /openzwave/libopenzwave.so* /lib/
 COPY --from=build /openzwave/config /usr/local/etc/openzwave
 COPY --from=build /usr/local/include/openzwave /usr/local/include/openzwave
