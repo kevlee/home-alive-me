@@ -1,5 +1,7 @@
 CREATE DATABASE  IF NOT EXISTS `homealiveme` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `homealiveme`;
+
+GRANT ALL PRIVILEGES ON *.* TO 'zwave'@'%' IDENTIFIED BY 'password';
 -- MySQL dump 10.13  Distrib 8.0.22, for Win64 (x86_64)
 --
 -- Host: localhost    Database: homealiveme
