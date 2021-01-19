@@ -1,7 +1,7 @@
 CREATE DATABASE  IF NOT EXISTS `homealiveme` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `homealiveme`;
 
-GRANT ALL PRIVILEGES ON *.* TO 'zwave'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON homealiveme.* TO 'zwave'@'%' IDENTIFIED BY 'password';
 -- MySQL dump 10.13  Distrib 8.0.22, for Win64 (x86_64)
 --
 -- Host: localhost    Database: homealiveme
@@ -22,7 +22,8 @@ GRANT ALL PRIVILEGES ON *.* TO 'zwave'@'%' IDENTIFIED BY 'password';
 --
 -- Table structure for table `nodes`
 --
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE IF NOT EXISTS `nodes` (
   `nodeid` int NOT NULL,
   `nodeuid` varchar(32) NOT NULL,
@@ -36,7 +37,8 @@ CREATE TABLE IF NOT EXISTS `nodes` (
 --
 -- Table structure for table `temperature`
 --
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE IF NOT EXISTS `temperature` (
   `nodeuid` varchar(32) NOT NULL,
   `label` tinytext,
@@ -52,7 +54,8 @@ CREATE TABLE IF NOT EXISTS `temperature` (
 --
 -- Table structure for table `lux`
 --
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE IF NOT EXISTS `lux` (
   `nodeuid` varchar(32) NOT NULL,
   `label` tinytext,
@@ -69,7 +72,8 @@ CREATE TABLE IF NOT EXISTS `lux` (
 --
 -- Table structure for table `task`
 --
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE IF NOT EXISTS `task` (
   `id` varchar(36) NOT NULL,
   `taskname` varchar(36) DEFAULT NULL,

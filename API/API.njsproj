@@ -1484,6 +1484,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="sql\homealivemedb.sql" />
+    <Content Include="sql\user.sql">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
