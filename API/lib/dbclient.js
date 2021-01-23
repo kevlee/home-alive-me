@@ -41,7 +41,7 @@ async function init(master) {
         })
 
         emitters.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
-            
+            addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
         })
 
         emitters.zwave.on('value changed', function (valueId, comclass, nodeid, deviceid) {
