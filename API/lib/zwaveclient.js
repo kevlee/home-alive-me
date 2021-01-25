@@ -281,6 +281,7 @@ function nodeAdded(nodeid) {
         status: NODE_STATUS[0] // initializing
     }
     this.addEmptyNodes()
+    this.client.requestAllConfigParams(nodeid)
     debug('Node added', nodeid)
     
 }
@@ -369,7 +370,7 @@ function nodeReady(nodeid, nodeinfo) {
             }
         }*/
 
-
+        
         emitters.zwave.emit('node ready', ozwnode)
 
         debug(

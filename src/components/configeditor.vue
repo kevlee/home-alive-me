@@ -19,13 +19,13 @@
         ],
         methods: {
             isswtichonoff(config) {
-                return JSON.stringify(Object.assign({}, config.availablevalue)) == JSON.stringify({ 0: 'Disable', 1: 'Enable' })
+                return JSON.stringify(Object.keys(config.availablevalue)) == JSON.stringify(["0", "1"])
             },
             loadnewconf(index) {
-                if (this.configs[index].value == 'Disable') {
-                    this.configs[index].value = 'Enable'
+                if (this.configs[index].value == this.configs[index].availablevalue[0]) {
+                    this.configs[index].value = this.configs[index].availablevalue[1]
                 } else {
-                    this.configs[index].value = 'Disable'
+                    this.configs[index].value = this.configs[index].availablevalue[0]
                 }
                 this.dataset.update = !this.dataset.update
             },

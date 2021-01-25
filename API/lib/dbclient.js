@@ -37,7 +37,9 @@ async function init(master) {
         // add node zwave if exist
         emitters.zwave.on('node available', function (nodeid, deviceid, name) {
             // add node to the homealiveme db
-            addclient(self, deviceid.toString(), nodeid, name, devicetype)
+            if (name && devicetype) {
+                addclient(self, deviceid.toString(), nodeid, name, devicetype)
+            }
         })
 
         emitters.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
@@ -71,6 +73,7 @@ async function init(master) {
                             break
                         case obj.help.includes('Completed'):
                             if (obj.nodeid > 1 && obj.nodeid < 255) {
+                                updatetaskstatus(self, 'AddDevice', 'Completed')
                                 this.addedclient = true
                             }
                             break
