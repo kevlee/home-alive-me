@@ -1192,6 +1192,7 @@
     <Content Include="config\config\oomi\ft118.xml" />
     <Content Include="config\config\options.xml" />
     <Content Include="config\config\options.xsd" />
+    <Content Include="config\config\ozwcache_0xeea9d3cc.xml" />
     <Content Include="config\config\OZW_Log.txt" />
     <Content Include="config\config\permundo\psc132zw.xml" />
     <Content Include="config\config\permundo\psc234zw.xml" />
