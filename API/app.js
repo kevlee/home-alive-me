@@ -21,9 +21,6 @@ async function init() {
     })
     emitters.zwave.on('scan complete', function (zwave) {
         task = new (require('./lib/task.js'))
-        zwave.client.requestAllConfigParams(8)
-        zwave.client.requestAllConfigParams(7)
-        zwave.client.requestAllConfigParams(4)
     })
 
 }
