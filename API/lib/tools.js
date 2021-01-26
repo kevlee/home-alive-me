@@ -10,7 +10,7 @@ var config = {
     ConsoleOutput: false, // enable console logging
     NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
     commandsTimeout: 30, // set time to 30 second
-    ConfigPath: './config'
+    ConfigPath: './config/config/'
 }
 
 function writeconfig(zwavecontroler,configs) {
@@ -66,32 +66,43 @@ function setport(type, port, os, connections) {
     
 }
 
-async function launchregistreddevice(eventEmitter) {
+async function launchregistreddevice(os) {
     var connections = {},
         err = null
     let DBClient = new (reqlib('./lib/dbclient.js'))(null)
     let modules = await DBClient.getmodulesconfigs()
     DBClient.closeconnection()
     let availabledevice = await getusblist()
-    for (var obj of modules) {
-        switch (obj.type) {
-            case 'zwave':
-                if (availabledevice.includes(obj.port)) {
-                    
-                    connections.zwave = new OpenZWave({
-                        Logging: false,     // disable file logging (OZWLog.txt)
-                        ConsoleOutput: false, // enable console logging
-                        NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
-                        port: '\\\\.\\' + obj.port,
-                        commandsTimeout: 30, // set time to 30 second
-                        ConfigPath: './config'
-                    })
-                    connections.zwave.connect()
-                    console.log(connections)
-                }
-                break
-            default:
-                err = 'module config not supported yet'
+    if (modules.length > 0) {
+        for (var obj of modules) {
+            switch (obj.type) {
+                case 'zwave':
+                    if (availabledevice.includes(obj.port)) {
+                        var portconfig = null
+                        switch (os) {
+                            case 'win32':
+                                portconfig = '\\\\.\\' + obj.port
+                                break
+                            case 'linux':
+                                portconfig = obj.port
+                                break
+                            default:
+                        }
+                        connections.zwave = new OpenZWave({
+                            Logging: false,     // disable file logging (OZWLog.txt)
+                            ConsoleOutput: false, // enable console logging
+                            NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
+                            port: portconfig,
+                            commandsTimeout: 30, // set time to 30 second
+                            ConfigPath: './config/config/'
+                        })
+                        connections.zwave.connect()
+                        console.log(connections)
+                    }
+                    break
+                default:
+                    err = 'module config not supported yet'
+            }
         }
     }
     return { err, connections}

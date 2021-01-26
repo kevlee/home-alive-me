@@ -1,15 +1,21 @@
 {
-  "name": "api",
-  "version": "0.0.0",
-  "description": "API",
+  "name": "ham_api",
+  "version": "1.0.0",
+  "description": "HomeAliveMe API",
   "main": "app.js",
   "author": {
-    "name": ""
+    "name": "Kevin TEMIN"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node app.js",
+    "serve": "cross-env NODE_ENV=development node app.js"
   },
   "dependencies": {
     "app-root-path": "^3.0.0",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "debug": "^4.2.0",
+    "dotenv-flow": "^3.2.0",
     "express": "^4.17.1",
     "mysql": "^2.18.1",
     "openzwave-shared": "^1.7.2",

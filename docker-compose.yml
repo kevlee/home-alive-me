@@ -1,0 +1,58 @@
+version: '2.3'
+
+services:
+ ham-web:
+  image: kevlee/ham-web-rpi
+  restart: unless-stopped
+  container_name: ham-web
+  ports:
+   - 192.168.1.193:80:80
+  networks:
+   ham-network:
+    ipv4_address: '192.168.2.2'
+ ham-api:
+  image: kevlee/ham-api-rpi
+  restart: unless-stopped
+  container_name: ham-api
+  ports:
+   - 192.168.1.194:80:80
+  privileged: true
+  devices:
+   - '/dev:/dev'
+  env_file:
+   ./API/.env.production
+  depends_on:
+   - ham-db
+  links:
+   - ham-db:mysqldb
+  networks:
+   ham-network:
+    ipv4_address: '192.168.2.3'
+ ham-db:
+  image: yobasystems/alpine-mariadb
+  container_name: ham-db
+  restart: unless-stopped
+  env_file:
+   ./API/.env.production
+  ports:
+   - 192.168.1.195:3306:3306
+  expose:
+   - 3306
+  extra_hosts:
+   - "gateway:192.168.2.1"
+  volumes:
+   - ham-db:/var/lib/mysql
+   - ./API/sql:/docker-entrypoint-initdb.d
+  networks:
+   ham-network:
+    ipv4_address: '192.168.2.4'
+
+volumes:
+  ham-db:
+
+networks:
+  ham-network:
+   ipam:
+    driver: default
+    config:
+     - subnet: 192.168.2.0/24

@@ -54,7 +54,7 @@
             configs: function (configs) {
                 for (var config in configs) {
                     var label = configs[config].label
-                    if (configs[config].value == 'Enable') {
+                    if (configs[config].value == configs[config].availablevalue[1]) {
                         this.newconfig[label] = true
                     } else {
                         this.newconfig[label] = false

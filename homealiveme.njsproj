@@ -31,13 +31,21 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include=".dockerignore">
+    <Content Include=".dockerignore" />
+    <Content Include=".env.development" />
+    <Content Include=".env.production">
       <SubType>Code</SubType>
     </Content>
-    <Content Include=".env.development">
+    <Content Include="docker-compose.yml">
       <SubType>Code</SubType>
     </Content>
     <Content Include="Dockerfile">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Dockerfile-rpi">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="hooks\post_checkout">
       <SubType>Code</SubType>
     </Content>
     <Content Include="lib\tools.js">
@@ -94,6 +102,7 @@
   <ItemGroup>
     <Folder Include="dist\" />
     <Folder Include="lib\" />
+    <Folder Include="hooks\" />
     <Folder Include="public\" />
     <Folder Include="src\" />
     <Folder Include="src\assets\" />

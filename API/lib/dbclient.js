@@ -17,10 +17,10 @@ function DBClient(master) {
 async function init(master) {
     this.addedclient = false
     this.db = mysql.createPool({
-        host: "localhost",
-        user: "zwave",
-        password: "ppI3h4uwaz*UgT#s",
-        database: "homealiveme",
+        host: process.env.APP_MYSQL_HOST || "localhost",
+        user: process.env.MYSQL_USER || "zwave",
+        password: process.env.MYSQL_PASSWORD || "ppI3h4uwaz*UgT#s",
+        database: process.env.MYSQL_DATABASE || "homealiveme",
         connectionLimit: 100, 
         multipleStatements: true
     });
@@ -37,11 +37,13 @@ async function init(master) {
         // add node zwave if exist
         emitters.zwave.on('node available', function (nodeid, deviceid, name) {
             // add node to the homealiveme db
-            addclient(self, deviceid.toString(), nodeid, name, devicetype)
+            if (name != "" && devicetype != "") {
+                addclient(self, deviceid.toString(), nodeid, name, devicetype)
+            }
         })
 
         emitters.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
-            
+            addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
         })
 
         emitters.zwave.on('value changed', function (valueId, comclass, nodeid, deviceid) {
@@ -71,6 +73,7 @@ async function init(master) {
                             break
                         case obj.help.includes('Completed'):
                             if (obj.nodeid > 1 && obj.nodeid < 255) {
+                                updatetaskstatus(self, 'AddDevice', 'Completed')
                                 this.addedclient = true
                             }
                             break
@@ -104,12 +107,6 @@ async function init(master) {
 
 function createtable(self) {
 
-    self.db.query('CREATE TABLE IF NOT EXISTS nodes ' +
-        '(nodeid INT NOT NULL,' +
-        'nodeuid VARCHAR(32) PRIMARY KEY,' +
-        'productname MEDIUMTEXT DEFAULT NULL,'+
-        'type TINYTEXT DEFAULT NULL)')
-
     Object.keys(COMCLASS).forEach(function (id) {
         self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] +
             '(nodeuid VARCHAR(32) NOT NULL,' +
@@ -121,34 +118,6 @@ function createtable(self) {
             'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
 
     })
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Temperature ' +
-        '(nodeuid VARCHAR(32) NOT NULL,' +
-        'label TINYTEXT DEFAULT NULL,' +
-        'value TINYTEXT DEFAULT NULL,' +
-        'units VARCHAR(32) DEFAULT NULL, ' +
-        'date DATETIME DEFAULT NULL, ' +
-        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
-
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Lux ' +
-        '(nodeuid VARCHAR(32) NOT NULL,' +
-        'label TINYTEXT DEFAULT NULL,' +
-        'value TINYTEXT DEFAULT NULL,' +
-        'units VARCHAR(32) DEFAULT NULL, ' +
-        'date DATETIME DEFAULT NULL, ' +
-        'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Task ' +
-        '(id VARCHAR(36) PRIMARY KEY,' +
-        "taskname VARCHAR(36) DEFAULT NULL," +
-        "status TINYTEXT," +
-        'result JSON,' +
-        'date DATETIME DEFAULT NULL )')
-
-    self.db.query('CREATE TABLE IF NOT EXISTS Connection ' +
-        '(type VARCHAR(36) PRIMARY KEY,' +
-        "port VARCHAR(36) NOT NULL )")
 
     //self.db.query('TRUNCATE task');
 
@@ -342,7 +311,12 @@ DBClient.prototype.setport = async function (type,port) {
 
 DBClient.prototype.getmodulesconfigs = async function () {
     const sql = "SELECT * FROM connection"
-    let result = await this.query(sql)
+    let result 
+    try {
+        result = await this.query(sql)
+    } catch (error) {
+        return []
+    }
     return result
 
 }
