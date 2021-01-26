@@ -76,6 +76,7 @@ You have to connect the raspberrypi to your wifi with the raspbian software :
 - Launch application:
 
 		cd home-alive-me && docker-compose up -d
+		chromium-browser --kiosk 192.168.1.193
 
 
 ## Development GUIDE
