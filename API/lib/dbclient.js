@@ -222,14 +222,18 @@ DBClient.prototype.gettempstat = async function (_callback,param) {
         db.query(sql, function (err, result, fields) {
             let data = {}
             let struct = []
-            for (var i of result) {
-                var row = Object.assign({}, i)
-                struct.push({
-                    value: row.value, units: row.units, date: row.date
-                })
-                data[row.nodeuid] = struct
+            if (result) {
+                for (var i of result) {
+                    var row = Object.assign({}, i)
+                    struct.push({
+                        value: row.value, units: row.units, date: row.date
+                    })
+                    data[row.nodeuid] = struct
+                }
+                resolve(data)
+            } else {
+                resolve([])
             }
-            resolve(data)
         })
     })
 
