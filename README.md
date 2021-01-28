@@ -98,8 +98,10 @@ You have to connect the raspberrypi to your wifi with the raspbian software :
 
 ### Generate images for rasbian
 
+	#in home-alive-me folder
 	docker buildx build --platform linux/arm/v7 -f .\Dockerfile-rpi -t ham-web-rpi .
-	docker buildx build --platform linux/arm/v7 -f .\API\Dockerfile-rpi -t ham-api-rpi .
+	#in home-alive-me/API folder
+	docker buildx build --platform linux/arm/v7 -f .\Dockerfile-rpi -t ham-api-rpi .
 
 ### Ethernet connection (not tested):
 

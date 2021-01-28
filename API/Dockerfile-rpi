@@ -20,4 +20,4 @@ COPY . .
 RUN npm install --unsafe-perm --no-update-notifier --no-fund --only=production
 
 EXPOSE 80
-CMD [ "npm" , "run" , "start" ]
+CMD [ "npm", "start" ]
