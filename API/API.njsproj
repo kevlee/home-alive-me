@@ -1521,6 +1521,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="sql\homealivemedb.sql" />
+    <Content Include="sql\migrate\migrate-1.1.0.sql">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="sql\user.sql">
       <SubType>Code</SubType>
     </Content>
@@ -1760,6 +1763,7 @@
     <Folder Include="lib\" />
     <Folder Include="hooks\" />
     <Folder Include="sql\" />
+    <Folder Include="sql\migrate\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>
