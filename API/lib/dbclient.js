@@ -123,6 +123,7 @@ function createtable(self) {
 
 }
 
+
 function addclient(self,uid, nodeid, name, type) {
     // don't change databases if node exist
     let sql = "INSERT INTO nodes (nodeid,nodeuid,productname,type)  values ('"
@@ -169,6 +170,22 @@ function updatetaskstatus(self, type, status, result=null) {
             "' WHERE taskname = '" + type + "'"
     }
     self.db.query(sql)
+}
+
+DBClient.prototype.addroom = async function (name) {
+    // don't change databases if room name exist
+    let db = this.db
+    let roomname = db.escape(name)
+    let sql = "INSERT INTO rooms (name)  values (" + roomname +
+        ") ON DUPLICATE KEY UPDATE name = " + roomname
+    await this.query(sql);
+}
+
+DBClient.prototype.getrooms = async function () {
+    // don't change databases if room name exist
+    let sql = "SELECT * from rooms"
+    let result = await this.query(sql)
+    return result;
 }
 
 DBClient.prototype.addtemplog = async function (_callback) {
@@ -250,7 +267,6 @@ DBClient.prototype.inittask = async function (_callback,uuid,type) {
     let now = new Date().toISOString().slice(0, 19).replace('T', ' ')
     let sql = "INSERT INTO task (id,taskname,status,result,date) values " +
         "('" + uuid + "','" + type + "','processing','{}','" + now + "')"
-    console.log(global.devicetype)
     await db.query(sql)
 }
 
