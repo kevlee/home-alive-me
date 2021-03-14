@@ -30,7 +30,7 @@
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add room</span>
                     <addroom v-bind:showaddroom="showaddroom"
-                             @closed="showaddroom = false"   />
+                             @closed="showaddroom = false" />
                 </md-list-item>
 
                 <md-list-item>
@@ -38,10 +38,7 @@
                     <span class="md-list-item-text">Remove room</span>
                 </md-list-item>
 
-                <md-list-item>
-                    <md-icon>list</md-icon>
-                    <span class="md-list-item-text">Room list</span>
-                </md-list-item>
+                <roomlist @open="showNavigation = false;"/>
 
                 <md-subheader>Devices</md-subheader>
                 <md-divider></md-divider>
@@ -103,6 +100,7 @@
     import devicelist from "./devicelist.vue";
     import addmodules from "./addmodules.vue";
     import addroom from "./addroom.vue";
+    import roomlist from "./roomlist.vue";
 
     export default {
         name: 'configsidebar',
@@ -113,12 +111,14 @@
             showdeviceslist: false,
             showaddmodule: false,
             showaddroom: false,
+            showroomlist: false,
         }),
         components: {
             adddevicestepper,
             devicelist,
             addmodules,
             addroom,
+            roomlist,
         },
 
         methods: {

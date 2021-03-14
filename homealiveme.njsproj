@@ -128,6 +128,9 @@
     <Content Include="src\components\addmodules.vue">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\components\roomlist.vue">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\stats.vue">
       <SubType>Code</SubType>
     </Content>
