@@ -57,6 +57,18 @@ function init() {
         }
     })
 
+    this.api.delete('/room/', async (req, res) => {
+        if (req.body.name) {
+            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+            result = await DBClient.removeroom(req.body.name)
+            DBClient.closeconnection()
+            res.status(200).send()
+        } else {
+            res.status(400).send({ error: 'no name in query' })
+        }
+
+    })
+
     this.api.get('/room/', async (req, res) => {
         try {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)

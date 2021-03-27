@@ -1,53 +1,66 @@
 <template>
-    <v-dialog content-class="dialog"
-              v-model="showaddroom"
-              persistent
-              @click:outside="close()">
-        <v-card class="diagcontent">
-            <v-card-title>
-                <span class="headline">Add Room</span>
-            </v-card-title>
-            <v-container class="moduleconfig">
-                <v-form ref="form" name="form"
-                        v-model="valid"
-                        lazy-validation>
-                    <v-row>
-                        <v-col class="d-flex">
-                            <v-text-field :rules="ruleroomname"
-                                          outlined
-                                          label="room name"
-                                          v-model="roomname"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row class="d-flex">
-                        <v-col class="d-flex">
-                            <v-btn class="mr-auto" depressed
-                                   color="secondary"
-                                   @click="close()">
-                                CANCEL
-                            </v-btn>
-                            <v-btn class="ml-auto" depressed
-                                   color="primary"
-                                   @click="validate()">
-                                SAVE
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </v-form>
-            </v-container>
-        </v-card>
-    </v-dialog>
+    <v-container class="addroom">
+        <slot name="activator" :on="on" :attrs="[showaddroom]">
+        </slot>
+
+            <v-dialog content-class="dialog"
+                      v-model="showaddroomoredit"
+                      persistent
+                      max-width="500px"
+                      @click:outside="close()">
+                <v-card class="diagcontent">
+                    <v-card-title>
+                        <slot name="title">
+                            <span class="headline">Add Room</span>
+                        </slot>
+                    </v-card-title>
+                    
+                    <v-container class="moduleconfig">
+                        <v-form ref="form" name="form"
+                                v-model="valid"
+                                lazy-validation>
+                            <v-row>
+                                <v-col class="d-flex">
+                                    <v-text-field :rules="ruleroomname"
+                                                  outlined
+                                                  label="room name"
+                                                  v-model="roomdata"></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row class="d-flex">
+                                <v-col class="d-flex">
+                                    <v-btn class="mr-auto" depressed
+                                           color="secondary"
+                                           @click="close()">
+                                        CANCEL
+                                    </v-btn>
+                                    <v-btn class="ml-auto" depressed
+                                           color="primary"
+                                           @click="validate()">
+                                        SAVE
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-form>
+                    </v-container>
+                </v-card>
+            </v-dialog>
+    </v-container>
 </template>
 
 <script>
     import * as tools from '../../lib/tools.js'
 
+
     function initialState() {
         return {
             valid: false,
             roomname: "",
+            showaddroom: false,
         }
     }
+
+   
 
     export default {
         name: 'addroom',
@@ -58,11 +71,28 @@
                     value => (value || '').length <= 50 || 'Max 50 characters',
                 ]
             }
-            return Object.assign({}, initialState(), rules)
+            let on = {
+                on: {
+                    click: () => { this.showaddroom = true },
+                }
+            }
+            return Object.assign({}, initialState(), rules, on)
         },
-        props: [
-            'showaddroom',
-        ],
+        props:
+            [
+                'newroom',
+                'editedItem'
+            ],
+        computed: {
+            showaddroomoredit() { return this.newroom || this.showaddroom },
+            roomdata() {
+                let nameItem = ""
+                if (this.editedItem && this.editedItem.name ) {
+                    nameItem = this.editedItem.name
+                }
+                return this.roomname + nameItem
+            }
+        },
         methods: {
             close() {
                 this.$emit('closed')
@@ -82,15 +112,12 @@
 
 <style scoped>
 
-    .dialog {
-        width: 600px;
+    .addroom {
+        width: 30%;
     }
 
     .diagcontent {
         overflow: auto;
     }
 
-    .moduleconfig {
-        min-width: 600px;
-    }
 </style>

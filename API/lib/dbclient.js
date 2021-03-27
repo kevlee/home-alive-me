@@ -182,10 +182,16 @@ DBClient.prototype.addroom = async function (name) {
 }
 
 DBClient.prototype.getrooms = async function () {
-    // don't change databases if room name exist
     let sql = "SELECT * from rooms"
     let result = await this.query(sql)
     return result;
+}
+
+DBClient.prototype.removeroom = async function (name) {
+    let db = this.db
+    let id = db.escape(name)
+    const sql = "DELETE FROM rooms WHERE name = " + "'" + name + "'"
+    let result = await this.query(sql)
 }
 
 DBClient.prototype.addtemplog = async function (_callback) {
