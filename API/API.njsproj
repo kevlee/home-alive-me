@@ -1497,6 +1497,9 @@
     <Content Include="lib\api.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="lib\api_ressources\rooms.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="lib\debug.js">
       <SubType>Code</SubType>
     </Content>
@@ -1762,6 +1765,7 @@
     <Folder Include="config\config\zwp\" />
     <Folder Include="lib\" />
     <Folder Include="hooks\" />
+    <Folder Include="lib\api_ressources\" />
     <Folder Include="sql\" />
     <Folder Include="sql\migrate\" />
   </ItemGroup>

@@ -4,6 +4,7 @@ const reqlib = require('app-root-path').require
 const bodyParser = require('body-parser')
 const { v4: uuidv4 } = require('uuid')
 const tools = reqlib('./lib/tools.js')
+const rooms = reqlib('./lib/api_ressources/rooms.js')
 
 global.devicetype = null
 
@@ -41,45 +42,7 @@ function init() {
         }
     })
 
-    this.api.post('/room/', async (req, res) => {
-        try {
-            if (req.body.name) {
-                let DBClient = new (reqlib('./lib/dbclient.js'))(null)
-                await DBClient.addroom(req.body.name)
-                DBClient.closeconnection()
-                res.status(200).send()
-            } else {
-                res.status(400).send({ error: 'no name in query' })
-            }
-        }
-        catch (e) {
-            res.status(400).send({ error: e.message })
-        }
-    })
-
-    this.api.delete('/room/', async (req, res) => {
-        if (req.body.name) {
-            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
-            result = await DBClient.removeroom(req.body.name)
-            DBClient.closeconnection()
-            res.status(200).send()
-        } else {
-            res.status(400).send({ error: 'no name in query' })
-        }
-
-    })
-
-    this.api.get('/room/', async (req, res) => {
-        try {
-            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
-            result = await DBClient.getrooms(req.body.name)
-            DBClient.closeconnection()
-            res.status(200).send(result)
-        }
-        catch (e) {
-            res.status(400).send({ error: e.message })
-        }
-    })
+    rooms.init(this.api)
 
     this.api.post('/adddevice/', async (req, res) => {
         if (req.body.type) {

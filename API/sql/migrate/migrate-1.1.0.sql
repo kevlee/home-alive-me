@@ -5,12 +5,15 @@ USE `homealiveme`;
 --
 
 CREATE TABLE IF NOT EXISTS `rooms` (
-  `name` varchar(50) NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL UNIQUE,
   `temperature` decimal DEFAULT 0.0  ,
   `lux` decimal DEFAULT 0.0 ,
-  PRIMARY KEY (`name`)
+  PRIMARY KEY (`id`,`name`)
 ) ;
 
 #add in node table the room location
-ALTER TABLE `nodes` ADD COLUMN `name` varchar(50);
-ALTER TABLE `nodes` ADD CONSTRAINT `nodes_ibfk_1` FOREIGN KEY (`name`) REFERENCES `rooms` (`name`);
+ALTER TABLE `nodes` ADD COLUMN IF NOT EXISTS `name` varchar(50);
+ALTER TABLE `nodes` ADD CONSTRAINT  `nodes_ibfk_1` FOREIGN KEY IF NOT EXISTS(`name`) REFERENCES `rooms` (`name`)
+ ON DELETE SET NULL
+ ON UPDATE CASCADE;
