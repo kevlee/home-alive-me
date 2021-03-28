@@ -85,13 +85,19 @@
             ],
         computed: {
             showaddroomoredit() { return this.newroom || this.showaddroom },
-            roomdata() {
-                let nameItem = ""
-                if (this.editedItem && this.editedItem.name ) {
-                    nameItem = this.editedItem.name
+            roomdata: {
+                get: function () {
+                    let nameItem = ""
+                    if (this.roomname == "" && this.editedItem && this.editedItem.name) {
+                        return this.editedItem.name
+                    }
+                    return this.roomname
+                },
+                set: function (value) {
+                    this.roomname = value
                 }
-                return this.roomname + nameItem
             }
+
         },
         methods: {
             close() {
@@ -101,7 +107,8 @@
             },
             async validate() {
                 if (this.$refs.form.validate()) {
-                    await tools.addroom(this.roomname)
+                    console.log(this.roomdata)
+                    await tools.addroom(this.roomdata)
                     this.close()
                 }
 
