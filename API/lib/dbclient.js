@@ -1,10 +1,14 @@
 /* eslint-disable camelcase */
 'use strict'
-var mysql = require('mysql');
-const util = require('util');
+
+var mysql = require('mysql')
+const util = require('util')
+const { addvalue } = require("./db_method/nodevalue")
+const { addclient, removeclient } = require("./db_method/zwavenode")
 var reqlib = require('app-root-path').require
-const COMCLASS = reqlib('./lib/classcom.js')
+const { COMCLASS } = require("./classcom")
 var emitters = reqlib('./lib/globalemitters')
+const room = require("./db_method/room")
 
 
 function DBClient(master) {
@@ -13,6 +17,7 @@ function DBClient(master) {
     }
     init.call(this, master)
 }
+
 
 async function init(master) {
     this.addedclient = false
@@ -60,7 +65,7 @@ async function init(master) {
                 self.addedclient = false
             }
         })
-        
+
         emitters.zwave.on('command controller', (obj) => {
             switch (true) {
                 case obj.help.includes('AddDevice'):
@@ -119,47 +124,7 @@ function createtable(self) {
 
     })
 
-    //self.db.query('TRUNCATE task');
-
 }
-
-
-function addclient(self,uid, nodeid, name, type) {
-    // don't change databases if node exist
-    let sql = "INSERT INTO nodes (nodeid,nodeuid,productname,type)  values ('"
-        + nodeid + "','" + nodeid + "-" + uid + "','" + name + "','" + type +
-        "') ON DUPLICATE KEY UPDATE nodeuid = nodeuid "
-    self.db.query(sql);
-}
-
-function removeclient(self, nodeid) {
-    const sql = "DELETE FROM nodes WHERE nodeid = '" + nodeid + "'"
-    self.db.query(sql)  
-}
-
-
-
-function addvalue(self, valueId, comclass, uid) {
-    try {
-        let choices = {}
-        if (valueId.values) {
-            choices = JSON.stringify(Object.assign({}, valueId.values))
-        } else {
-            choices = "{}"
-        }
-        let sql = 'INSERT INTO ' + COMCLASS[comclass] +
-            ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
-            "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices + "')" +
-            "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'"
-        self.db.query(sql)
-
-    } catch (error) {
-        console.error(error);
-        console.log(comclass);
-    }
-}
-
-
 
 function updatetaskstatus(self, type, status, result=null) {
     let sql = "UPDATE task SET status = '" +
@@ -172,14 +137,8 @@ function updatetaskstatus(self, type, status, result=null) {
     self.db.query(sql)
 }
 
-DBClient.prototype.addroom = async function (name) {
-    // don't change databases if room name exist
-    let db = this.db
-    let roomname = db.escape(name)
-    let sql = "INSERT INTO rooms (name)  values (" + roomname +
-        ") ON DUPLICATE KEY UPDATE name = " + roomname
-    await this.query(sql);
-}
+DBClient.prototype.addroom = room.addroom
+
 
 DBClient.prototype.getrooms = async function () {
     let sql = "SELECT * from rooms"
@@ -188,11 +147,12 @@ DBClient.prototype.getrooms = async function () {
 }
 
 DBClient.prototype.removeroom = async function (name) {
-    let db = this.db
-    let id = db.escape(name)
-    const sql = "DELETE FROM rooms WHERE name = " + "'" + name + "'"
-    let result = await this.query(sql)
-}
+    let db = this.db;
+    let id = db.escape(name);
+    const sql = "DELETE FROM rooms WHERE name = " + "'" + name + "'";
+    let result = await this.query(sql);
+};
+
 
 DBClient.prototype.addtemplog = async function (_callback) {
     let db = this.db

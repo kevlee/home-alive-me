@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid')
 const tools = reqlib('./lib/tools.js')
 const rooms = reqlib('./lib/api_ressources/rooms.js')
 
+
 global.devicetype = null
 
 function API() {
