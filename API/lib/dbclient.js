@@ -137,21 +137,13 @@ function updatetaskstatus(self, type, status, result=null) {
     self.db.query(sql)
 }
 
+/***************** ROOM MANAGEMENT *******************/
+
 DBClient.prototype.addroom = room.addroom
-
-
-DBClient.prototype.getrooms = async function () {
-    let sql = "SELECT * from rooms"
-    let result = await this.query(sql)
-    return result;
-}
-
-DBClient.prototype.removeroom = async function (name) {
-    let db = this.db;
-    let id = db.escape(name);
-    const sql = "DELETE FROM rooms WHERE name = " + "'" + name + "'";
-    let result = await this.query(sql);
-};
+DBClient.prototype.getroom = room.getroom
+DBClient.prototype.getrooms = room.getrooms
+DBClient.prototype.updateroom = room.updateroom
+DBClient.prototype.removeroom = room.removeroom
 
 
 DBClient.prototype.addtemplog = async function (_callback) {

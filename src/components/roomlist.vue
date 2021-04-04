@@ -22,7 +22,7 @@
                         <addroom v-bind:newroom="newroom"
                                  v-bind:editedItem="editedItem"
                                   @click:outside ="close"
-                                  @closed="close;initialize()">
+                                  @closed="close();initialize()">
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn color="primary"
                                        light

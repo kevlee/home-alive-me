@@ -33,9 +33,9 @@ function init(API) {
 
     API.put('/room/:id', async (req, res) => {
         try {
-            if (req.body.name) {
+            if (req.params.id && req.body.name) {
                 let DBClient = new (reqlib('./lib/dbclient.js'))(null)
-                await DBClient.addroom(req.body.name)
+                await DBClient.updateroom(req.params.id, req.body.name)
                 DBClient.closeconnection()
                 res.status(200).send()
             } else {
