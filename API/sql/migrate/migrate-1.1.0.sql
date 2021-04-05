@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `rooms` (
 ) ;
 
 #add in node table the room location
-ALTER TABLE `nodes` ADD COLUMN IF NOT EXISTS `name` varchar(50);
-ALTER TABLE `nodes` ADD CONSTRAINT  `nodes_ibfk_1` FOREIGN KEY IF NOT EXISTS(`name`) REFERENCES `rooms` (`name`)
+ALTER TABLE `nodes` ADD COLUMN IF NOT EXISTS `roomname` varchar(50);
+ALTER TABLE `nodes` ADD CONSTRAINT  `nodes_ibfk_1` FOREIGN KEY IF NOT EXISTS(`roomname`) REFERENCES `rooms` (`name`)
  ON DELETE SET NULL
  ON UPDATE CASCADE;

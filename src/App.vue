@@ -1,9 +1,8 @@
 <template>
     <div id="app">
         <v-app>
-            <div id="myconfigsidebar">
-                <configsidebar />
-            </div>
+            <background />
+            <configsidebar />
             <router-view></router-view>
             <div id="navbar">
                 <md-bottom-bar md-type="shift" md-sync-route :md-theme="'bottom-bar-' + theme" md-fixed>
@@ -22,6 +21,8 @@
 <script>
     import configsidebar from "./components/configsidebar.vue"
     import * as tools from '../lib/tools.js'
+    import background from "./components/background.vue";
+
     export default {
         name: 'App',
         data: () => {
@@ -30,7 +31,8 @@
             }
         },
         components: {
-            configsidebar
+            configsidebar,
+            background
         },
         mounted: async function () {
             await tools.getallmodules()
@@ -79,14 +81,6 @@
         bottom: 0px;
         width: 100%;
         z-index: 1000;
-    }
-
-    #myconfigsidebar {
-        display: flex;
-        flex-direction: row-reverse;
-        position: absolute;
-        right: 0px;
-        z-index: 1200;
     }
 
     ::-webkit-scrollbar {

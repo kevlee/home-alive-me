@@ -2,14 +2,19 @@
     <md-dialog-content class="nodedetails">
         <md-tabs>
             <md-tab id="tab-manage" md-label="manage" v-if="nodeinfo.type == 'shutter'">
-                <md-content>
-                    <label for="curtainposition">Curtain Position</label>
-                    <v-slider thumb-label ticks id="curtainposition" name="curtainposition"
-                              min="0" max="100" v-model="lvl" step="25" 
-                              @input="changelvl($event)" />
-                    <output id="value">{{lvl}}%</output>
-
-                </md-content>
+                <v-form flat>
+                    <v-container>
+                        <v-slider label="Curtain Position"
+                                  ticks id="curtainposition"
+                                  name="curtainposition"
+                                  min="0" max="100" v-model="lvl" step="25"
+                                  @input="changelvl($event)" >
+                            <template v-slot:append>
+                                <div id="value">{{lvl}}%</div>
+                            </template>
+                        </v-slider>
+                    </v-container>
+                </v-form>
             </md-tab>
             <md-tab id="tab-home" md-label="Config" v-if="configs">
                 <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>

@@ -3,12 +3,12 @@
               scrollable
               >
         <template v-slot:activator="{ on, attrs }">
-            <md-list-item @click="emitopen()"
+            <v-list-item @click="emitopen()"
                           v-bind="attrs"
                           v-on="on">
                 <md-icon>list</md-icon>
                 <span class="md-list-item-text">Room list</span>
-            </md-list-item>
+            </v-list-item>
         </template>
         <v-card>
             <v-data-table :headers="headers"
@@ -135,6 +135,7 @@
 
             async emitopen() {
                 this.initialize()
+                this.roomlist=true
                 this.$emit('open')
             },
 
@@ -188,5 +189,6 @@
     .roomlist {
         min-width: 90%;
         min-height: 90%;
+        z-index:1200;
     }
 </style>

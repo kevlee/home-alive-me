@@ -1,13 +1,17 @@
 <template>
-    <v-dialog
-              scrollable>
+    <v-dialog scrollable
+              v-model="dialog">
         <template v-slot:activator="{ on, attrs }">
-            <md-list-item @click="emitopen()"
-                          v-bind="attrs"
-                          v-on="on">
-                <md-icon>list</md-icon>
-                <span class="md-list-item-text">Device list</span>
-            </md-list-item>
+            <v-list-item @click="emitopen()"
+                         v-bind="attrs"
+                         v-on="on">
+                <v-list-item-icon>
+                    <v-icon>fas fa-list</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    <v-list-item-title class="v-list-item-text">Device list</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
         </template>
         <v-card class="scroller">
             <v-data-table :headers="headers"
@@ -39,14 +43,15 @@
         </v-card>
     </v-dialog>
 </template>
+
 <script>
     import * as tools from '../../lib/tools.js'
     import listnodeinfo from "./listnodeinfo.vue";
 
     function initialState() {
         let data = {
+            dialog: false,
             list: {},
-            showdetail: [],
             clicked: 0,
             configs: [],
             curtainlvl: {},
@@ -117,11 +122,13 @@
 
             async emitopen() {
                 initialState()
+                this.dialog=true
                 this.$emit('open')
             },
 
             close() {
                 Object.assign(this.$data, initialState());
+                this.dialog = false
                 this.$emit('closed')
             },
 
