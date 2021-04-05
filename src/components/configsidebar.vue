@@ -20,24 +20,7 @@
 
                 <md-subheader>Rooms</md-subheader>
                 <md-divider></md-divider>
-                <md-list-item @click="
-                              showaddroom = true;
-                              showaddstepper = false;
-                              showNavigation = false;
-                              showdeviceslist = false;
-                              showaddmodule = false;
-                              ">
-                    <md-icon>add</md-icon>
-                    <span class="md-list-item-text">Add room</span>
-                    <addroom v-bind:showaddroom="showaddroom"
-                             @closed="showaddroom = false" />
-                </md-list-item>
-
-                <md-list-item>
-                    <md-icon>delete</md-icon>
-                    <span class="md-list-item-text">Remove room</span>
-                </md-list-item>
-
+                
                 <roomlist @open="showNavigation = false;"/>
 
                 <md-subheader>Devices</md-subheader>
@@ -56,17 +39,7 @@
                                       @nodevice="showalert" />
                 </md-list-item>
 
-                <md-list-item @click="
-                              showaddstepper = false;
-                              showNavigation = false;
-                              showdeviceslist = true;
-                              showaddmodule = false;
-                              ">
-                    <md-icon>list</md-icon>
-                    <span class="md-list-item-text">Device list</span>
-                    <devicelist v-bind:devicelist="showdeviceslist"
-                                @closed="showdeviceslist = false" />
-                </md-list-item>
+                <devicelist @open="showNavigation = false;" />
 
                 <md-list-item>
                     <md-icon>delete</md-icon>

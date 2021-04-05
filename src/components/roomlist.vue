@@ -64,7 +64,7 @@
                 <template v-slot:no-data>
                     <v-btn color="primary"
                            @click="initialize">
-                        Reset
+                        Reload
                     </v-btn>
                 </template>
             </v-data-table>
@@ -110,8 +110,6 @@
         },
 
         async mounted() {
-            var roomlist = await tools.getroom()
-            console.log(roomlist)
             this.initialize()
         },
 

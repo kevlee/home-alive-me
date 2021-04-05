@@ -90,7 +90,7 @@
     }
 
     ::-webkit-scrollbar {
-        height: 5px;
+        width: 10px;
     }
 
     ::-webkit-scrollbar-track {

@@ -11,7 +11,7 @@
 
                 </md-content>
             </md-tab>
-            <md-tab id="tab-home" md-label="Config" v-if="configs[0]">
+            <md-tab id="tab-home" md-label="Config" v-if="configs">
                 <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
                 <div class="processbuttton">
                     <md-button class="md-raised md-primary save"
@@ -52,6 +52,7 @@
         ],
         watch: {
             configs: function (configs) {
+                console.log(configs)
                 for (var config in configs) {
                     var label = configs[config].label
                     if (configs[config].value == configs[config].availablevalue[1]) {
