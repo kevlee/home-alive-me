@@ -16,6 +16,10 @@ import * as svgicon from 'vue-svgicon'
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
 
+import AsyncComputed from 'vue-async-computed'
+
+Vue.use(AsyncComputed)
+
 
 Vue.use(Vuetify)
 Vue.use(VueMaterial);

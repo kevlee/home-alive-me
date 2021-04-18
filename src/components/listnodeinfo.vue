@@ -1,22 +1,37 @@
 <template>
-    <md-dialog-content class="nodedetails">
-        <md-tabs>
-            <md-tab id="tab-manage" md-label="manage" v-if="nodeinfo.type == 'shutter'">
+    <v-container class="nodedetails">
+        <v-tabs v-model="tab">
+            <v-tab key="tab-manage" label="manage">
+                Manage
+            </v-tab>
+            <v-tab key="tab-home" label="Config" v-if="configs">
+               Configuration
+            </v-tab>
+        </v-tabs>
+        <v-tabs-items v-model="tab">
+            <v-tab-item key="tab-manage">
                 <v-form flat>
-                    <v-container>
+                    <v-container v-if="nodeinfo.type == 'shutter'">
                         <v-slider label="Curtain Position"
                                   ticks id="curtainposition"
                                   name="curtainposition"
                                   min="0" max="100" v-model="lvl" step="25"
-                                  @input="changelvl($event)" >
+                                  @input="changelvl($event)">
                             <template v-slot:append>
                                 <div id="value">{{lvl}}%</div>
                             </template>
                         </v-slider>
                     </v-container>
+                    <v-container>
+                        <v-select :items="roomlist"
+                                  item-text="name"
+                                  item-value="name"
+                                  label="Room">
+                        </v-select>
+                    </v-container>
                 </v-form>
-            </md-tab>
-            <md-tab id="tab-home" md-label="Config" v-if="configs">
+            </v-tab-item>
+            <v-tab-item key="tab-home">
                 <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
                 <div class="processbuttton">
                     <md-button class="md-raised md-primary save"
@@ -24,9 +39,9 @@
                         SAVE
                     </md-button>
                 </div>
-            </md-tab>
-        </md-tabs>
-    </md-dialog-content>
+            </v-tab-item>
+        </v-tabs-items>
+    </v-container>
 </template>
 
 <script>
@@ -44,7 +59,8 @@
                 75: 0x20,
                 100:0x00
             },
-            delay : null,
+            delay: null,
+            tab: null,
         }
     }
     export default {
@@ -55,9 +71,14 @@
             'configs',
             'curtainlvl'
         ],
+        asyncComputed: {
+            roomlist: async function () {
+                return await tools.getroom()
+            }
+        }
+        ,
         watch: {
             configs: function (configs) {
-                console.log(configs)
                 for (var config in configs) {
                     var label = configs[config].label
                     if (configs[config].value == configs[config].availablevalue[1]) {

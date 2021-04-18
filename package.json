@@ -36,6 +36,7 @@
     "eslint-plugin-vue": "4.7.1",
     "node-sass": "^5.0.0",
     "sass-loader": "^10.1.0",
+    "vue-async-computed": "^3.9.0",
     "vue-router": "^3.4.9",
     "vue-template-compiler": "^2.6.12"
   },
