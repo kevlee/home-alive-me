@@ -2,9 +2,9 @@ const Express = require('express')
 const cors = require('cors')
 const reqlib = require('app-root-path').require
 const bodyParser = require('body-parser')
-const { v4: uuidv4 } = require('uuid')
 const tools = reqlib('./lib/tools.js')
 const rooms = reqlib('./lib/api_ressources/rooms.js')
+const dongle = reqlib('./lib/api_ressources/dongle.js')
 
 
 global.devicetype = null
@@ -45,30 +45,7 @@ function init() {
 
     rooms.init(this.api)
 
-    this.api.post('/adddevice/', async (req, res) => {
-        if (req.body.type) {
-            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
-            global.devicetype = req.body.type
-            let uuid = uuidv4()
-            res.status(200).json({ 'msg': 'start enrolling', 'task_id' : uuid })
-            this.connections.zwave.startInclusion(true)
-            result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "AddDevice")
-        } else {
-            res.status(400).send({ error:  'no type in query' })
-        }
-    })
-
-    this.api.post('/removedevice/', async (req, res) => {
-        if (req.body.type) {
-            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
-            let uuid = uuidv4()
-            res.status(200).send({ 'msg': 'start removed', 'task_id': uuid })
-            this.connections.zwave.startExclusion(true)
-            result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "RemoveDevice")
-        } else {
-            res.status(400).send({ error: 'no type in query' })
-        }
-    })
+    dongle.init(this.api,this.connections)
 
     this.api.get('/task/:uuid', async (req, res) => {
         if (req.params.uuid) {

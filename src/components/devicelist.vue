@@ -32,7 +32,6 @@
                 <template v-slot:expanded-item="{ headers, item }">
                     <td :colspan="headers.length">
                         <listnodeinfo v-bind:nodeinfo="item"
-                                      v-bind:configs="configs"
                                       v-bind:curtainlvl="curtainlvl"
                                       @newconfig="fetchconfig"
                                       @newdata="fetchcurtainlvl" />

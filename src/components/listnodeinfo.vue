@@ -23,13 +23,20 @@
                         </v-slider>
                     </v-container>
                     <v-container>
-                        <v-select :items="roomlist"
+                        <v-select v-model="moduleroom"
+                                  :items="roomlist"
                                   item-text="name"
-                                  item-value="name"
+                                  item-value="id"
                                   label="Room">
                         </v-select>
                     </v-container>
                 </v-form>
+                <div class="processbuttton">
+                    <md-button class="md-raised md-primary save"
+                               @click="savenoderoom()">
+                        SAVE
+                    </md-button>
+                </div>
             </v-tab-item>
             <v-tab-item key="tab-home">
                 <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
@@ -61,36 +68,44 @@
             },
             delay: null,
             tab: null,
+            moduleroom: null,
         }
     }
     export default {
         name: 'listnodeinfo',
-        data: () => (initialState()),
+        data: () => {
+            return initialState()
+        },
         props: [
             'nodeinfo',
-            'configs',
             'curtainlvl'
         ],
         asyncComputed: {
-            roomlist: async function () {
-                return await tools.getroom()
-            }
-        }
-        ,
-        watch: {
-            configs: function (configs) {
-                for (var config in configs) {
-                    var label = configs[config].label
-                    if (configs[config].value == configs[config].availablevalue[1]) {
+            configs: async function () {
+                let nodeconfigs = await tools.fetchconfig(this.nodeinfo.nodeuid)
+                for (var config in nodeconfigs) {
+                    var label = nodeconfigs[config].label
+                    if (nodeconfigs[config].value == nodeconfigs[config].availablevalue[1]) {
                         this.newconfig[label] = true
                     } else {
                         this.newconfig[label] = false
                     }
                 }
+                return nodeconfigs
             },
+            roomlist: async function () {
+                let list = await tools.getroom()
+                list.map(item => item.header = "")
+                console.log(list)
+                return list
+            },
+
+        }
+        ,
+        watch: {
             curtainlvl: function (curtainlvl) {
                 this.lvl = this.getcurtainlvl(curtainlvl.value)
-            },
+            }
         },
         methods: {
             setcurtain(value) {
@@ -135,6 +150,10 @@
                 await tools.sendconfig(this.configs, this.nodeinfo.nodeuid)
                 this.$emit('newconfig', this.nodeinfo.nodeuid)
             },
+            async savenoderoom() {
+                console.log(this.moduleroom)
+            },
+            
         },
         components: {
             configeditor,
