@@ -26,7 +26,7 @@ function init(API,connections) {
     })
 
     API.post('/reset/', async (req, res) => {
-        connections.zwave.client.hardReset()
+        connections.zwave.client.softReset()
         res.status(200).send("OK")
     })
 
