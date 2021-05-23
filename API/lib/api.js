@@ -147,7 +147,7 @@ function init() {
         if (this.connections.zwave) {
             modulelist.zwave = this.connections.zwave
         }
-        res.status(200).json(this.connections)
+        res.status(200).json(modulelist)
     })
 
 }

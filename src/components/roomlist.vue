@@ -116,7 +116,7 @@
         methods: {
             async initialize() {
                 var roomlist = await tools.getroom()
-                if (roomlist) {
+                if (roomlist && roomlist.length > 0 ) {
                     this.headers = []
                     for (var h of Object.keys(roomlist[0])) {
                         this.headers.push(

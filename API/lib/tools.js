@@ -50,6 +50,9 @@ function setport(type, port, os, connections) {
         case 'linux':
             portconfig = port
             break
+        case 'darwin':
+            portconfig = port.replace('tty', 'cu')
+            break
         default:
     }
 

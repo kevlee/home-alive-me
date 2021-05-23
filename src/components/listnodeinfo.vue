@@ -24,6 +24,7 @@
                     </v-container>
                     <v-container>
                         <v-select v-model="moduleroom"
+                                  @click="getrooms"
                                   :items="roomlist"
                                   item-text="name"
                                   item-value="id"
@@ -69,6 +70,7 @@
             delay: null,
             tab: null,
             moduleroom: null,
+            roomlist: [],
         }
     }
     export default {
@@ -93,12 +95,7 @@
                 }
                 return nodeconfigs
             },
-            roomlist: async function () {
-                let list = await tools.getroom()
-                list.map(item => item.header = "")
-                console.log(list)
-                return list
-            },
+
 
         }
         ,
@@ -153,6 +150,10 @@
             async savenoderoom() {
                 console.log(this.moduleroom)
             },
+            async getrooms(){
+                let list = await tools.getroom()
+                this.roomlist = list 
+            }
             
         },
         components: {

@@ -107,7 +107,7 @@
             },
             async validate() {
                 if (this.$refs.form.validate()) {
-                    if (!this.editedItem) {
+                    if (Object.keys(Object.assign({},this.editedItem)).length == 0) {
                         await tools.addroom(this.roomdata)
                     }
                     else {
