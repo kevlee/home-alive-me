@@ -148,6 +148,7 @@
                 this.$emit('newconfig', this.nodeinfo.nodeuid)
             },
             async savenoderoom() {
+                
                 console.log(this.moduleroom)
             },
             async getrooms(){

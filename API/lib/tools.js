@@ -89,6 +89,9 @@ async function launchregistreddevice(os) {
                             case 'linux':
                                 portconfig = obj.port
                                 break
+                            case 'darwin':
+                                portconfig = obj.port.replace('tty', 'cu')
+                                break
                             default:
                         }
                         connections.zwave = new OpenZWave({

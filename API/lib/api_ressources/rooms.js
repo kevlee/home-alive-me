@@ -3,6 +3,7 @@ const reqlib = require('app-root-path').require
 var result=""
 
 function init(API) {
+
     API.get('/room/', async (req, res) => {
         try {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)
