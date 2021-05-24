@@ -34,7 +34,8 @@
                         <listnodeinfo v-bind:nodeinfo="item"
                                       v-bind:curtainlvl="curtainlvl"
                                       @newconfig="fetchconfig"
-                                      @newdata="fetchcurtainlvl" />
+                                      @newdata="fetchcurtainlvl"
+                                      @editmetadata="fetchnodes" />
                     </td>
                 </template>
                 <v-divider></v-divider>
@@ -117,6 +118,10 @@
             },
             async fetchcurtainlvl(nodeuid) {
                 this.curtainlvl = await tools.fetchcurtainlvl(nodeuid)
+            },
+
+            fetchnodes(nodeuid) {
+                this.nodeslist()
             },
 
             async emitopen() {

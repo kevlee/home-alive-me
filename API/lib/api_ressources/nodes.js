@@ -27,12 +27,11 @@ function init(API,connections) {
         result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "RemoveDevice")
     })
 
-    
-
     API.get('/nodes/', async (req, res) => {
         let DBClient = new (reqlib('./lib/dbclient.js'))(null)
         let result
-        result = await DBClient.getnodes(() => { DBClient.closeconnection() }, req.query)
+        result = await DBClient.getnodes()
+        DBClient.closeconnection()
         res.status(200)
         return res.json(result);
 
@@ -49,7 +48,6 @@ function init(API,connections) {
 
     })
 
-
     API.get('/curtainlevel/:uuid',async (req, res) => {
         if (req.params.uuid) {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)
@@ -60,8 +58,6 @@ function init(API,connections) {
         }
 
     })
-
-
 
     API.post('/nodes/:uuid/data/', async (req, res) => {
         if (req.params.uuid) {
@@ -81,6 +77,31 @@ function init(API,connections) {
             res.status(400).send({ error: 'no uuid in query' })
         }
     })
+
+    API.post('/nodes/:uuid/room/',async (req, res) => {
+        if (req.params.uuid && req.body.room) {
+            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+            await DBClient.setnoderoom(req.params.uuid,req.body.room)
+            DBClient.closeconnection()
+            res.status(200).json("OK")
+        } else {
+            res.status(400).send({ error: 'no uuid in query' })
+        }
+
+    })
+
+    API.post('/nodes/:uuid/type/',async (req, res) => {
+        if (req.params.uuid && req.body.type) {
+            let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+            await DBClient.setnodetype(req.params.uuid,req.body.type)
+            DBClient.closeconnection()
+            res.status(200).json("OK")
+        } else {
+            res.status(400).send({ error: 'no uuid in query' })
+        }
+
+    })
+
 
 }
 

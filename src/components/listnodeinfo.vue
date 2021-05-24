@@ -9,7 +9,7 @@
             </v-tab>
         </v-tabs>
         <v-tabs-items v-model="tab">
-            <v-tab-item key="tab-manage">
+            <v-tab-item key="tab-manage" v-show="true">
                 <v-form flat>
                     <v-container v-if="nodeinfo.type == 'shutter'">
                         <v-slider label="Curtain Position"
@@ -22,19 +22,29 @@
                             </template>
                         </v-slider>
                     </v-container>
+                    <v-divider></v-divider>
                     <v-container>
                         <v-select v-model="moduleroom"
-                                  @click="getrooms"
                                   :items="roomlist"
                                   item-text="name"
-                                  item-value="id"
-                                  label="Room">
+                                  item-value="name"
+                                  label="Room"
+                                  single-line
+                                  >
+                        </v-select>
+                    </v-container>
+                    <v-container>
+                        <v-select v-model="nodetype"
+                                  :items="typelist"
+                                  label="Type"
+                                  single-line
+                                  >
                         </v-select>
                     </v-container>
                 </v-form>
                 <div class="processbuttton">
                     <md-button class="md-raised md-primary save"
-                               @click="savenoderoom()">
+                               @click="savenode()">
                         SAVE
                     </md-button>
                 </div>
@@ -70,7 +80,9 @@
             delay: null,
             tab: null,
             moduleroom: null,
+            nodetype: null,
             roomlist: [],
+            typelist: [],
         }
     }
     export default {
@@ -95,8 +107,13 @@
                 }
                 return nodeconfigs
             },
+            data: async function () {
+                this.moduleroom = this.nodeinfo.roomname
+                this.getrooms()
+                this.typelist = tools.typelist
+                this.nodetype = this.nodeinfo.type
 
-
+            }
         }
         ,
         watch: {
@@ -106,7 +123,6 @@
         },
         methods: {
             setcurtain(value) {
-                //console.log(value)
             },
             getcurtainlvl(value) {
                 var lvl
@@ -147,14 +163,16 @@
                 await tools.sendconfig(this.configs, this.nodeinfo.nodeuid)
                 this.$emit('newconfig', this.nodeinfo.nodeuid)
             },
-            async savenoderoom() {
-                
-                console.log(this.moduleroom)
+            async savenode() {
+                await tools.setnoderoom(this.nodeinfo.nodeuid , this.moduleroom)
+                await tools.setnodetype(this.nodeinfo.nodeuid , this.nodetype)
+                this.$emit('editmetadata', this.nodeinfo.nodeuid)
             },
             async getrooms(){
                 let list = await tools.getroom()
                 this.roomlist = list 
-            }
+            },
+            
             
         },
         components: {
