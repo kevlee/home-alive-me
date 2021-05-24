@@ -1,10 +1,14 @@
 /* eslint-disable camelcase */
 'use strict'
-var mysql = require('mysql');
-const util = require('util');
+
+var mysql = require('mysql')
+const util = require('util')
+const { addclient, removeclient } = require("./db_method/zwavenode")
 var reqlib = require('app-root-path').require
-const COMCLASS = reqlib('./lib/classcom.js')
+const { COMCLASS } = require("./classcom")
 var emitters = reqlib('./lib/globalemitters')
+const room = require("./db_method/room")
+const nodes = require("./db_method/nodes")
 
 
 function DBClient(master) {
@@ -13,6 +17,7 @@ function DBClient(master) {
     }
     init.call(this, master)
 }
+
 
 async function init(master) {
     this.addedclient = false
@@ -43,24 +48,24 @@ async function init(master) {
         })
 
         emitters.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
-            addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
+            nodes.addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
         })
 
         emitters.zwave.on('value changed', function (valueId, comclass, nodeid, deviceid) {
-            addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
+            nodes.addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
         })
         
 
         emitters.zwave.on('node ready', function (ozwnode) {
             for (let [key, value] of Object.entries(ozwnode.values)) {
-                addvalue(self, value, value.class_id, ozwnode.node_id + "-" + ozwnode.device_id)
+                nodes.addvalue(self, value, value.class_id, ozwnode.node_id + "-" + ozwnode.device_id)
             }
             if (self.addedclient == true) {
                 updatetaskstatus(self, 'AddDevice', 'Completed', { 'node_uid': ozwnode.node_id + "-" + ozwnode.device_id })
                 self.addedclient = false
             }
         })
-        
+
         emitters.zwave.on('command controller', (obj) => {
             switch (true) {
                 case obj.help.includes('AddDevice'):
@@ -119,46 +124,7 @@ function createtable(self) {
 
     })
 
-    //self.db.query('TRUNCATE task');
-
 }
-
-function addclient(self,uid, nodeid, name, type) {
-    // don't change databases if node exist
-    let sql = "INSERT INTO nodes (nodeid,nodeuid,productname,type)  values ('"
-        + nodeid + "','" + nodeid + "-" + uid + "','" + name + "','" + type +
-        "') ON DUPLICATE KEY UPDATE nodeuid = nodeuid "
-    self.db.query(sql);
-}
-
-function removeclient(self, nodeid) {
-    const sql = "DELETE FROM nodes WHERE nodeid = '" + nodeid + "'"
-    self.db.query(sql)  
-}
-
-
-
-function addvalue(self, valueId, comclass, uid) {
-    try {
-        let choices = {}
-        if (valueId.values) {
-            choices = JSON.stringify(Object.assign({}, valueId.values))
-        } else {
-            choices = "{}"
-        }
-        let sql = 'INSERT INTO ' + COMCLASS[comclass] +
-            ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
-            "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices + "')" +
-            "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'"
-        self.db.query(sql)
-
-    } catch (error) {
-        console.error(error);
-        console.log(comclass);
-    }
-}
-
-
 
 function updatetaskstatus(self, type, status, result=null) {
     let sql = "UPDATE task SET status = '" +
@@ -170,6 +136,21 @@ function updatetaskstatus(self, type, status, result=null) {
     }
     self.db.query(sql)
 }
+
+/***************** ROOM MANAGEMENT *******************/
+
+DBClient.prototype.addroom = room.addroom
+DBClient.prototype.getroom = room.getroom
+DBClient.prototype.getrooms = room.getrooms
+DBClient.prototype.updateroom = room.updateroom
+DBClient.prototype.removeroom = room.removeroom
+
+
+/***************** NODES MANAGEMENT *******************/
+
+DBClient.prototype.getnodes = nodes.getnodes
+DBClient.prototype.setnoderoom = nodes.setnoderoom
+DBClient.prototype.setnodetype = nodes.setnodetype
 
 DBClient.prototype.addtemplog = async function (_callback) {
     let db = this.db
@@ -192,7 +173,6 @@ DBClient.prototype.addtemplog = async function (_callback) {
             sql_push = 'INSERT INTO Temperature (nodeuid,value,units,date) values ' +
                 "('" + key + "','" + value['Air Temperature'] + "','" +
                 value['Air Temperature Units'] + "','" + now + "')"
-            console.log(sql_push)
             promises.push(new Promise((resolve) => {
                 db.query(sql_push, function () { resolve('finish') })
             }))
@@ -250,7 +230,6 @@ DBClient.prototype.inittask = async function (_callback,uuid,type) {
     let now = new Date().toISOString().slice(0, 19).replace('T', ' ')
     let sql = "INSERT INTO task (id,taskname,status,result,date) values " +
         "('" + uuid + "','" + type + "','processing','{}','" + now + "')"
-    console.log(global.devicetype)
     await db.query(sql)
 }
 
@@ -273,13 +252,7 @@ DBClient.prototype.removetask = async function (_callback, uuid) {
 
 }
 
-DBClient.prototype.getnodes = async function (_callback, uuid) {
-    const sql = "SELECT * FROM nodes"
-    let result = await this.query(sql)
-    _callback()
-    return result
 
-}
 
 DBClient.prototype.getcurtainlevel = async function (_callback, uuid) {
     let db = this.db

@@ -95,4 +95,6 @@ const COMCLASS = {
     240: 'COMMAND_CLASS_NON_INTEROPERABLE'
 }
 
-module.exports = COMCLASS;
+module.exports = {
+    COMCLASS
+};

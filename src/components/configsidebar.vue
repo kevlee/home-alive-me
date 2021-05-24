@@ -1,99 +1,84 @@
 <template>
-    <div id="parentx">
-
-        <md-button @click="
-                   showNavigation = true;
-                   showaddstepper = false;
-                   showdeviceslist = false;
-                   showaddmodule = false;
-                   " 
-                   color="primary" type="filled" md-theme="drawer-toolsbar">
-            <md-icon class="md-size-100x">menu</md-icon>
-        </md-button>
-
-        <md-drawer :md-active.sync="showNavigation" md-swipeable md-right md-fixed md-theme="drawer-toolsbar">
-            <md-toolbar class="md-transparent" md-elevation="0">
+    <v-row>
+        <v-col align="end">
+            <v-btn icon
+                   color="indigo accent-4"
+                   @click="
+                        showNavigation = true;
+                        showaddstepper = false;
+                        showdeviceslist = false;
+                        showaddmodule = false;
+                        ">
+                <v-icon>fas fa-bars</v-icon>
+            </v-btn>
+        </v-col>
+        <v-navigation-drawer width="30%"
+                             v-model="showNavigation"
+                             absolute
+                             right
+                             temporary>
+            <v-toolbar class="md-transparent">
                 <span class="md-title">Configuration</span>
-            </md-toolbar>
+            </v-toolbar>
 
-            <md-list>
+            <v-list>
 
-                <md-subheader>Rooms</md-subheader>
-                <md-divider></md-divider>
-                <md-list-item>
-                    <md-icon>add</md-icon>
-                    <span class="md-list-item-text">Add room</span>
-                </md-list-item>
+                <v-subheader>Rooms</v-subheader>
+                <v-divider></v-divider>
 
-                <md-list-item>
-                    <md-icon>delete</md-icon>
-                    <span class="md-list-item-text">Remove room</span>
-                </md-list-item>
+                <roomlist @open="showNavigation = false;" />
 
-                <md-list-item>
-                    <md-icon>list</md-icon>
-                    <span class="md-list-item-text">Room list</span>
-                </md-list-item>
+                <v-subheader>Devices</v-subheader>
+                <v-divider></v-divider>
 
-                <md-subheader>Devices</md-subheader>
-                <md-divider></md-divider>
-
-                <md-list-item @click="
-                              showaddstepper = true;
-                              showNavigation = false;
-                              showdeviceslist = false;
-                              showaddmodule = false;
-                              ">
+                <v-list-item @click="
+                                    showaddstepper = true;
+                                    showNavigation = false;
+                                    showdeviceslist = false;
+                                    showaddmodule = false;
+                                    ">
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add device</span>
                     <adddevicestepper v-bind:showaddstepper="showaddstepper"
                                       @saved="showaddstepper = false"
                                       @nodevice="showalert" />
-                </md-list-item>
+                </v-list-item>
 
-                <md-list-item @click="
-                              showaddstepper = false;
-                              showNavigation = false;
-                              showdeviceslist = true;
-                              showaddmodule = false;
-                              ">
-                    <md-icon>list</md-icon>
-                    <span class="md-list-item-text">Device list</span>
-                    <devicelist v-bind:devicelist="showdeviceslist"
-                                @closed="showdeviceslist = false" />
-                </md-list-item>
+                <devicelist @open="showNavigation = false;" />
 
-                <md-list-item>
+                <v-list-item>
                     <md-icon>delete</md-icon>
                     <span class="md-list-item-text">Remove device</span>
-                </md-list-item>
+                </v-list-item>
 
-                <md-subheader>Modules</md-subheader>
-                <md-divider></md-divider>
-                <md-list-item @click="
-                              showaddstepper = false;
-                              showNavigation = false;
-                              showdeviceslist = false;
-                              showaddmodule = true;
-                              ">
+                <v-subheader>Modules</v-subheader>
+                <v-divider></v-divider>
+                <v-list-item @click="
+                                    showaddstepper = false;
+                                    showNavigation = false;
+                                    showdeviceslist = false;
+                                    showaddmodule = true;
+                                    ">
                     <md-icon>add</md-icon>
                     <span class="md-list-item-text">Add module</span>
                     <addmodules v-bind:showaddmodule="showaddmodule"
                                 @saved="showaddmodule = false"
                                 @closed="showaddmodule = false" />
-                </md-list-item>
+                </v-list-item>
 
 
-            </md-list>
-        </md-drawer>
-        
-    </div>
+            </v-list>
+        </v-navigation-drawer>
+    </v-row>
+    
 </template>
 
 <script>
     import adddevicestepper from "./adddevicestepper.vue";
     import devicelist from "./devicelist.vue";
     import addmodules from "./addmodules.vue";
+    import addroom from "./addroom.vue";
+    import roomlist from "./roomlist.vue";
 
     export default {
         name: 'configsidebar',
@@ -103,11 +88,15 @@
             showNavigation: false,
             showdeviceslist: false,
             showaddmodule: false,
+            showaddroom: false,
+            showroomlist: false,
         }),
         components: {
             adddevicestepper,
             devicelist,
             addmodules,
+            addroom,
+            roomlist,
         },
 
         methods: {
@@ -119,14 +108,6 @@
     
 </script>
 
-<style lang="scss">
-    @import "~vue-material/dist/theme/engine";
-
-    @include md-register-theme("drawer-toolsbar", (
-        icon-on-background: md-get-palette-color(lightblue, 800),
-    ));
-    @import "~vue-material/dist/theme/all";
-</style>
 
 <style scoped>
 
@@ -157,5 +138,9 @@
             border-left: 1px solid rgba(0,0,0,.07) !important;
             border-radius: 0px !important;
         }
+
+    .v-navigation-drawer {
+        z-index: 1200;
+    }
 
 </style>

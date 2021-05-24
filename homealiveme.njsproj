@@ -78,6 +78,9 @@
     <Content Include="src\components\configeditor.vue">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\components\addroom.vue">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\listmoduledialog.vue">
       <SubType>Code</SubType>
     </Content>
@@ -123,6 +126,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\components\addmodules.vue">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\components\roomlist.vue">
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\components\stats.vue">

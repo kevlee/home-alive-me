@@ -50,6 +50,9 @@ function setport(type, port, os, connections) {
         case 'linux':
             portconfig = port
             break
+        case 'darwin':
+            portconfig = port.replace('tty', 'cu')
+            break
         default:
     }
 
@@ -85,6 +88,9 @@ async function launchregistreddevice(os) {
                                 break
                             case 'linux':
                                 portconfig = obj.port
+                                break
+                            case 'darwin':
+                                portconfig = obj.port.replace('tty', 'cu')
                                 break
                             default:
                         }

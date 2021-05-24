@@ -1,6 +1,5 @@
 <template>
     <div class="stats" id="stats">
-        <background />
         <tempchart></tempchart>
     </div>
 </template>

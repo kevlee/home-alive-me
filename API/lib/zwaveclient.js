@@ -485,12 +485,17 @@ function scanComplete() {
         nodes[i].neighborns = this.client.getNodeNeighbors(nodes[i].node_id)
     }
 
+    // get current configuration
+    for (var i = 0; i < nodes.length; i++) {
+        this.client.requestAllConfigParams(nodes[i].node_id)
+    }
+
     /*if (this.cfg.saveConfig && typeof this.client.writeConfig === 'function') {
         this.client.writeConfig()
     }*/
 
     debug('Network scan complete. Found:', nodes.length, 'nodes')
-    emitters.zwave.emit('scan complete',this)
+    emitters.zwave.emit('scan complete', this.client)
     
 }
 

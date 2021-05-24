@@ -1494,7 +1494,15 @@
     <Content Include="hooks\post_checkout">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="lib\api_ressources\dongle.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="lib\db_method\nodevalue.js" />
+    <Content Include="lib\db_method\zwavenode.js" />
     <Content Include="lib\api.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="lib\api_ressources\rooms.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="lib\debug.js">
@@ -1509,6 +1517,7 @@
     <Content Include="lib\globalemitters.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="lib\db_method\room.js" />
     <Content Include="lib\task.js">
       <SubType>Code</SubType>
     </Content>
@@ -1521,6 +1530,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="sql\homealivemedb.sql" />
+    <Content Include="sql\migrate\migrate-1.1.0.sql">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="sql\user.sql">
       <SubType>Code</SubType>
     </Content>
@@ -1759,7 +1771,10 @@
     <Folder Include="config\config\zwp\" />
     <Folder Include="lib\" />
     <Folder Include="hooks\" />
+    <Folder Include="lib\api_ressources\" />
+    <Folder Include="lib\db_method\" />
     <Folder Include="sql\" />
+    <Folder Include="sql\migrate\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>
