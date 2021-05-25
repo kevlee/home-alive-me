@@ -111,7 +111,7 @@
                 this.moduleroom = this.nodeinfo.roomname
                 this.getrooms()
                 this.typelist = tools.typelist
-                this.nodetype = this.nodeinfo.type
+                this.nodetype = this.nodeinfo.type[0].toUpperCase() + this.nodeinfo.type.substring(1)
 
             }
         }

@@ -1,76 +1,77 @@
 <template>
-    <v-row>
-        <v-col align="end">
-            <v-btn icon
-                   color="indigo accent-4"
-                   @click="
-                        showNavigation = true;
-                        showaddstepper = false;
-                        showdeviceslist = false;
-                        showaddmodule = false;
-                        ">
-                <v-icon>fas fa-bars</v-icon>
-            </v-btn>
-        </v-col>
-        <v-navigation-drawer width="30%"
-                             v-model="showNavigation"
-                             absolute
-                             right
-                             temporary>
-            <v-toolbar class="md-transparent">
-                <span class="md-title">Configuration</span>
-            </v-toolbar>
+    <v-container fluid>
+        <v-row >
+            <v-col align="end">
+                <v-btn icon
+                       color="indigo accent-4"
+                       @click="
+                            showNavigation = true;
+                            showaddstepper = false;
+                            showdeviceslist = false;
+                            showaddmodule = false;
+                            ">
+                    <v-icon>fas fa-bars</v-icon>
+                </v-btn>
+            </v-col>
+            <v-navigation-drawer width="30%"
+                                 v-model="showNavigation"
+                                 absolute
+                                 right
+                                 temporary>
+                <v-toolbar class="md-transparent">
+                    <span class="md-title">Configuration</span>
+                </v-toolbar>
 
-            <v-list>
+                <v-list>
 
-                <v-subheader>Rooms</v-subheader>
-                <v-divider></v-divider>
+                    <v-subheader>Rooms</v-subheader>
+                    <v-divider></v-divider>
 
-                <roomlist @open="showNavigation = false;" />
+                    <roomlist @open="showNavigation = false;" />
 
-                <v-subheader>Devices</v-subheader>
-                <v-divider></v-divider>
+                    <v-subheader>Devices</v-subheader>
+                    <v-divider></v-divider>
 
-                <v-list-item @click="
-                                    showaddstepper = true;
-                                    showNavigation = false;
-                                    showdeviceslist = false;
-                                    showaddmodule = false;
-                                    ">
-                    <md-icon>add</md-icon>
-                    <span class="md-list-item-text">Add device</span>
-                    <adddevicestepper v-bind:showaddstepper="showaddstepper"
-                                      @saved="showaddstepper = false"
-                                      @nodevice="showalert" />
-                </v-list-item>
+                    <v-list-item @click="
+                                        showaddstepper = true;
+                                        showNavigation = false;
+                                        showdeviceslist = false;
+                                        showaddmodule = false;
+                                        ">
+                        <md-icon>add</md-icon>
+                        <span class="md-list-item-text">Add device</span>
+                        <adddevicestepper v-bind:showaddstepper="showaddstepper"
+                                          @saved="showaddstepper = false"
+                                          @nodevice="showalert" />
+                    </v-list-item>
 
-                <devicelist @open="showNavigation = false;" />
+                    <devicelist @open="showNavigation = false;" />
 
-                <v-list-item>
-                    <md-icon>delete</md-icon>
-                    <span class="md-list-item-text">Remove device</span>
-                </v-list-item>
+                    <v-list-item>
+                        <md-icon>delete</md-icon>
+                        <span class="md-list-item-text">Remove device</span>
+                    </v-list-item>
 
-                <v-subheader>Modules</v-subheader>
-                <v-divider></v-divider>
-                <v-list-item @click="
-                                    showaddstepper = false;
-                                    showNavigation = false;
-                                    showdeviceslist = false;
-                                    showaddmodule = true;
-                                    ">
-                    <md-icon>add</md-icon>
-                    <span class="md-list-item-text">Add module</span>
-                    <addmodules v-bind:showaddmodule="showaddmodule"
-                                @saved="showaddmodule = false"
-                                @closed="showaddmodule = false" />
-                </v-list-item>
+                    <v-subheader>Modules</v-subheader>
+                    <v-divider></v-divider>
+                    <v-list-item @click="
+                                        showaddstepper = false;
+                                        showNavigation = false;
+                                        showdeviceslist = false;
+                                        showaddmodule = true;
+                                        ">
+                        <md-icon>add</md-icon>
+                        <span class="md-list-item-text">Add module</span>
+                        <addmodules v-bind:showaddmodule="showaddmodule"
+                                    @saved="showaddmodule = false"
+                                    @closed="showaddmodule = false" />
+                    </v-list-item>
 
 
-            </v-list>
-        </v-navigation-drawer>
-    </v-row>
-    
+                </v-list>
+            </v-navigation-drawer>
+        </v-row>
+    </v-container>
 </template>
 
 <script>

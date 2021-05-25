@@ -1,31 +1,29 @@
 <template>
-    <div class="home" id="home">
-    </div>
+    <v-container>
+        <v-row no-gutters>
+            <v-col justify="space-between" >
+                <v-card class="home" id="home"
+                    color="white"
+                    elevation="9"
+                    height="144"
+                    shaped
+                    width="137">
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
-    import background from "./background.vue";
-    
-
-    //import('./themes')
 
     export default {
         name: 'Home',
         data: () => ({
-            theme: 'green'
+            
         }),
         methods: {
-            toblue() {
-                this.theme = blue
-            },
-            togreen() {
-                this.theme = green
-            }
 
         },
-        components: {
-            background,
-        }
     };
 </script>
 
