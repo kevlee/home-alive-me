@@ -3,17 +3,17 @@
         <v-app>
             <background />
             <configsidebar />
-            <router-view></router-view>
-            <div id="navbar">
-                <v-bottom-navigation grow :background-color="color" v-model="value" shift dark >
+            <v-main>
+                <router-view></router-view>
+            </v-main>
+            <v-bottom-navigation grow :background-color="color" v-model="value" shift dark >
                     <v-btn to="/homepage/">
                         <v-icon>fas fa-home</v-icon>
                     </v-btn >
                     <v-btn to="/stats/">
                         <v-icon>fas fa-chart-line</v-icon>
                     </v-btn >
-                </v-bottom-navigation>
-            </div>
+            </v-bottom-navigation>
         </v-app>
     </div>
 

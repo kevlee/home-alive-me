@@ -1,9 +1,9 @@
 <template>
-    <v-container>
+    <v-container fluid class="fill-height">
         <v-row no-gutters>
             <v-col justify="space-between" >
                 <v-card class="home" id="home"
-                    color="white"
+                    color="rgba(255, 255, 255, 0.7)"
                     elevation="9"
                     height="144"
                     shaped
