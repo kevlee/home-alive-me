@@ -6,8 +6,12 @@
             <v-list-item @click="emitopen()"
                           v-bind="attrs"
                           v-on="on">
-                <md-icon>list</md-icon>
-                <span class="md-list-item-text">Room list</span>
+                <v-list-item-icon>
+                    <v-icon>fas fa-list</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    <v-list-item-title class="v-list-item-text">Room list</v-list-item-title>
+                </v-list-item-content>
             </v-list-item>
         </template>
         <v-card>
