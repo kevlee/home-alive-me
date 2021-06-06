@@ -32,9 +32,6 @@
                 <template v-slot:expanded-item="{ headers, item }">
                     <td :colspan="headers.length">
                         <listnodeinfo v-bind:nodeinfo="item"
-                                      v-bind:curtainlvl="curtainlvl"
-                                      @newconfig="fetchconfig"
-                                      @newdata="fetchcurtainlvl"
                                       @editmetadata="fetchnodes" />
                     </td>
                 </template>
@@ -54,7 +51,7 @@
             list: {},
             clicked: 0,
             configs: [],
-            curtainlvl: {},
+            curtainlvl: [],
             headers: [],
             expanded: [],
             expand: { text: '', value: 'data-table-expand' },
@@ -103,21 +100,10 @@
                     this.clicked = 0
                 } else {
                     this.clicked = event.nodeid
-                    await this.fetchconfig(event.nodeuid)
-                    if (event.type == 'shutter') {
-                         await this.fetchcurtainlvl(event.nodeuid)
-                    }
                 }
             },
             mustshow(nodeid) {
                 return (this.clicked == nodeid)
-            },
-
-            async fetchconfig(nodeuid) {
-                this.configs = await tools.fetchconfig(nodeuid)
-            },
-            async fetchcurtainlvl(nodeuid) {
-                this.curtainlvl = await tools.fetchcurtainlvl(nodeuid)
             },
 
             fetchnodes(nodeuid) {

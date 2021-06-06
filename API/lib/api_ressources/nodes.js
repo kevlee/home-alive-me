@@ -48,7 +48,7 @@ function init(API,connections) {
 
     })
 
-    API.get('/curtainlevel/:uuid',async (req, res) => {
+    API.get('/curtainlevel/:uuid/',async (req, res) => {
         if (req.params.uuid) {
             let DBClient = new (reqlib('./lib/dbclient.js'))(null)
             result = await DBClient.getcurtainlevel(() => { DBClient.closeconnection() }, req.params.uuid)

@@ -1,28 +1,28 @@
 <template>
-    <v-container fluid class="fill-height">
-        <v-row no-gutters>
-            <v-col justify="space-between" >
-                <v-card class="home" id="home"
-                    color="rgba(255, 255, 255, 0.7)"
-                    elevation="9"
-                    height="144"
-                    shaped
-                    width="137">
-                </v-card>
-            </v-col>
-        </v-row>
-    </v-container>
+    <dashboard />
 </template>
 
 <script>
 
+    import dashboard from "./dashboard.vue";
+
+    function initialState() {
+        return {
+            open: 0,
+            close: 0,
+        }
+    }
+
     export default {
         name: 'Home',
-        data: () => ({
-            
-        }),
+        data: () => {
+            return initialState()
+        },
         methods: {
 
+        },
+        components:{
+            dashboard
         },
     };
 </script>
