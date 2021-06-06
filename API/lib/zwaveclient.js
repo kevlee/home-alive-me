@@ -757,7 +757,6 @@ ZwaveClient.prototype.close = function () {
         }
 
         this.client.removeAllListeners()
-        console.log(emitters)
         emitters.zwave.removeAllListeners()
         this.client.disconnect(this.cfg.port)
     }

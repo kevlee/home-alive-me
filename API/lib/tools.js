@@ -103,7 +103,6 @@ async function launchregistreddevice(os) {
                             ConfigPath: './config/config/'
                         })
                         connections.zwave.connect()
-                        console.log(connections)
                     }
                     break
                 default:

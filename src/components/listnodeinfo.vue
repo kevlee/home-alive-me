@@ -117,12 +117,10 @@
         },
         watch: {
             curtainlvl: function (curtainlvl) {
-                this.lvl = this.getcurtainlvl(this.curtainlvl.value)
+                this.lvl = this.getcurtainlvl(curtainlvl.value)
             }
         },
         methods: {
-            setcurtain(value) {
-            },
             getcurtainlvl(value) {
                 var lvl
                 switch (true) {

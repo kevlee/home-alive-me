@@ -106,7 +106,7 @@
                 return (this.clicked == nodeid)
             },
 
-            fetchnodes(nodeuid) {
+            fetchnodes() {
                 this.nodeslist()
             },
 
