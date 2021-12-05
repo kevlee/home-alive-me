@@ -83,6 +83,7 @@
             nodetype: null,
             roomlist: [],
             typelist: [],
+            curtainlvl: {},
         }
     }
     export default {
@@ -92,7 +93,6 @@
         },
         props: [
             'nodeinfo',
-            'curtainlvl'
         ],
         asyncComputed: {
             configs: async function () {
@@ -111,19 +111,16 @@
                 this.moduleroom = this.nodeinfo.roomname
                 this.getrooms()
                 this.typelist = tools.typelist
-                this.nodetype = this.nodeinfo.type
-
+                this.nodetype = this.nodeinfo.type[0].toUpperCase() + this.nodeinfo.type.substring(1)
+                await this.fetchcurtainlvl(this.nodeinfo.nodeuid)
             }
-        }
-        ,
+        },
         watch: {
             curtainlvl: function (curtainlvl) {
                 this.lvl = this.getcurtainlvl(curtainlvl.value)
             }
         },
         methods: {
-            setcurtain(value) {
-            },
             getcurtainlvl(value) {
                 var lvl
                 switch (true) {
@@ -161,7 +158,6 @@
             },
             async savenodeconfig() {
                 await tools.sendconfig(this.configs, this.nodeinfo.nodeuid)
-                this.$emit('newconfig', this.nodeinfo.nodeuid)
             },
             async savenode() {
                 await tools.setnoderoom(this.nodeinfo.nodeuid , this.moduleroom)
@@ -171,6 +167,9 @@
             async getrooms(){
                 let list = await tools.getroom()
                 this.roomlist = list 
+            },
+            async fetchcurtainlvl(nodeuid) {
+                this.curtainlvl = await tools.fetchcurtainlvl(nodeuid)
             },
             
             

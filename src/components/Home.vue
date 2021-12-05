@@ -1,31 +1,29 @@
 <template>
-    <div class="home" id="home">
-    </div>
+    <dashboard />
 </template>
 
 <script>
-    import background from "./background.vue";
-    
 
-    //import('./themes')
+    import dashboard from "./dashboard.vue";
+
+    function initialState() {
+        return {
+            open: 0,
+            close: 0,
+        }
+    }
 
     export default {
         name: 'Home',
-        data: () => ({
-            theme: 'green'
-        }),
+        data: () => {
+            return initialState()
+        },
         methods: {
-            toblue() {
-                this.theme = blue
-            },
-            togreen() {
-                this.theme = green
-            }
 
         },
-        components: {
-            background,
-        }
+        components:{
+            dashboard
+        },
     };
 </script>
 

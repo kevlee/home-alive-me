@@ -3,13 +3,17 @@
         <v-app>
             <background />
             <configsidebar />
-            <router-view></router-view>
-            <div id="navbar">
-                <md-bottom-bar md-type="shift" md-sync-route :md-theme="'bottom-bar-' + theme" md-fixed>
-                    <md-bottom-bar-item to="/homepage/" exact md-label="Home" md-icon="home" @click.native="theme = 'blue'"></md-bottom-bar-item>
-                    <md-bottom-bar-item to="/stats/" exact md-label="stats" md-icon="bar_chart" @click.native="theme = 'green'"></md-bottom-bar-item>
-                </md-bottom-bar>
-            </div>
+            <v-main>
+                <router-view></router-view>
+            </v-main>
+            <v-bottom-navigation grow :background-color="color" v-model="value" shift dark >
+                    <v-btn to="/homepage/">
+                        <v-icon>fas fa-home</v-icon>
+                    </v-btn >
+                    <v-btn to="/stats/">
+                        <v-icon>fas fa-chart-line</v-icon>
+                    </v-btn >
+            </v-bottom-navigation>
         </v-app>
     </div>
 
@@ -27,7 +31,8 @@
         name: 'App',
         data: () => {
             return {
-                theme: 'blue'
+                theme: 'blue',
+                value: 0
             }
         },
         components: {
@@ -36,8 +41,17 @@
         },
         mounted: async function () {
             await tools.getallmodules()
+        },
+        computed: {
+            color () {
+                switch (this.value) {
+                    case 0: return 'blue darken-2'
+                    case 1: return 'teal darken-1'
+                    default: return 'blue darken-2'
+                }
+            }
         }
-    };
+    }
 </script>
 
 <style lang="scss">

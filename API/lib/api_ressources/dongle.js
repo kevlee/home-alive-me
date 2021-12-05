@@ -25,7 +25,6 @@ function init(API,connections) {
 
 
     API.get('/modules/', async (req, res) => {
-        console.log(connections)
         let modulelist = {}
         if (connections && connections.zwave) {
             modulelist.zwave = connections.zwave

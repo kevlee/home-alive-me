@@ -18,7 +18,7 @@ exports.addvalue = function addvalue(self, valueId, comclass, uid) {
         let sql = 'INSERT INTO ' + COMCLASS[comclass] +
             ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
             "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices + "')" +
-            "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'";
+            "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'"
         self.db.query(sql);
 
     } catch (error) {
