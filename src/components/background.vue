@@ -9,7 +9,7 @@
         data() {
             return {
                 image: {
-                    backgroundImage: 'url(' + require('../assets/images/background.png') + ')'
+                    backgroundImage: 'url(' + require('../assets/images/cloud.jpg') + ')'
                 }
             };
         },
