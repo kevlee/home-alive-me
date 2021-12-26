@@ -22,6 +22,7 @@ function init() {
 
     this.connections = {},
     this.api = Express()
+    this.api.router = this.api.Router()
     this.api.use(cors())
     this.api.use(bodyParser.urlencoded({ extended: true }))
     this.api.use(bodyParser.json())
