@@ -2,6 +2,9 @@
 const reqlib = require('app-root-path').require
 const tools = reqlib('./lib/tools.js')
 var result=""
+const { 
+  v4: uuidv4,
+} = require('uuid');
 
 function init(API,connections) {
 
