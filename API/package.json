@@ -22,6 +22,7 @@
     "openzwave-shared": "^1.7.2",
     "serialport": "^9.0.3",
     "util": "^0.12.3",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.1",
+    "uuidv4": "^6.2.12"
   }
 }
