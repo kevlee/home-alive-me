@@ -6,9 +6,11 @@ const tools = reqlib('./lib/tools.js')
 const rooms = reqlib('./lib/api_ressources/rooms.js')
 const dongle = reqlib('./lib/api_ressources/dongle.js')
 const nodes = reqlib('./lib/api_ressources/nodes.js')
+const authenticateToken = reqlib('./lib/api_ressources/authenticate.js')
 
 
 global.devicetype = null
+global.connections = {}
 
 function API() {
     if (!(this instanceof API)) {
@@ -20,9 +22,7 @@ function API() {
 
 function init() {
 
-    this.connections = {},
     this.api = Express()
-    this.api.router = this.api.Router()
     this.api.use(cors())
     this.api.use(bodyParser.urlencoded({ extended: true }))
     this.api.use(bodyParser.json())
@@ -45,11 +45,13 @@ function init() {
         }
     })
 
+    this.api.use('/dongle/', authenticateToken , dongle)
+
     rooms.init(this.api)
 
-    dongle.init(this.api,this.connections)
+   
 
-    nodes.init(this.api,this.connections)
+    nodes.init(this.api,global.connections)
 
     this.api.get('/task/:uuid', async (req, res) => {
         if (req.params.uuid) {

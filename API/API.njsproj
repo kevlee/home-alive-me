@@ -32,6 +32,7 @@
     <Content Include=".dockerignore">
       <SubType>Code</SubType>
     </Content>
+    <Content Include=".env.development" />
     <Content Include=".env.production">
       <SubType>Code</SubType>
     </Content>
@@ -1494,9 +1495,13 @@
     <Content Include="hooks\post_checkout">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="lib\api_ressources\authenticate.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="lib\api_ressources\dongle.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="lib\api_ressources\nodes.js" />
     <Content Include="lib\db_method\nodevalue.js" />
     <Content Include="lib\db_method\zwavenode.js" />
     <Content Include="lib\api.js">

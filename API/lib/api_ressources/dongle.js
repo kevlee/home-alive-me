@@ -3,17 +3,17 @@ const reqlib = require('app-root-path').require
 const tools = reqlib('./lib/tools.js')
 const { v4: uuidv4 } = require('uuid')
 var result = ""
+const express = require('express')
+let dongle = express.Router()
 
-function init(API,connections) {
-
-    API.post('/addmodule/', async (req, res) => {
+dongle.post('/addmodule/', async (req, res) => {
         if (req.body.port && req.body.type) {
-            let { err, portconfig, type, connection } = await tools.setport(req.body.type, req.body.port, process.platform, connections)
+            let { err, portconfig, type, connection } = await tools.setport(req.body.type, req.body.port, process.platform, global.connections)
             if (!err) {
                 let DBClient = new (reqlib('./lib/dbclient.js'))(null)
                 await DBClient.setport(req.body.type, req.body.port)
                 DBClient.closeconnection()
-                connections = Object.assign(connections,connection)
+                global.connections = Object.assign(global.connections,connection)
             } else {
                 res.status(400).send({ error: err })
             }
@@ -21,30 +21,28 @@ function init(API,connections) {
         } else {
             res.status(400).send({ error: 'missing param' })
         }
-    })
+})
 
 
-    API.get('/modules/', async (req, res) => {
+dongle.get('/modules/', async (req, res) => {
         let modulelist = {}
-        if (connections && connections.zwave) {
-            modulelist.zwave = connections.zwave
+        if (global.connections && global.connections.zwave) {
+            modulelist.zwave = global.connections.zwave
         }
         res.status(200).json(modulelist)
-    })
+ })
 
-    API.get('/usblist/', async (req, res) => {
+dongle.get('/usblist/', async (req, res) => {
         let result = await tools.getusblist()
         res.status(200).json(result)
-    })
+ })
 
     
 
-    API.post('/reset/', async (req, res) => {
-        connections.zwave.client.softReset()
+dongle.post('/reset/', async (req, res) => {
+        global.connections.zwave.client.softReset()
         res.status(200).send("OK")
-    })
+})
 
 
-}
-
-module.exports = { init }
+module.exports = dongle
