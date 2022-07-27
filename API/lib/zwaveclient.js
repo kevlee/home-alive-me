@@ -2,8 +2,10 @@
 'use strict'
 
 // eslint-disable-next-line one-var
+
+
 var reqlib = require('app-root-path').require,
-    OpenZWave = require('openzwave-shared'),
+    OpenZWave = require('zwave-js'),
     inherits = require('util').inherits,
     EventEmitter = require('events'),
     debug = reqlib('./lib/debug')('Zwave')
@@ -148,7 +150,7 @@ async function init(cfg) {
         this.client = CLIENT
         this.client.updateOptions(options)
     } else {
-        this.client = CLIENT = new OpenZWave(options)
+        this.client = CLIENT = new OpenZWave.Driver(options.port)
         if (cfg.plugin) {
             try {
                 require(cfg.plugin)(this)

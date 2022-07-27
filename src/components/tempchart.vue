@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    import Chart from "chart.js"
+    import * as Chart from "chart.js"
     import * as tools from '../../lib/tools.js'
 
 

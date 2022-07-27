@@ -1,6 +1,7 @@
 'use strict';
 
 
+
 const OpenZWave = require('./lib/zwaveclient')
 
 var DBClient

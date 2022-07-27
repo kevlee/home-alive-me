@@ -1,4 +1,4 @@
-<template>
+  <template>
     <div id="app">
         <v-app>
             <background />
@@ -6,21 +6,19 @@
             <v-main>
                 <router-view></router-view>
             </v-main>
-            <v-bottom-navigation grow :background-color="color" v-model="value" shift dark >
-                    <v-btn to="/homepage/">
-                        <v-icon>fas fa-home</v-icon>
-                    </v-btn >
-                    <v-btn to="/stats/">
-                        <v-icon>fas fa-chart-line</v-icon>
-                    </v-btn >
+            <v-bottom-navigation grow :background-color="color" v-model="value" shift dark>
+                <v-btn to="/homepage/">
+                    <v-icon>fas fa-home</v-icon>
+                </v-btn>
+                <v-btn to="/stats/">
+                    <v-icon>fas fa-chart-line</v-icon>
+                </v-btn>
             </v-bottom-navigation>
         </v-app>
     </div>
 
 </template>
 
-<script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 
 <script>
     import configsidebar from "./components/configsidebar.vue"
@@ -29,6 +27,17 @@
 
     export default {
         name: 'App',
+        created: () => {
+            var scripts = [
+                "https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js",
+                "https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"
+            ];
+            scripts.forEach(script => {
+                let tag = document.createElement("script");
+                tag.setAttribute("src", script);
+                document.head.appendChild(tag);
+            });
+        },
         data: () => {
             return {
                 theme: 'blue',
@@ -54,20 +63,6 @@
     }
 </script>
 
-<style lang="scss">
-    @import "~vue-material/dist/theme/engine";
-
-    @include md-register-theme("bottom-bar-blue", (
-        primary: md-get-palette-color(blue, 800)
-    ));
-
-    @include md-register-theme("bottom-bar-green", (
-        primary: md-get-palette-color(green, 800)
-    ));
-    @import "~vue-material/dist/theme/all";
-
-
-</style>
 
 <style>
     @import url("https://fonts.googleapis.com/css?family=Material+Icons");

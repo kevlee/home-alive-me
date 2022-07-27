@@ -120,8 +120,8 @@
       <Publish>True</Publish>
     </Content>
     <Content Include="src\components\icons\index.js" />
-    <Content Include="src\components\icons\shuttericon.js" />
-    <Content Include="src\components\icons\switchicon.js" />
+    <Content Include="src\components\icons\shuttericon.vue" />
+    <Content Include="src\components\icons\switchicon.vue" />
     <Content Include="src\components\listnodeinfo.vue">
       <SubType>Code</SubType>
     </Content>

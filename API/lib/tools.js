@@ -2,7 +2,7 @@
 'use strict'
 const reqlib = require('app-root-path').require
 const OpenZWave = reqlib('./lib/zwaveclient')
-const SerialPort = require('serialport')
+const SerialPort = require('serialport').SerialPort
 
 
 var config = {
