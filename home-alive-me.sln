@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "homealiveme", "homealiveme.njsproj", "{1BEE1C55-B40B-4E25-8809-83C3DD7C62B3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{89602444-41DD-48A8-A1BD-7DEFA8D18A1F} = {89602444-41DD-48A8-A1BD-7DEFA8D18A1F}
+	EndProjectSection
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "API", "API\API.njsproj", "{89602444-41DD-48A8-A1BD-7DEFA8D18A1F}"
 EndProject

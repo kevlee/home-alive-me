@@ -45,7 +45,7 @@ function setport(type, port, os, connections) {
     }
     switch (os) {
         case 'win32':
-            portconfig = '\\\\.\\' + port
+            portconfig = port
             break
         case 'linux':
             portconfig = port
@@ -69,7 +69,7 @@ function setport(type, port, os, connections) {
     
 }
 
-async function launchregistreddevice(os) {
+async function launchregistreddevice() {
     var connections = {},
         err = null
     let DBClient = new (reqlib('./lib/dbclient.js'))(null)
@@ -82,9 +82,9 @@ async function launchregistreddevice(os) {
                 case 'zwave':
                     if (availabledevice.includes(obj.port)) {
                         var portconfig = null
-                        switch (os) {
+                        switch (process.platform) {
                             case 'win32':
-                                portconfig = '\\\\.\\' + obj.port
+                                portconfig =  obj.port
                                 break
                             case 'linux':
                                 portconfig = obj.port

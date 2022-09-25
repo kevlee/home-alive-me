@@ -72,7 +72,8 @@ const EVENTS = {
     'value refreshed': valueChanged,
     notification: notification,
     'scan complete': scanComplete,
-    'controller command': controllerCommand
+    'controller command': controllerCommand,
+    'error': driverFailed
 }
 
 // Status based on notification
@@ -109,7 +110,15 @@ async function init(cfg) {
     // this.scenes = todo
 
     // Full option list: https://github.com/OpenZWave/open-zwave/wiki/Config-Options
+
+    var ZwaveOptions = OpenZWave.ZwaveOptions
+    console.log(`Error while loading ${ZwaveOptions} plugin`)
     var options = {
+        timeouts: {
+            ack: 10000,
+            byte: 600,
+            serialAPIStarted: 10000
+        },
         Logging: cfg.Logging,
         ConsoleOutput: cfg.ConsoleOutput,
         AssumeAwake: true,
@@ -150,7 +159,7 @@ async function init(cfg) {
         this.client = CLIENT
         this.client.updateOptions(options)
     } else {
-        this.client = CLIENT = new OpenZWave.Driver(options.port)
+        this.client = CLIENT = new OpenZWave.Driver(cfg.port,options)
         if (cfg.plugin) {
             try {
                 require(cfg.plugin)(this)
@@ -182,53 +191,16 @@ function onEvent(name, ...args) {
 }
 
 async function driverReady(homeid) {
-    this.driverReadyStatus = true
-    this.ozwConfig.homeid = homeid
-    var homeHex = '0x' + homeid.toString(16)
-    this.ozwConfig.name = homeHex
+    //this.driverReadyStatus = true
+    //this.ozwConfig.homeid = homeid
+    //var homeHex = '0x' + homeid.toString(16)
+    //this.ozwConfig.name = homeHex
 
     this.error = false
     this.status = ZWAVE_STATUS[0]
 
-    // this.zwcfg_nodes = jsonStore.get(store.nodes) change by the BDD
-    // pre-load nodes properties by reading zwcfg xml file
-     /*if (this.zwcfg_nodes.length === 0) {
-        try {
-            var zwcfg = await readFile(
-                utils.joinPath(cfg.ConfigPath, 'zwcfg_' + homeHex + '.xml')
-            )
-            console.log('loading file')
-
-            var matches
-            // Fails if name or location contains " char
-            var regex = /Node id="([\d]+)" name="([^"]*)" location="([^"]*)"/g
-            // eslint-disable-next-line no-cond-assign
-            while ((matches = regex.exec(zwcfg))) {
-                var nodeID = parseInt(matches[1])
-                var name = matches[2] || ''
-                var loc = matches[3] || ''
-
-                // this call is async so it is possible that node has been already added
-                if (this.nodes[nodeID]) {
-                    this.nodes[nodeID].name = name
-                    this.nodes[nodeID].loc = loc
-                }
-
-                this.zwcfg_nodes[nodeID] = {}
-                this.zwcfg_nodes[nodeID].name = name
-                this.zwcfg_nodes[nodeID].loc = loc
-            }
-
-            // update in memory file
-            if (this.zwcfg_nodes.length > 0) {
-                await jsonStore.put(store.nodes, this.zwcfg_nodes)
-            }
-        } catch (error) {
-            debug('Error while reading zwcfg file', error.message)
-        }
-    }*/
     emitters.zwave.emit('zwave connection',this)
-    debug('Scanning network with homeid:', homeHex)
+    debug('Scanning network with homeid:')
 
 }
 
@@ -873,10 +845,10 @@ ZwaveClient.prototype.refreshNeighborns = function () {
 /**
  * Method used to start Zwave connection using configuration `port`
  */
-ZwaveClient.prototype.connect = function () {
+ZwaveClient.prototype.connect = async function () {
     if (!this.connected) {
         debug('Connecting to', this.cfg.port)
-        this.client.connect(this.cfg.port)
+        await this.client.start()
         this.connected = true
     } else {
         debug('Client already connected to', this.cfg.port)

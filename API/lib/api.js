@@ -32,6 +32,8 @@ function init() {
         console.log(`Example app listening on port 80!`),
     )
 
+    tools.launchregistreddevice();
+
     this.api.get('/tempstat/', async (req, res) => {
         let DBClient = new (reqlib('./lib/dbclient.js'))(null)
         let result
