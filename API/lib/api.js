@@ -8,6 +8,7 @@ const dongle = reqlib('./lib/api_ressources/dongle.js')
 const nodes = reqlib('./lib/api_ressources/nodes.js')
 
 
+
 global.devicetype = null
 
 function API() {
@@ -18,21 +19,20 @@ function API() {
 }
 
 
-function init() {
+async function init() {
 
-    this.connections = {},
+    tools.launchregistreddevice()
+
     this.api = Express()
     this.api.use(cors())
     this.api.use(bodyParser.urlencoded({ extended: true }))
     this.api.use(bodyParser.json())
     this.api.use(bodyParser.raw())
 
-
     this.api.listen(80, () =>
         console.log(`Example app listening on port 80!`),
     )
 
-    tools.launchregistreddevice();
 
     this.api.get('/tempstat/', async (req, res) => {
         let DBClient = new (reqlib('./lib/dbclient.js'))(null)
@@ -48,9 +48,11 @@ function init() {
 
     rooms.init(this.api)
 
-    dongle.init(this.api,this.connections)
+    dongle.init(this.api)
 
-    nodes.init(this.api,this.connections)
+    nodes.init(this.api)
+
+ 
 
     this.api.get('/task/:uuid', async (req, res) => {
         if (req.params.uuid) {

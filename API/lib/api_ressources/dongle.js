@@ -3,17 +3,18 @@ const reqlib = require('app-root-path').require
 const tools = reqlib('./lib/tools.js')
 const { v4: uuidv4 } = require('uuid')
 var result = ""
+const flatted = require('flatted')
 
-function init(API,connections) {
+function init(API) {
 
     API.post('/addmodule/', async (req, res) => {
         if (req.body.port && req.body.type) {
-            let { err, portconfig, type, connection } = await tools.setport(req.body.type, req.body.port, process.platform, connections)
+            let { err, portconfig, type, connection } = await tools.setport(req.body.type, req.body.port, process.platform, global.connections)
             if (!err) {
                 let DBClient = new (reqlib('./lib/dbclient.js'))(null)
                 await DBClient.setport(req.body.type, req.body.port)
                 DBClient.closeconnection()
-                connections = Object.assign(connections,connection)
+                console.log(global.connections)
             } else {
                 res.status(400).send({ error: err })
             }
@@ -26,10 +27,10 @@ function init(API,connections) {
 
     API.get('/modules/', async (req, res) => {
         let modulelist = {}
-        if (connections && connections.zwave) {
-            modulelist.zwave = connections.zwave
+        if (global.connections && global.connections.zwave) {
+            modulelist = global.connections
         }
-        res.status(200).json(modulelist)
+        res.status(200).send(modulelist)
     })
 
     API.get('/usblist/', async (req, res) => {
@@ -40,7 +41,7 @@ function init(API,connections) {
     
 
     API.post('/reset/', async (req, res) => {
-        connections.zwave.client.softReset()
+        global.connections.zwave.client.softReset()
         res.status(200).send("OK")
     })
 

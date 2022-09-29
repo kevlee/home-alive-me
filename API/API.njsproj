@@ -1497,6 +1497,7 @@
     <Content Include="lib\api_ressources\dongle.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="lib\api_ressources\nodes.js" />
     <Content Include="lib\db_method\nodevalue.js" />
     <Content Include="lib\db_method\zwavenode.js" />
     <Content Include="lib\api.js">

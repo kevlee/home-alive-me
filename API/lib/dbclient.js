@@ -26,6 +26,7 @@ async function init(master) {
         user: process.env.MYSQL_USER || "zwave",
         password: process.env.MYSQL_PASSWORD || "ppI3h4uwaz*UgT#s",
         database: process.env.MYSQL_DATABASE || "homealiveme",
+        port: 3306,
         connectionLimit: 100, 
         multipleStatements: true
     });
@@ -292,6 +293,7 @@ DBClient.prototype.getmodulesconfigs = async function () {
     try {
         result = await this.query(sql)
     } catch (error) {
+        console.log(error)
         return []
     }
     return result

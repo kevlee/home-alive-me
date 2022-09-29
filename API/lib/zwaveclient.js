@@ -10,6 +10,7 @@ var reqlib = require('app-root-path').require,
     EventEmitter = require('events'),
     debug = reqlib('./lib/debug')('Zwave')
     
+const { exit } = require('process')
 var emitters = require('./globalemitters')
 
 debug.color = 6
@@ -85,8 +86,7 @@ const NODE_STATUS = {
     6: 'Alive'
 }
 
-// the singleton client connection instance
-var CLIENT
+let DRIVER;
 
 /**
  * The constructor
@@ -103,7 +103,7 @@ function ZwaveClient(config) {
 
 async function init(cfg) {
     this.inclusion = false
-    this.exclusion = false 
+    this.exclusion = false
     this.cfg = cfg
 
     this.closed = false
@@ -119,7 +119,7 @@ async function init(cfg) {
             byte: 600,
             serialAPIStarted: 10000
         },
-        Logging: cfg.Logging,
+        logConfig: cfg.logConfig,
         ConsoleOutput: cfg.ConsoleOutput,
         AssumeAwake: true,
         //QueueLogLevel: cfg.queueloglevel ? 8 : 6,
@@ -143,23 +143,13 @@ async function init(cfg) {
         options.NetworkKey = cfg.NetworkKey.replace(/\s/g, '')
     }
 
-    /*if (cfg.configPath) {
-        options.ConfigPath = cfg.configPath || process.env.OZW_CONFIG_PATH
-    }
+  
 
-    if (cfg.assumeAwake) {
-        options.AssumeAwake = cfg.assumeAwake || process.env.OZW_ASSUME_AWAKE
-    }
-
-    if (cfg.options) {
-        Object.assign(options, cfg.options)
-    }*/
-
-    if (CLIENT) {
-        this.client = CLIENT
-        this.client.updateOptions(options)
+    if (DRIVER) {
+        DRIVER.updateOptions(options)
     } else {
-        this.client = CLIENT = new OpenZWave.Driver(cfg.port,options)
+        DRIVER = new OpenZWave.Driver(cfg.port, options)
+        console.log(this)
         if (cfg.plugin) {
             try {
                 require(cfg.plugin)(this)
@@ -168,6 +158,7 @@ async function init(cfg) {
             }
         }
     }
+    DRIVER.client = this
 
     this.nodes = []
     this.zwcfg_nodes = {}
@@ -175,10 +166,9 @@ async function init(cfg) {
     this.ozwConfig = {}
     this.healTimeout = null
 
-    var self = this
     Object.keys(EVENTS).forEach(function (evt) {
-        self.client.on(evt, onEvent.bind(self, evt))
-        self.client.on(evt, EVENTS[evt].bind(self))
+        DRIVER.on(evt, onEvent.bind(DRIVER, evt))
+        DRIVER.on(evt, EVENTS[evt].bind(DRIVER))
     })
 }
 
@@ -191,15 +181,16 @@ function onEvent(name, ...args) {
 }
 
 async function driverReady(homeid) {
-    //this.driverReadyStatus = true
-    //this.ozwConfig.homeid = homeid
+    this.driverReadyStatus = true
+    console.log()
+    //this.ozwConfig.homeid = DRIVER.homeid
     //var homeHex = '0x' + homeid.toString(16)
     //this.ozwConfig.name = homeHex
 
     this.error = false
     this.status = ZWAVE_STATUS[0]
 
-    emitters.zwave.emit('zwave connection',this)
+    emitters.zwave.emit('zwave connection',this.client)
     debug('Scanning network with homeid:')
 
 }
@@ -732,7 +723,7 @@ ZwaveClient.prototype.close = function () {
 
         this.client.removeAllListeners()    
         emitters.zwave.removeAllListeners()
-        this.client.disconnect(this.cfg.port)
+        DRIVER.disconnect(this.cfg.port)
     }
 }
 
@@ -848,7 +839,7 @@ ZwaveClient.prototype.refreshNeighborns = function () {
 ZwaveClient.prototype.connect = async function () {
     if (!this.connected) {
         debug('Connecting to', this.cfg.port)
-        await this.client.start()
+        await DRIVER.start()
         this.connected = true
     } else {
         debug('Client already connected to', this.cfg.port)

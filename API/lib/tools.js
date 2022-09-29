@@ -56,22 +56,21 @@ function setport(type, port, os, connections) {
         default:
     }
 
-    if (connections.hasOwnProperty('zwave') && connections.zwave) {
-        config = connections.zwave.cfg
-        connections.zwave.close()
+    if (global.connections.hasOwnProperty('zwave') && global.connections.zwave) {
+        config = global.connections.zwave.cfg
+        global.connections.zwave.close()
         
     }
     config.port = portconfig
-    connections.zwave = new OpenZWave(config)
-    connections.zwave.connect()
+    global.connections.zwave = new OpenZWave(config)
+    global.connections.zwave.connect()
     return { err, portconfig, type, connections }
     
     
 }
 
 async function launchregistreddevice() {
-    var connections = {},
-        err = null
+    var err = null
     let DBClient = new (reqlib('./lib/dbclient.js'))(null)
     let modules = await DBClient.getmodulesconfigs()
     DBClient.closeconnection()
@@ -94,15 +93,18 @@ async function launchregistreddevice() {
                                 break
                             default:
                         }
-                        connections.zwave = new OpenZWave({
-                            Logging: false,     // disable file logging (OZWLog.txt)
+                        global.connections.zwave = new OpenZWave({
+                            logConfig: {
+                                enabled: false,
+                                level: 0
+                            },     // disable file logging (OZWLog.txt)
                             ConsoleOutput: false, // enable console logging
                             NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
                             port: portconfig,
                             commandsTimeout: 30, // set time to 30 second
                             ConfigPath: './config/config/'
                         })
-                        connections.zwave.connect()
+                        global.connections.zwave.connect()
                     }
                     break
                 default:
@@ -110,7 +112,7 @@ async function launchregistreddevice() {
             }
         }
     }
-    return { err, connections}
+    return err
 }
 
 
