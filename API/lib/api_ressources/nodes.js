@@ -15,8 +15,7 @@ function init(API) {
             global.devicetype = req.body.type
             let uuid = uuidv4()
             res.status(200).json({ 'msg': 'start enrolling', 'task_id': uuid })
-            console.log(global.connections.zwave)
-            global.connections.zwave.startInclusion(true)
+            global.connections.zwave.startInclusion()
             result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "AddDevice")
         } else {
             res.status(400).send({ error: 'no type in query' })

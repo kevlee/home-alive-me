@@ -55,3 +55,11 @@ exports.setnodetype = async function setnodetype(uid , type){
     }
 }
 
+exports.addclient = async function addclient(self, uid, nodeid, name) {
+    // don't change databases if node exist
+    console.log(nodeid)
+    self.db.query("INSERT INTO nodes (nodeid,nodeuid,productname)" +
+        "values('" + nodeid + "', '" + uid + "', '" + name + "') " +
+        "ON DUPLICATE KEY UPDATE nodeid = nodeid ");
+}
+

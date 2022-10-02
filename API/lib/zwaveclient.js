@@ -54,10 +54,12 @@ const EVENTS = {
     'driver ready': driverReady,
     'driver failed': driverFailed,
     connected: connected,
+    'node found': nodeAdded,
     'node added': nodeAdded,
     'node removed': nodeRemoved,
-    'node available': nodeAvailable,
-    'node ready': nodeReady,
+    'alive': nodeAvailable,
+    'dead': nodeAvailable,
+    'ready': nodeReady,
     // 'node naming': nop,
     'node event': nodeEvent,
     // 'polling disabled': nop,
@@ -72,7 +74,7 @@ const EVENTS = {
     'value removed': valueRemoved,
     'value refreshed': valueChanged,
     notification: notification,
-    'scan complete': scanComplete,
+    'all nodes ready': scanComplete,
     'controller command': controllerCommand,
     'error': driverFailed
 }
@@ -143,21 +145,24 @@ async function init(cfg) {
         options.NetworkKey = cfg.NetworkKey.replace(/\s/g, '')
     }
 
-  
-
-    if (DRIVER) {
-        DRIVER.updateOptions(options)
-    } else {
-        DRIVER = new OpenZWave.Driver(cfg.port, options)
-        console.log(this)
-        if (cfg.plugin) {
-            try {
-                require(cfg.plugin)(this)
-            } catch (error) {
-                debug(`Error while loading ${cfg.plugin} plugin`, error.message)
-            }
+    let DRIVER2 = new OpenZWave.Driver(cfg.port, options)
+    if (cfg.plugin) {
+        try {
+            require(cfg.plugin)(this)
+        } catch (error) {
+            debug(`Error while loading ${cfg.plugin} plugin`, error.message)
         }
     }
+
+    if (DRIVER) {
+        let old_driver = DRIVER
+        DRIVER = DRIVER2
+        await old_driver.destroy()
+        await DRIVER.start()
+    } else {
+        DRIVER = DRIVER2
+    }
+   
     DRIVER.client = this
 
     this.nodes = []
@@ -167,9 +172,11 @@ async function init(cfg) {
     this.healTimeout = null
 
     Object.keys(EVENTS).forEach(function (evt) {
-        DRIVER.on(evt, onEvent.bind(DRIVER, evt))
+        onEvent.bind(DRIVER.client,evt)
         DRIVER.on(evt, EVENTS[evt].bind(DRIVER))
     })
+
+ 
 }
 
 // ---------- ZWAVE EVENTS -------------------------------------
@@ -177,55 +184,64 @@ async function init(cfg) {
 // catch all events
 function onEvent(name, ...args) {
     this.lastUpdate = Date.now()
-    emitters.zwave.emit('event', name, ...args)
+    emitters.zwave.on('event', name, ...args)
 }
 
-async function driverReady(homeid) {
-    this.driverReadyStatus = true
-    console.log()
-    //this.ozwConfig.homeid = DRIVER.homeid
-    //var homeHex = '0x' + homeid.toString(16)
-    //this.ozwConfig.name = homeHex
+async function driverReady() {
+    this.client.driverReadyStatus = true
+    this.client.ozwConfig.homeid = DRIVER.controller.homeId
+    var homeHex = '0x' + DRIVER.controller.homeId.toString(16)
+    this.client.ozwConfig.name = homeHex
 
     this.error = false
     this.status = ZWAVE_STATUS[0]
 
-    emitters.zwave.emit('zwave connection',this.client)
-    debug('Scanning network with homeid:')
+    Object.keys(EVENTS).forEach(function (evt) {
+        DRIVER.controller.nodes.forEach(function (node) {
+            node.on(evt, EVENTS[evt].bind(node))
+        })
+    })
+
+    
+    emitters.zwave.emit('zwave connection',DRIVER.client)
+    debug('Scanning network with homeid:', DRIVER.client.ozwConfig.name)
 
 }
 
 function driverFailed() {
-    this.error = 'Driver failed'
-    this.status = ZWAVE_STATUS[5]
-    debug('Driver failed', this.ozwConfig)
+    this.client.error = 'Driver failed'
+    this.client.status = ZWAVE_STATUS[5]
+    debug('Driver failed', this.client.ozwConfig)
 }
 
 function connected(version) {
-    this.ozwConfig.version = version
+    this.client.ozwConfig.version = version
     debug('Zwave connected, Openzwave version:', version)
-    this.status = ZWAVE_STATUS[1]
+    this.client.status = ZWAVE_STATUS[1]
 
-    //this.emitEvent('CONNECTED', this.ozwConfig)
+    this.emitEvent('CONNECTED', this.client.ozwConfig)
 }
 
 function nodeRemoved(nodeid) {
     // don't use splice here, nodeid equals to the index in the array
-    var node = this.nodes[nodeid]
+    var node = this.client.nodes[nodeid]
     if (node) {
-        this.nodes[nodeid] = null
+        this.client.nodes[nodeid] = null
     }
     debug('Node removed', nodeid)
 
     emitters.zwave.emit('nodeRemoved', node)
 
-    this.addEmptyNodes()
+    this.client.addEmptyNodes()
 }
 
 // Triggered when a node is added
-function nodeAdded(nodeid) {
-    this.nodes[nodeid] = {
-        node_id: nodeid,
+function nodeAdded(node) {
+    let nodeId = node.id
+    debug("add node ", nodeId)
+
+    DRIVER.client.nodes[nodeId] = {
+        node_id: nodeId,
         device_id: '',
         manufacturer: '',
         manufacturerid: '',
@@ -233,9 +249,9 @@ function nodeAdded(nodeid) {
         producttype: '',
         productid: '',
         type: '',
-        name: this.zwcfg_nodes[nodeid] ? this.zwcfg_nodes[nodeid].name : '',
-        loc: this.zwcfg_nodes[nodeid] ? this.zwcfg_nodes[nodeid].loc : '',
-        values: {},
+        name: DRIVER.client.zwcfg_nodes[nodeId] ? DRIVER.client.zwcfg_nodes[nodeId].name : '',
+        loc: DRIVER.client.zwcfg_nodes[nodeId] ? DRIVER.client.zwcfg_nodes[nodeId].loc : '',
+        values: [],
         groups: [],
         neighborns: [],
         ready: false,
@@ -245,112 +261,86 @@ function nodeAdded(nodeid) {
         lastActive: null,
         status: NODE_STATUS[0] // initializing
     }
-    this.addEmptyNodes()
-    this.client.requestAllConfigParams(nodeid)
-    debug('Node added', nodeid)
+
+    DRIVER.client.addEmptyNodes()
+    node.refreshValues()
+    debug('Node added', nodeId )
     
 }
 
 // Triggered after node added event when the node info are firstly loaded
 // ATTENTION: Values not added yet here
-function nodeAvailable(nodeid, nodeinfo) {
-    var ozwnode = this.nodes[nodeid]
-    if (ozwnode) {
-        this.initNode(ozwnode, nodeinfo)
+function nodeAvailable(ozwnode) {
+    if (ozwnode && !ozwnode.isControllerNode()) {
+        emitters.zwave.emit('node available', ozwnode.id, getDeviceID(ozwnode), ozwnode.productType)
         debug(
             'node %d uid %s AVAILABLE: %s - %s - (%s)',
-            nodeid,
+            ozwnode.id,
             getDeviceID(ozwnode),
-            nodeinfo.manufacturer,
-            nodeinfo.product,
-            nodeinfo.type || 'Unknown'
+            ozwnode.manufacturerId,
+            ozwnode.productId,
+            ozwnode.productType || 'Unknown'
         )
-
-        emitters.zwave.emit('node available', nodeid, getDeviceID(ozwnode), nodeinfo.product)
     }
 }
 
 // Triggered after node available event when a value is added
-function valueAdded(nodeid, comclass, valueId) {
-    var ozwnode = this.nodes[nodeid]
+function valueAdded(node, valueId) {
+    var ozwnode = DRIVER.client.nodes[node.id]
+    var comclass = valueId.commandClass
     if (!ozwnode) {
         debug('ValueAdded: no such node: ' + nodeid, 'error')
     } else {
 
-        parseValue(valueId)
+        ozwnode.values[comclass] = valueId
 
-        
-        var id = getValueID(valueId)
-
-        ozwnode.values[id] = valueId
-
-        if (comclass === 0x86 && valueId.index === 2) {
+        console.log(ozwnode.values[valueId.endpoint])
+        if (comclass === 0x86 && valueId.endpoint === 2) {
             // application version
-            ozwnode.version = valueId.value
+            ozwnode.version = valueId.newValue
         }
 
         // check if node is added as secure node
-        if (comclass === 0x98 && valueId.index === 0) {
-            ozwnode.secure = valueId.value
+        if (comclass === 0x98 && valueId.endpoint === 0) {
+            ozwnode.secure = valueId.newValue
         }
 
         // avoid changed value mesure to 0 on wake up device: to be check with not battery device
-        if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.value !== 0) {
-            emitters.zwave.emit('value added', valueId, comclass, nodeid, getDeviceID(ozwnode))
+        if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.endpoint !== 0) {
+            emitters.zwave.emit('value added', valueId, comclass, node.id, getDeviceID(ozwnode))
         }
         
-        debug('ValueAdded: %s %s %s', valueId.value_id, valueId.label, valueId.value)
+        debug('ValueAdded: %s %s %s', comclass, valueId.commandClassName, valueId.newValue)
         
 
     }
 }
 
 // Triggered after all values have been added
-function nodeReady(nodeid, nodeinfo) {
-    var ozwnode = this.nodes[nodeid]
-
-    if (ozwnode) {
+function nodeReady(node) {
+    DRIVER.client.nodes[node.id] = {}
+    if (node) {
         // When a node is added 'on fly' it never triggers 'node available'
-        if (!ozwnode.available) {
-            this.initNode(ozwnode, nodeinfo)
+        if (node.ready) {
+            DRIVER.client.initNode(node)
         }
 
-        ozwnode.ready = true
-        ozwnode.status = NODE_STATUS[6]
-        ozwnode.lastActive = Date.now()
-
-        // add it to know devices types (if not already present)
-        /*if (!this.devices[ozwnode.device_id]) {
-            this.devices[ozwnode.device_id] = {
-                name: `[${ozwnode.device_id}] ${ozwnode.product} (${ozwnode.manufacturer})`,
-                values: JSON.parse(JSON.stringify(ozwnode.values))
-            }
-
-            // remove node specific info from values
-            for (var v in this.devices[ozwnode.device_id].values) {
-                var tmp = this.devices[ozwnode.device_id].values[v]
-                delete tmp.node_id
-                delete tmp.hassDevices
-                tmp.value_id = getValueID(tmp)
-            }
-        }*/
-
         
-        emitters.zwave.emit('node ready', ozwnode)
 
+        emitters.zwave.emit('node ready', node)
         debug(
             'node %d ready: %s - %s (%s)',
-            nodeid,
-            nodeinfo.manufacturer,
-            nodeinfo.product,
-            nodeinfo.type || 'Unknown'
+            node.id,
+            node.manufacturerId,
+            node.productId,
+            node.productType || 'Unknown'
         )
     }
 }
 
 // Triggered when a node is ready and a value changes
 function valueChanged(nodeid, comclass, valueId) {
-    var ozwnode = this.nodes[nodeid]
+    var ozwnode = this.client.nodes[nodeid]
     var value_id = getValueID(valueId)
     parseValue(valueId)
     if (!ozwnode) {
@@ -365,7 +355,7 @@ function valueChanged(nodeid, comclass, valueId) {
             ozwnode.values[value_id] = valueId
             // avoid changed value mesure to 0 on wake up device: to be check with not battery device
             if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.value !== 0 ) {
-                emitters.zwave.emit('value changed', valueId, comclass, nodeid,getDeviceID(ozwnode))
+                emitters.zwave.emit('value changed', valueId, comclass, nodeid, this.client.getDeviceID(ozwnode))
             }
         }
 
@@ -381,7 +371,7 @@ function valueChanged(nodeid, comclass, valueId) {
 }
 
 function valueRemoved(nodeid, comclass, instance, index) {
-    var ozwnode = this.nodes[nodeid]
+    var ozwnode = this.client.nodes[nodeid]
     var value_id = getValueID({
         class_id: comclass,
         instance: instance,
@@ -406,7 +396,7 @@ function sceneEvent(nodeid, sceneCode) {
 }
 
 function notification(nodeid, notif, help) {
-    var ozwnode = this.nodes[nodeid]
+    var ozwnode = this.client.nodes[nodeid]
     switch (notif) {
         case 0: // message complete
         case 1: // timeout
@@ -438,29 +428,35 @@ function notification(nodeid, notif, help) {
 
 function scanComplete() {
 
-    this.scanComplete = true
+    DRIVER.controller.nodes.forEach((node) => {
+        if (!node.isControllerNode) {
+            nodeReady(node)
+        }
+    });
 
-    this.status = ZWAVE_STATUS[2]
+    DRIVER.client.scanComplete = true
 
-    var nodes = this.nodes.filter(n => !n.failed)
+    DRIVER.client.status = ZWAVE_STATUS[2]
 
-    // popolate groups (just for active nodes)
+    var nodes = DRIVER.client.nodes.filter(node => node.ready)
+
+    // get node information
     for (var i = 0; i < nodes.length; i++) {
-        this.getGroups(nodes[i].node_id)
-        nodes[i].neighborns = this.client.getNodeNeighbors(nodes[i].node_id)
+        // DRIVER.client.getGroups(nodes[i].id) not yet develop
+        if (!nodes[i].isControllerNode) {
+            console.log(nodes[i].id)
+            nodes[i].neighborns = DRIVER.controller.getNodeNeighbors(nodes[i].id)
+            DRIVER.controller.nodes[nodes[i].id].refreshValues()
+        }
     }
 
-    // get current configuration
-    for (var i = 0; i < nodes.length; i++) {
-        this.client.requestAllConfigParams(nodes[i].node_id)
-    }
 
     /*if (this.cfg.saveConfig && typeof this.client.writeConfig === 'function') {
         this.client.writeConfig()
     }*/
 
     debug('Network scan complete. Found:', nodes.length, 'nodes')
-    emitters.zwave.emit('scan complete', this.client)
+    emitters.zwave.emit('scan complete', DRIVER.client)
     
 }
 
@@ -494,10 +490,9 @@ function controllerCommand(nodeid, state, errcode, help) {
  */
 function getDeviceID(ozwnode) {
     if (!ozwnode) return ''
-
-    return `${parseInt(ozwnode.manufacturerid)}-${parseInt(
-        ozwnode.productid
-    )}-${parseInt(ozwnode.producttype)}`
+    return `${parseInt(ozwnode.manufacturerId)}-${parseInt(
+        ozwnode.productId
+    )}-${parseInt(ozwnode.productType)}`
 }
 
 /**
@@ -519,7 +514,7 @@ function parseValue(valueId) {
  * @returns The value id without node reference: `${v.class_id}-${v.instance}-${v.index}`
  */
 function getValueID(v) {
-    return `${v.class_id}-${v.instance}-${v.index}`
+    return `${v.endpoint}-${v.commandClass}-${v.property}`
 }
 
 /**
@@ -744,40 +739,75 @@ ZwaveClient.prototype.getStatus = function () {
  * @param {Object} ozwnode The Node Zwave Object
  * @param {Object} nodeinfo Node Info Object
  */
-ZwaveClient.prototype.initNode = function (ozwnode, nodeinfo) {
-    var nodeid = ozwnode.node_id
-    for (var attrname in nodeinfo) {
+ZwaveClient.prototype.initNode = async function (ozwnode) {
+    var nodeid = ozwnode.id
+
+    DRIVER.client.nodes[nodeid] = {
+        node_id: nodeid,
+        device_id: '',
+        manufacturer: '',
+        manufacturerid: '',
+        product: '',
+        producttype: '',
+        productid: '',
+        type: '',
+        name: DRIVER.client.zwcfg_nodes[nodeid] ? DRIVER.client.zwcfg_nodes[nodeid].name : '',
+        loc: DRIVER.client.zwcfg_nodes[nodeid] ? DRIVER.client.zwcfg_nodes[nodeid].loc : '',
+        values: [],
+        groups: [],
+        neighborns: [],
+        ready: false,
+        available: false,
+        hassDevices: {},
+        failed: false,
+        lastActive: null,
+        status: NODE_STATUS[0] // initializing
+    }
+
+    await ozwnode.refreshValues()
+    for (let [key, valueid] of Object.entries(ozwnode.getDefinedValueIDs())) {
+        let value = ozwnode.getValue(valueid)
+        valueid.value = value
+        emitters.zwave.emit('value added', valueid, valueid.commandClass, ozwnode.id, getDeviceID(ozwnode))
+    }
+    DRIVER.client.nodes[nodeid].isControllerNode = ozwnode.isControllerNode
+    DRIVER.client.nodes[nodeid].id = nodeid
+    DRIVER.client.nodes[nodeid].ready = true
+    DRIVER.client.nodes[nodeid].status = NODE_STATUS[6]
+    DRIVER.client.nodes[nodeid].lastActive = Date.now()
+
+    
+
+    for (var attrname in ozwnode) {
         // Use custom node naming and location
-        if (attrname === 'name' || attrname === 'loc') {
-            ozwnode[attrname] = this.zwcfg_nodes[nodeid]
-                ? this.zwcfg_nodes[nodeid][attrname]
+        if (attrname === 'name' || attrname === 'location') {
+            ozwnode[attrname] = DRIVER.client.zwcfg_nodes[nodeid]
+                ? DRIVER.client.zwcfg_nodes[nodeid][attrname]
                 : ''
-        } else {
-            ozwnode[attrname] = nodeinfo[attrname]
         }
     }
-
-    if (this.zwcfg_nodes[nodeid] && this.zwcfg_nodes[nodeid].hassDevices) {
-        ozwnode.hassDevices = copy(this.zwcfg_nodes[nodeid].hassDevices)
+    
+    if (DRIVER.client.zwcfg_nodes[nodeid] && DRIVER.client.zwcfg_nodes[nodeid].hassDevices) {
+        ozwnode.hassDevices = copy(DRIVER.client.zwcfg_nodes[nodeid].hassDevices)
     }
-
-    if (!this.zwcfg_nodes[nodeid]) this.zwcfg_nodes[nodeid] = {}
-
-    ozwnode.status = NODE_STATUS[4] // sleeping
-    ozwnode.available = true
+    
+    if (!DRIVER.client.zwcfg_nodes[nodeid]) DRIVER.client.zwcfg_nodes[nodeid] = {}
+    
+    DRIVER.client.nodes[nodeid].status = NODE_STATUS[4] // sleeping
+    DRIVER.client.nodes[nodeid].available = true
 
     var deviceID = getDeviceID(ozwnode)
-    ozwnode.device_id = deviceID
+    DRIVER.client.nodes[nodeid].device_id = deviceID
 
-    ozwnode.basic_device_class = this.client.getNodeBasic(nodeid)
-    ozwnode.generic_device_class = this.client.getNodeGeneric(nodeid)
-    ozwnode.specific_device_class = this.client.getNodeSpecific(nodeid)
+    DRIVER.client.nodes[nodeid].basic_device_class = ozwnode.deviceClass.basic
+    DRIVER.client.nodes[nodeid].generic_device_class = ozwnode.deviceClass.generic
+    DRIVER.client.nodes[nodeid].specific_device_class = ozwnode.deviceClass.specific
 
     // if scan is complete update node groups (for nodes added 'on fly')
-    if (this.scanComplete) {
-        this.getGroups(nodeid)
-        ozwnode.neighborns = this.client.getNodeNeighbors(nodeid)
-    }
+    //if (DRIVER.client.scanComplete) {
+    //    ozwnode.neighborns = DRIVER.controller.getNodeNeighbors(nodeid)
+   // }
+    debug('finished init node:', nodeid)
 }
 
 /**
@@ -825,8 +855,8 @@ ZwaveClient.prototype.getGroups = function (nodeID) {
  */
 ZwaveClient.prototype.refreshNeighborns = function () {
     for (let i = 0; i < this.nodes.length; i++) {
-        if (!this.nodes[i].failed) {
-            this.nodes[i].neighborns = this.client.getNodeNeighbors(i)
+        if (!this.client.nodes[i].failed) {
+            this.client.nodes[i].neighborns = DRIVE.controller.getNodeNeighbors(i)
         }
     }
 
@@ -1122,18 +1152,28 @@ ZwaveClient.prototype.getInfo = function () {
 }
 
 ZwaveClient.prototype.startInclusion = function (secure) {
-    if (this.client && !this.closed && !this.inclusion) {
-        this.inclusion = true
-        if (this.commandsTimeout) {
-            clearTimeout(this.commandsTimeout)
-            this.commandsTimeout = null
+    if (DRIVER && DRIVER.controller && !DRIVER.client.closed && !DRIVER.client.inclusion) {
+        DRIVER.client.inclusion = true
+        if (DRIVER.client.commandsTimeout) {
+            clearTimeout(DRIVER.client.commandsTimeout)
+            DRIVER.client.commandsTimeout = null
         }
 
-        this.commandsTimeout = setTimeout(
-            this.stopControllerCommand.bind(this),
-            this.cfg.commandsTimeout * 1000 || 30000
+        DRIVER.client.commandsTimeout = setTimeout(
+            () => {
+                DRIVER.controller.stopInclusion.bind(DRIVER.client)
+                DRIVER.client.inclusion = false
+                debug("stop Inclusion")
+            }
+            ,
+            DRIVER.client.cfg.commandsTimeout * 1000 || 30000
         )
-        this.client.addNode(secure)
+        let InclusionOptions = {
+            strategy: 0,
+            forceSecurity: secure
+        }
+        DRIVER.controller.beginInclusion(InclusionOptions)
+        debug("start Inclusion")
     }
 }
 
@@ -1145,10 +1185,10 @@ ZwaveClient.prototype.startExclusion = function () {
         }
 
         this.commandsTimeout = setTimeout(
-            this.stopControllerCommand.bind(this),
+            this.driver.controller.stopExclusion.bind(this),
             this.cfg.commandsTimeout * 1000 || 30000
         )
-        this.client.removeNode()
+        this.driver.controller.beginExclusion()
     }
 }
 

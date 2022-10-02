@@ -41,11 +41,10 @@ async function init(master) {
         await createtable(self)
 
         // add node zwave if exist
-        emitters.zwave.on('node available', function (nodeid, deviceid, name) {
+        emitters.zwave.on('node available', function (nodeid, nodeuid, productType) {
             // add node to the homealiveme db
-            if (name != "" && devicetype != "") {
-                addclient(self, deviceid.toString(), nodeid, name, devicetype)
-            }
+            nodes.addclient(self, nodeuid, nodeid, productType)
+           
         })
 
         emitters.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
@@ -56,15 +55,16 @@ async function init(master) {
             nodes.addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
         })
         
-
+        
         emitters.zwave.on('node ready', function (ozwnode) {
-            for (let [key, value] of Object.entries(ozwnode.values)) {
-                nodes.addvalue(self, value, value.class_id, ozwnode.node_id + "-" + ozwnode.device_id)
-            }
-            if (self.addedclient == true) {
-                updatetaskstatus(self, 'AddDevice', 'Completed', { 'node_uid': ozwnode.node_id + "-" + ozwnode.device_id })
-                self.addedclient = false
-            }
+            console.log("insert into DB node", ozwnode.id)
+            //if (!ozwnode.isController) {
+            //    nodes.addclient(self, nodeuid.toString(), nodeid, name, devicetype)
+            //}
+            //if (self.addedclient == true) {
+            //    updatetaskstatus(self, 'AddDevice', 'Completed', { 'node_uid': ozwnode.id + "-" + ozwnode.name })
+            //    self.addedclient = false
+            //}
         })
 
         emitters.zwave.on('command controller', (obj) => {
@@ -145,7 +145,7 @@ DBClient.prototype.getroom = room.getroom
 DBClient.prototype.getrooms = room.getrooms
 DBClient.prototype.updateroom = room.updateroom
 DBClient.prototype.removeroom = room.removeroom
-
+DBClient.prototype.addclient = room.addclient
 
 /***************** NODES MANAGEMENT *******************/
 

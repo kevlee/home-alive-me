@@ -17,3 +17,5 @@ ALTER TABLE `nodes` ADD COLUMN IF NOT EXISTS `roomname` varchar(50);
 ALTER TABLE `nodes` ADD CONSTRAINT  `nodes_ibfk_1` FOREIGN KEY IF NOT EXISTS(`roomname`) REFERENCES `rooms` (`name`)
  ON DELETE SET NULL
  ON UPDATE CASCADE;
+
+ ALTER TABLE `nodes` ADD COLUMN IF NOT EXISTS `roomname` varchar(50);
