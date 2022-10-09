@@ -309,18 +309,13 @@ function nodeReady(node) {
 // Triggered after node available event when a value is added
 function valueAdded(node, valueId) {
     let ozwnode = node
-    
+    console.log(valueId)
     if (!ozwnode) {
         debug('ValueAdded: no such node: ' + node.id, 'error')
     } else {
-        let metaValueId = ozwnode.getValueMetadata(valueId)
-        console.log(typeof(metaValueId))
+        let value = ozwnode.newValue
         let comclass = valueId.commandClass
         let value_uid = getValueID(ozwnode.id, valueId)
-        let value = valueId.newValue
-        ozwnode.values[comclass] = comclass
-
-        console.log(ozwnode.values[valueId.endpoint])
         if (comclass === 0x86 && valueId.endpoint === 2) {
             // application version
             ozwnode.version = value
@@ -333,9 +328,8 @@ function valueAdded(node, valueId) {
 
         // avoid changed value mesure to 0 on wake up device: to be check with not battery device
         if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.endpoint !== 0) {
-
-            emitters.zwave.emit('value added', getDeviceID(ozwnode), value_uid,
-                valueId.commandClassName, value, metaValueId.type, valueId.commandClassName)
+            emitters.zwave.emit('value added', value_uid,
+                valueId, value, ozwnode.id, getDeviceID(ozwnode))
         }
         
         debug('ValueAdded: %s %s %s', value_uid, valueId.commandClassName, value)
@@ -348,10 +342,11 @@ function valueAdded(node, valueId) {
 
 // Triggered when a node is ready and a value changes
 function valueChanged(nodeid, valueId) {
+
+    console.log(valueId)
     var ozwnode = DRIVER.client.nodes[node.id]
     var comclass = valueId.commandClass
     var value_id = getValueID(ozwnode.id,valueId)
-    parseValue(valueId)
     if (!ozwnode) {
         debug('valueChanged: no such node: ' + nodeid, 'error')
     } else {
@@ -523,7 +518,7 @@ function parseValue(valueId) {
  * @returns The value id without node reference: `${v.class_id}-${v.instance}-${v.index}`
  */
 function getValueID(nodeId ,v) {
-    return `${nodeId}-${v.commandClass}-${v.endpoint}`
+    return `${nodeId}-${v.commandClass}-${v.endpoint}-${v.property}`
 }
 
 /**
@@ -773,11 +768,15 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
         status: NODE_STATUS[0] // initializing
     }
 
-    await ozwnode.refreshValues()
+
+    //await ozwnode.refreshCCValues(ozwnode.commandClasses)
+    //await ozwnode.refreshInfo()
     for (let [key, valueid] of Object.entries(ozwnode.getDefinedValueIDs())) {
-        let value = ozwnode.getValue(valueid)
-        valueid.value = value
-        emitters.zwave.emit('value added', valueid, valueid.commandClass, ozwnode.id, getDeviceID(ozwnode))
+        let value = await ozwnode.getValue(valueid)
+        if (value !== null) {
+            emitters.zwave.emit('value added', getValueID(ozwnode.id, valueid),
+                valueid, value , ozwnode.id, getDeviceID(ozwnode))
+        }
     }
     DRIVER.client.nodes[nodeid].isControllerNode = ozwnode.isControllerNode
     DRIVER.client.nodes[nodeid].id = nodeid

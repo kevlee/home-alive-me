@@ -7,7 +7,7 @@ exports.getnodes = async function () {
     return result
 }
 
-exports.addvalue = function addvalue(value_uid,value, comclass, uid) {
+exports.addvalue = function addvalue(value_uid, value, commandClass , commandClassName,type, uid) {
     try {
         let choices = {};
         if (value) {
@@ -15,9 +15,14 @@ exports.addvalue = function addvalue(value_uid,value, comclass, uid) {
         } else {
             choices = "{}";
         }
-        let sql = 'INSERT INTO ' + COMCLASS[comclass] +
+        let sql = 'INSERT INTO ' + COMCLASS[commandClass] +
             ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
-            "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices + "')" +
+            "('" + uid +
+            "','" + value_uid +
+            "','" + commandClassName +
+            "','" + value +
+            "','" + type +
+            "','" + choices + "')" +
             "ON CONFLICT(nodeuid,valueid) DO UPDATE SET value = EXCLUDED.value "
         this.query(sql);
 

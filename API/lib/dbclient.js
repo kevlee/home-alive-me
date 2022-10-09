@@ -47,19 +47,21 @@ async function init(master) {
            
         })
 
-        emitters.zwave.on('value added', function (value_uid, valueId, comclass, nodeid, deviceid) {
-            self.addvalue(value_uid, valueId, comclass, deviceid)
+        emitters.zwave.on('value added', function (value_uid, valueId, value, nodeid, deviceid) {
+            self.addvalue(value_uid, value, valueId.commandClass,
+                valueId.commandClassName, valueId.propertyName, deviceid)
         })
 
-        emitters.zwave.on('value changed', function (value_uid,valueId, comclass, nodeid, deviceid) {
-            self.addvalue(value_uid, valueId, comclass, deviceid)
+        emitters.zwave.on('value changed', function (value_uid,valueId, nodeid, deviceid) {
+            self.addvalue(value_uid, value , valueId.commandClass,
+                valueId.commandClassName, valueId.propertyName, deviceid)
         })
         
         
         emitters.zwave.on('node ready', function (ozwnode) {
             console.log("insert into DB node", ozwnode.id)
             //if (!ozwnode.isController) {
-            //    nodes.addclient(self, nodeuid.toString(), nodeid, name, devicetype)
+            //    self.addclient(self, nodeuid.toString(), nodeid, name, devicetype)
             //}
             //if (self.addedclient == true) {
             //    updatetaskstatus(self, 'AddDevice', 'Completed', { 'node_uid': ozwnode.id + "-" + ozwnode.name })
