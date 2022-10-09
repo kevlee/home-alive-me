@@ -48,13 +48,14 @@ async function init(master) {
         })
 
         emitters.zwave.on('value added', function (value_uid, valueId, value, nodeid, deviceid) {
+            console.log(valueId)
             self.addvalue(value_uid, value, valueId.commandClass,
-                valueId.commandClassName, valueId.propertyName, deviceid)
+                valueId.label, valueId.type, deviceid, valueId.availablevalue )
         })
 
         emitters.zwave.on('value changed', function (value_uid,valueId, nodeid, deviceid) {
-            self.addvalue(value_uid, value , valueId.commandClass,
-                valueId.commandClassName, valueId.propertyName, deviceid)
+            self.addvalue(value_uid, value, valueId.commandClass,
+                valueId.label, valueId.type, deviceid, valueId.availablevalue)
         })
         
         

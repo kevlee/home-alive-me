@@ -7,14 +7,8 @@ exports.getnodes = async function () {
     return result
 }
 
-exports.addvalue = function addvalue(value_uid, value, commandClass , commandClassName,type, uid) {
+exports.addvalue = function addvalue(value_uid, value, commandClass , commandClassName,type, uid , choices) {
     try {
-        let choices = {};
-        if (value) {
-            choices = JSON.stringify(Object.assign({}, value));
-        } else {
-            choices = "{}";
-        }
         let sql = 'INSERT INTO ' + COMCLASS[commandClass] +
             ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
             "('" + uid +
@@ -22,8 +16,11 @@ exports.addvalue = function addvalue(value_uid, value, commandClass , commandCla
             "','" + commandClassName +
             "','" + value +
             "','" + type +
-            "','" + choices + "')" +
-            "ON CONFLICT(nodeuid,valueid) DO UPDATE SET value = EXCLUDED.value "
+            "','" + choices + "') " +
+            "ON CONFLICT(nodeuid,valueid) DO UPDATE SET " +
+            "(label,value,typevalue,availablevalue) = " +
+            "(EXCLUDED.label,EXCLUDED.value,EXCLUDED.typevalue,EXCLUDED.availablevalue) "
+        console.log(sql)
         this.query(sql);
 
     } catch (error) {
