@@ -284,38 +284,6 @@ function nodeAvailable(ozwnode) {
     }
 }
 
-// Triggered after node available event when a value is added
-function valueAdded(node, valueId) {
-    var ozwnode = DRIVER.client.nodes[node.id]
-    var comclass = valueId.commandClass
-    if (!ozwnode) {
-        debug('ValueAdded: no such node: ' + nodeid, 'error')
-    } else {
-
-        ozwnode.values[comclass] = valueId
-
-        console.log(ozwnode.values[valueId.endpoint])
-        if (comclass === 0x86 && valueId.endpoint === 2) {
-            // application version
-            ozwnode.version = valueId.newValue
-        }
-
-        // check if node is added as secure node
-        if (comclass === 0x98 && valueId.endpoint === 0) {
-            ozwnode.secure = valueId.newValue
-        }
-
-        // avoid changed value mesure to 0 on wake up device: to be check with not battery device
-        if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.endpoint !== 0) {
-            emitters.zwave.emit('value added', valueId, comclass, node.id, getDeviceID(ozwnode))
-        }
-        
-        debug('ValueAdded: %s %s %s', comclass, valueId.commandClassName, valueId.newValue)
-        
-
-    }
-}
-
 // Triggered after all values have been added
 function nodeReady(node) {
     DRIVER.client.nodes[node.id] = {}
@@ -325,7 +293,7 @@ function nodeReady(node) {
             DRIVER.client.initNode(node)
         }
 
-        
+
 
         emitters.zwave.emit('node ready', node)
         debug(
@@ -338,10 +306,51 @@ function nodeReady(node) {
     }
 }
 
+// Triggered after node available event when a value is added
+function valueAdded(node, valueId) {
+    let ozwnode = node
+    
+    if (!ozwnode) {
+        debug('ValueAdded: no such node: ' + node.id, 'error')
+    } else {
+        let metaValueId = ozwnode.getValueMetadata(valueId)
+        console.log(typeof(metaValueId))
+        let comclass = valueId.commandClass
+        let value_uid = getValueID(ozwnode.id, valueId)
+        let value = valueId.newValue
+        ozwnode.values[comclass] = comclass
+
+        console.log(ozwnode.values[valueId.endpoint])
+        if (comclass === 0x86 && valueId.endpoint === 2) {
+            // application version
+            ozwnode.version = value
+        }
+
+        // check if node is added as secure node
+        if (comclass === 0x98 && valueId.endpoint === 0) {
+            ozwnode.secure = value
+        }
+
+        // avoid changed value mesure to 0 on wake up device: to be check with not battery device
+        if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.endpoint !== 0) {
+
+            emitters.zwave.emit('value added', getDeviceID(ozwnode), value_uid,
+                valueId.commandClassName, value, metaValueId.type, valueId.commandClassName)
+        }
+        
+        debug('ValueAdded: %s %s %s', value_uid, valueId.commandClassName, value)
+        
+
+    }
+}
+
+
+
 // Triggered when a node is ready and a value changes
-function valueChanged(nodeid, comclass, valueId) {
-    var ozwnode = this.client.nodes[nodeid]
-    var value_id = getValueID(valueId)
+function valueChanged(nodeid, valueId) {
+    var ozwnode = DRIVER.client.nodes[node.id]
+    var comclass = valueId.commandClass
+    var value_id = getValueID(ozwnode.id,valueId)
     parseValue(valueId)
     if (!ozwnode) {
         debug('valueChanged: no such node: ' + nodeid, 'error')
@@ -349,13 +358,13 @@ function valueChanged(nodeid, comclass, valueId) {
         var oldst = ozwnode.values[value_id].value
         if (ozwnode.ready && oldst !== valueId.value) {
             debug(
-                `zwave node ${nodeid}: changed: ${value_id}:${valueId.label}:${oldst} -> ${valueId.value}`
+                `zwave node ${nodeid}: changed: ${value_id}:${valueId.label}:${oldst} -> ${valueId.newValue}`
             )
             // update cache
             ozwnode.values[value_id] = valueId
             // avoid changed value mesure to 0 on wake up device: to be check with not battery device
             if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.value !== 0 ) {
-                emitters.zwave.emit('value changed', valueId, comclass, nodeid, this.client.getDeviceID(ozwnode))
+                emitters.zwave.emit('value changed', value_id, valueId.newValue, comclass, nodeid, getDeviceID(ozwnode))
             }
         }
 
@@ -490,7 +499,7 @@ function controllerCommand(nodeid, state, errcode, help) {
  */
 function getDeviceID(ozwnode) {
     if (!ozwnode) return ''
-    return `${parseInt(ozwnode.manufacturerId)}-${parseInt(
+    return `${parseInt(ozwnode.id)}-${parseInt(ozwnode.manufacturerId)}-${parseInt(
         ozwnode.productId
     )}-${parseInt(ozwnode.productType)}`
 }
@@ -513,8 +522,8 @@ function parseValue(valueId) {
  * @param {Object} v Zwave valueId object
  * @returns The value id without node reference: `${v.class_id}-${v.instance}-${v.index}`
  */
-function getValueID(v) {
-    return `${v.endpoint}-${v.commandClass}-${v.property}`
+function getValueID(nodeId ,v) {
+    return `${nodeId}-${v.commandClass}-${v.endpoint}`
 }
 
 /**

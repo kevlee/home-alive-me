@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 'use strict'
 
-var mysql = require('mysql')
+var mysql = require('pg')
 const util = require('util')
 const { addclient, removeclient } = require("./db_method/zwavenode")
 var reqlib = require('app-root-path').require
@@ -21,12 +21,12 @@ function DBClient(master) {
 
 async function init(master) {
     this.addedclient = false
-    this.db = mysql.createPool({
+    this.db = new mysql.Pool({
         host: process.env.APP_MYSQL_HOST || "localhost",
         user: process.env.MYSQL_USER || "zwave",
         password: process.env.MYSQL_PASSWORD || "ppI3h4uwaz*UgT#s",
         database: process.env.MYSQL_DATABASE || "homealiveme",
-        port: 3306,
+        port: 5432,
         connectionLimit: 100, 
         multipleStatements: true
     });
@@ -43,16 +43,16 @@ async function init(master) {
         // add node zwave if exist
         emitters.zwave.on('node available', function (nodeid, nodeuid, productType) {
             // add node to the homealiveme db
-            nodes.addclient(self, nodeuid, nodeid, productType)
+            self.addclient(nodeuid, nodeid, productType)
            
         })
 
-        emitters.zwave.on('value added', function (valueId, comclass, nodeid, deviceid) {
-            nodes.addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
+        emitters.zwave.on('value added', function (value_uid, valueId, comclass, nodeid, deviceid) {
+            self.addvalue(value_uid, valueId, comclass, deviceid)
         })
 
-        emitters.zwave.on('value changed', function (valueId, comclass, nodeid, deviceid) {
-            nodes.addvalue(self, valueId, comclass, nodeid + "-" + deviceid)
+        emitters.zwave.on('value changed', function (value_uid,valueId, comclass, nodeid, deviceid) {
+            self.addvalue(value_uid, valueId, comclass, deviceid)
         })
         
         
@@ -116,13 +116,13 @@ function createtable(self) {
     Object.keys(COMCLASS).forEach(function (id) {
         self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] +
             '(nodeuid VARCHAR(32) NOT NULL,' +
-            'valueid VARCHAR(32) PRIMARY KEY, ' +
-            'label TINYTEXT DEFAULT NULL,' +
-            'value TINYTEXT DEFAULT NULL,' +
-            'typevalue TINYTEXT DEFAULT NULL,' +
+            'valueid VARCHAR(32) NOT NULL,' +
+            'label TEXT DEFAULT NULL,' +
+            'value TEXT DEFAULT NULL,' +
+            'typevalue TEXT DEFAULT NULL,' +
             'availablevalue JSON DEFAULT NULL,' +
+            'PRIMARY KEY (nodeuid,valueid), ' +
             'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
-
     })
 
 }
@@ -135,7 +135,7 @@ function updatetaskstatus(self, type, status, result=null) {
             "', result = '" + JSON.stringify(result) +
             "' WHERE taskname = '" + type + "'"
     }
-    self.db.query(sql)
+    this.query(sql)
 }
 
 /***************** ROOM MANAGEMENT *******************/
@@ -145,13 +145,15 @@ DBClient.prototype.getroom = room.getroom
 DBClient.prototype.getrooms = room.getrooms
 DBClient.prototype.updateroom = room.updateroom
 DBClient.prototype.removeroom = room.removeroom
-DBClient.prototype.addclient = room.addclient
+
 
 /***************** NODES MANAGEMENT *******************/
 
 DBClient.prototype.getnodes = nodes.getnodes
 DBClient.prototype.setnoderoom = nodes.setnoderoom
 DBClient.prototype.setnodetype = nodes.setnodetype
+DBClient.prototype.addvalue = nodes.addvalue
+DBClient.prototype.addclient = nodes.addclient
 
 DBClient.prototype.addtemplog = async function (_callback) {
     let db = this.db
@@ -161,68 +163,42 @@ DBClient.prototype.addtemplog = async function (_callback) {
     let struct = {}
     let sql_push
 
-    db.query(sql, function (err, result, fields) {
-        if (err) throw err;
-        for (var i of result) {
-            var row = Object.assign({}, i)
-            struct[row.label] = row.value
-            data[row.nodeuid] = struct
-        }
+    let result = await this.query(sql)
+    for (var i of result.rows) {
+        var row = Object.assign({}, i)
+        struct[row.label] = row.value
+        data[row.nodeuid] = struct
+    }
 
-        let promises = []
-        for (const [key, value] of Object.entries(data)) {
-            sql_push = 'INSERT INTO Temperature (nodeuid,value,units,date) values ' +
+    let promises = []
+    for (const [key, value] of Object.entries(data)) {
+        sql_push = 'INSERT INTO Temperature (nodeuid,value,units,date) values ' +
                 "('" + key + "','" + value['Air Temperature'] + "','" +
                 value['Air Temperature Units'] + "','" + now + "')"
-            promises.push(new Promise((resolve) => {
-                db.query(sql_push, function () { resolve('finish') })
-            }))
+        await this.query(sql_push)
                                  
-        }
-        Promise.all(promises).then(() => {
-            _callback()
-        })
-
-    })
-
+    }
 }
 
 DBClient.prototype.gettempstat = async function (_callback,param) {
     let db = this.db
     let id = db.escape(param.nodeuid)
     let sql
-    var sql_result
+    let sql_result = {}
     
     if (!id)
         sql = 'SELECT *  FROM Temperature'
     else
         sql = 'SELECT *  FROM Temperature WHERE nodeuid =' + id
 
-
-    let promise = new Promise((resolve) => {
-        db.query(sql, function (err, result, fields) {
-            let data = {}
-            let struct = []
-            if (result) {
-                for (var i of result) {
-                    var row = Object.assign({}, i)
-                    struct.push({
-                        value: row.value, units: row.units, date: row.date
-                    })
-                    data[row.nodeuid] = struct
-                }
-                resolve(data)
-            } else {
-                resolve([])
-            }
+    let result = await this.query(sql)
+    for (var i of result.rows) {
+        sql_result = Object.assign({}, i)
+        struct.push({
+            value: row.value, units: row.units, date: row.date
         })
-    })
-
-    promise.then((result) => {
-        _callback()
-        sql_result = result
-    })
-    await promise
+        sql_result[row.nodeuid] = struct
+    }
     return sql_result
 }
 
@@ -272,18 +248,18 @@ DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
     const sql = "SELECT * FROM " + COMCLASS[112] + " WHERE nodeuid =" + id
     let result = await this.query(sql)
     _callback()
-    for (var row in result) {
-        result[row].availablevalue = JSON.parse(result[row].availablevalue)
+    for (var row in result.rows) {
+        result.rows[row].availablevalue = JSON.parse(result.rows[row].availablevalue)
     }
-    return result
+    return result.rows
 
 }
 
 DBClient.prototype.setport = async function (type,port) {
     const sql = "INSERT INTO connection (type,port) values ('" + type + "','" + port +
-        "') ON DUPLICATE KEY UPDATE port = '" + port + "'"
+        "') ON CONFLICT(type) DO UPDATE SET port = EXCLUDED.port"
     let result = await this.query(sql)
-    return result
+    return result.rows
 
 }
 
@@ -296,7 +272,7 @@ DBClient.prototype.getmodulesconfigs = async function () {
         console.log(error)
         return []
     }
-    return result
+    return result.rows
 
 }
 

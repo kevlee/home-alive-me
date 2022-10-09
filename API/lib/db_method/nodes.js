@@ -7,19 +7,19 @@ exports.getnodes = async function () {
     return result
 }
 
-exports.addvalue = function addvalue(self, valueId, comclass, uid) {
+exports.addvalue = function addvalue(value_uid,value, comclass, uid) {
     try {
         let choices = {};
-        if (valueId.values) {
-            choices = JSON.stringify(Object.assign({}, valueId.values));
+        if (value) {
+            choices = JSON.stringify(Object.assign({}, value));
         } else {
             choices = "{}";
         }
         let sql = 'INSERT INTO ' + COMCLASS[comclass] +
             ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
             "('" + uid + "','" + valueId.value_id + "','" + valueId.label + "','" + valueId.value + "','" + valueId.type + "','" + choices + "')" +
-            "ON DUPLICATE KEY UPDATE value = '" + valueId.value + "'"
-        self.db.query(sql);
+            "ON CONFLICT(nodeuid,valueid) DO UPDATE SET value = EXCLUDED.value "
+        this.query(sql);
 
     } catch (error) {
         console.error(error);
@@ -55,11 +55,12 @@ exports.setnodetype = async function setnodetype(uid , type){
     }
 }
 
-exports.addclient = async function addclient(self, uid, nodeid, name) {
+exports.addclient = async function addclient(uid, nodeid, name) {
     // don't change databases if node exist
-    console.log(nodeid)
-    self.db.query("INSERT INTO nodes (nodeid,nodeuid,productname)" +
+    this.query("INSERT INTO nodes (nodeid,nodeuid,productname)" +
         "values('" + nodeid + "', '" + uid + "', '" + name + "') " +
-        "ON DUPLICATE KEY UPDATE nodeid = nodeid ");
+        "ON CONFLICT(nodeuid) DO UPDATE SET " +
+        "(nodeid,nodeuid,productname) = " +
+        "(EXCLUDED.nodeid, EXCLUDED.nodeuid, EXCLUDED.productname) ")
 }
 
