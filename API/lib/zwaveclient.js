@@ -547,7 +547,11 @@ function getValueParam(ozwnode, valueId) {
  * @returns The value id without node reference: `${v.class_id}-${v.instance}-${v.index}`
  */
 function getValueID(nodeId ,v) {
-    return `${nodeId}-${v.commandClass}-${v.endpoint}-${v.property}`
+    if (v.hasOwnProperty('endpoint')) {
+        return `${nodeId}-${v.commandClass}-${v.endpoint}-${v.property}`
+    } else {
+        return `${nodeId}-${v.commandClass}-${v.format}-${v.property}`
+    }
 }
 
 /**
