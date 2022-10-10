@@ -20,7 +20,6 @@ exports.addvalue = function addvalue(value_uid, value, commandClass , commandCla
             "ON CONFLICT(nodeuid,valueid) DO UPDATE SET " +
             "(label,value,typevalue,availablevalue) = " +
             "(EXCLUDED.label,EXCLUDED.value,EXCLUDED.typevalue,EXCLUDED.availablevalue) "
-        console.log(sql)
         this.query(sql);
 
     } catch (error) {
