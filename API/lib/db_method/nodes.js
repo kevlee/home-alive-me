@@ -4,7 +4,7 @@
 exports.getnodes = async function () {
     const sql = "SELECT * FROM nodes"
     let result = await this.query(sql)
-    return result
+    return result.rows
 }
 
 exports.addvalue = function addvalue(value_uid, value, commandClass , commandClassName,type, uid , choices) {

@@ -234,25 +234,23 @@ DBClient.prototype.removetask = async function (_callback, uuid) {
 
 
 DBClient.prototype.getcurtainlevel = async function (_callback, uuid) {
-    let db = this.db
-    let id = db.escape(uuid)
-    const sql = "SELECT * FROM " + COMCLASS[38] + " WHERE nodeuid =" + id +
-        " and label='level'"
+    let sql = {}
+    sql.text = "SELECT * FROM " + COMCLASS[38] + " WHERE nodeuid = $1 and label='Current value'"
+    sql.values = [uuid]
     let result = await this.query(sql)
     _callback()
-    return result[0]
+    return result.rows[0]
 
 }
 
 DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
-    let db = this.db
-    let id = db.escape(uuid)
-    const sql = "SELECT * FROM " + COMCLASS[112] + " WHERE nodeuid =" + id
-    let result = await this.query(sql)
+
+    const sql = 'SELECT * FROM ' + COMCLASS[112] + ' WHERE nodeuid = $1'
+    let result = await this.query(sql, [uuid])
     _callback()
-    for (var row in result.rows) {
-        result.rows[row].availablevalue = JSON.parse(result.rows[row].availablevalue)
-    }
+    //for (var row in result.rows) {
+    //result.rows[row].availablevalue = JSON.parse(result.rows[row].availablevalue)
+    //}
     return result.rows
 
 }
