@@ -239,27 +239,6 @@ function nodeAdded(node) {
     let nodeId = node.id
     debug("add node ", nodeId)
 
-    DRIVER.client.nodes[nodeId] = {
-        node_id: nodeId,
-        device_id: '',
-        manufacturer: '',
-        manufacturerid: '',
-        product: '',
-        producttype: '',
-        productid: '',
-        type: '',
-        name: DRIVER.client.zwcfg_nodes[nodeId] ? DRIVER.client.zwcfg_nodes[nodeId].name : '',
-        loc: DRIVER.client.zwcfg_nodes[nodeId] ? DRIVER.client.zwcfg_nodes[nodeId].loc : '',
-        values: [],
-        groups: [],
-        neighborns: [],
-        ready: false,
-        available: false,
-        hassDevices: {},
-        failed: false,
-        lastActive: null,
-        status: NODE_STATUS[0] // initializing
-    }
 
     DRIVER.client.addEmptyNodes()
     node.refreshValues()
@@ -779,27 +758,7 @@ ZwaveClient.prototype.getStatus = function () {
 ZwaveClient.prototype.initNode = async function (ozwnode) {
     var nodeid = ozwnode.id
 
-    DRIVER.client.nodes[nodeid] = {
-        node_id: nodeid,
-        device_id: '',
-        manufacturer: '',
-        manufacturerid: '',
-        product: '',
-        producttype: '',
-        productid: '',
-        type: '',
-        name: DRIVER.client.zwcfg_nodes[nodeid] ? DRIVER.client.zwcfg_nodes[nodeid].name : '',
-        loc: DRIVER.client.zwcfg_nodes[nodeid] ? DRIVER.client.zwcfg_nodes[nodeid].loc : '',
-        values: [],
-        groups: [],
-        neighborns: [],
-        ready: false,
-        available: false,
-        hassDevices: {},
-        failed: false,
-        lastActive: null,
-        status: NODE_STATUS[0] // initializing
-    }
+    DRIVER.client.nodes[nodeid] = ozwnode
 
 
     //await ozwnode.refreshCCValues(ozwnode.commandClasses)
@@ -814,8 +773,6 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
     }
     DRIVER.client.nodes[nodeid].isControllerNode = ozwnode.isControllerNode
     DRIVER.client.nodes[nodeid].id = nodeid
-    DRIVER.client.nodes[nodeid].ready = true
-    DRIVER.client.nodes[nodeid].status = NODE_STATUS[6]
     DRIVER.client.nodes[nodeid].lastActive = Date.now()
 
     
@@ -835,8 +792,6 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
     
     if (!DRIVER.client.zwcfg_nodes[nodeid]) DRIVER.client.zwcfg_nodes[nodeid] = {}
     
-    DRIVER.client.nodes[nodeid].status = NODE_STATUS[4] // sleeping
-    DRIVER.client.nodes[nodeid].available = true
 
     var deviceID = getDeviceID(ozwnode)
     DRIVER.client.nodes[nodeid].device_id = deviceID
