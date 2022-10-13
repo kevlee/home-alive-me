@@ -13,29 +13,29 @@ var config = {
     ConfigPath: './config/config/'
 }
 
-function writeconfig(zwavecontroler, configs) {
+function writeconfig(zwaveclient, configs) {
     
     for (var [index, config] of Object.entries(configs)) {
         let valueid = config.valueid.split('-')
-        let ozwnode = zwavecontroler.nodes[valueid[0]]
+        let ozwnodeId = valueid[0]
         let valueId = {
             "commandClass": valueid[1],
             "endpoint": parseInt(valueid[2]),
             "property": parseInt(valueid[3])
         }
-        ozwnode.setValue(valueId, config.value)
+        zwaveclient.writeValue(ozwnodeId, valueId, config.value)
     }
 }
 
-function writedata(zwavecontroler, data) {
+function writedata(zwaveclient, data) {
     let valueid = data.valueid.split('-')
-    let ozwnode = zwavecontroler.nodes[valueid[0]]
+    let ozwnodeId = valueid[0]
     let valueId = {
         "commandClass": valueid[1],
         "endpoint": parseInt(valueid[2]),
         "property": valueid[3],
     }
-    ozwnode.setValue(valueId, data.value)
+    zwaveclient.writeValue(ozwnodeId, valueId, data.value)
 }
 
 async function getusblist() {
