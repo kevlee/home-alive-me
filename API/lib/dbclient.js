@@ -117,8 +117,8 @@ function createtable(self) {
 
     Object.keys(COMCLASS).forEach(function (id) {
         self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] +
-            '(nodeuid VARCHAR(32) NOT NULL,' +
-            'valueid VARCHAR(32) NOT NULL,' +
+            '(nodeuid VARCHAR(60) NOT NULL,' +
+            'valueid VARCHAR(60) NOT NULL,' +
             'label TEXT DEFAULT NULL,' +
             'value TEXT DEFAULT NULL,' +
             'typevalue TEXT DEFAULT NULL,' +

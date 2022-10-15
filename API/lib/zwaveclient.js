@@ -48,35 +48,32 @@ const VAR_TYPES = {
     }
 }
 
-// Events to subscribe to
-// Info at: https://github.com/OpenZWave/node-openzwave-shared/blob/master/src/callbacks.cc
+// event
 const EVENTS = {
-    'driver ready': driverReady,
-    'driver failed': driverFailed,
-    connected: connected,
-    'node found': nodeAdded,
-    'node added': nodeAdded,
-    'node removed': nodeRemoved,
-    'alive': nodeAvailable,
-    'dead': nodeAvailable,
-    'ready': nodeReady,
-    // 'node naming': nop,
-    'node event': nodeEvent,
-    // 'polling disabled': nop,
-    // 'polling enabled': nop,
-    // 'create button': nop,
-    // 'delete button': nop,
-    // 'button on': nop,
-    // 'button off': nop,
-    'scene event': sceneEvent,
-    'value added': valueAdded,
-    'value updated': valueChanged,
-    'value removed': valueRemoved,
-    'value refreshed': valueChanged,
-    notification: notification,
-    'all nodes ready': scanComplete,
-    'controller command': controllerCommand,
-    'error': driverFailed
+    'driver':
+    {
+        'driver ready': driverReady,
+        'all nodes ready': scanComplete,
+        'error': driverFailed
+    },
+    'controller':
+    {
+        'node found': nodeAdded,
+        'node added': nodeAdded,
+        'node removed': nodeRemoved
+
+    },
+    'node':
+    {
+        'alive': nodeAvailable,
+        'ready': nodeReady,
+        'node event': nodeEvent,
+        'value added': valueAdded,
+        'value updated': valueChanged,
+        'value removed': valueRemoved,
+        'value refreshed': valueChanged,
+        'dead': nodeDead
+    } 
 }
 
 // Status based on notification
@@ -109,30 +106,15 @@ async function init(cfg) {
     this.cfg = cfg
 
     this.closed = false
-    // this.scenes = todo
-
-    // Full option list: https://github.com/OpenZWave/open-zwave/wiki/Config-Options
-
-    var ZwaveOptions = OpenZWave.ZwaveOptions
     var options = {
         timeouts: {
-            ack: 10000,
-            byte: 600,
+            ack: 200,
+            byte: 300,
+            response: 500,
+            sendDataCallback: 10000,
             serialAPIStarted: 10000
         },
         logConfig: cfg.logConfig,
-        ConsoleOutput: cfg.ConsoleOutput,
-        AssumeAwake: true,
-        //QueueLogLevel: cfg.queueloglevel ? 8 : 6,
-        UserPath: cfg.ConfigPath, 
-        ConfigPath: cfg.ConfigPath, 
-        DriverMaxAttempts: 9999,
-        SaveConfiguration: true,
-        //RetryTimeout: 10000,
-        //  IntervalBetweenPolls: true,
-        PollInterval: 500,// cfg.pollInterval || process.env.OZW_POLL_INTERVAL,
-        //AutoUpdateConfigFile: Boolean(cfg.autoUpdateConfig)
-        // SuppressValueRefresh: true,
     } 
 
 
@@ -170,11 +152,10 @@ async function init(cfg) {
     this.ozwConfig = {}
     this.healTimeout = null
 
-    Object.keys(EVENTS).forEach(function (evt) {
-        onEvent.bind(DRIVER.client,evt)
-        DRIVER.on(evt, EVENTS[evt].bind(DRIVER))
-    })
-
+    Object.keys(EVENTS.driver).forEach(function (evt) {
+        onEvent.bind(DRIVER,evt)
+        DRIVER.on(evt, EVENTS.driver[evt].bind(DRIVER))
+    })  
  
 }
 
@@ -187,30 +168,42 @@ function onEvent(name, ...args) {
 }
 
 async function driverReady() {
+    const homeHex = '0x' + DRIVER.controller.homeId.toString(16)
     this.client.driverReadyStatus = true
     this.client.ozwConfig.homeid = DRIVER.controller.homeId
-    var homeHex = '0x' + DRIVER.controller.homeId.toString(16)
     this.client.ozwConfig.name = homeHex
-
     this.error = false
     this.status = ZWAVE_STATUS[0]
 
-    Object.keys(EVENTS).forEach(function (evt) {
-        DRIVER.controller.nodes.forEach(function (node) {
-            node.on(evt, EVENTS[evt].bind(node))
-        })
+    // set controller event
+    Object.keys(EVENTS.controller).forEach(function (evt) {
+        onEvent.bind(DRIVER.controller, evt)
+        DRIVER.controller.on(evt, EVENTS.controller[evt].bind(DRIVER.controller))
+    })
+    Object.keys(EVENTS.node).forEach(function (evt) {
+        onEvent.bind(DRIVER.controller, evt)
+        DRIVER.controller.on(evt, EVENTS.node[evt].bind(DRIVER.controller))
     })
 
-    
+    Object.keys(EVENTS.node).forEach(function (evt) {
+        DRIVER.controller.nodes.forEach(function (node) {
+            onEvent.bind(node, evt)
+            node.on(evt, EVENTS.node[evt].bind(node))
+        })
+        
+    })
+
+
     emitters.zwave.emit('zwave connection',DRIVER.client)
     debug('Scanning network with homeid:', DRIVER.client.ozwConfig.name)
 
 }
 
-function driverFailed() {
+function driverFailed(e) {
     this.client.error = 'Driver failed'
     this.client.status = ZWAVE_STATUS[5]
     debug('Driver failed', this.client.ozwConfig)
+    debug('Driver error: ', e)
 }
 
 function connected(version) {
@@ -221,26 +214,30 @@ function connected(version) {
     this.emitEvent('CONNECTED', this.client.ozwConfig)
 }
 
+function nodeDead(ozwnode) {
+    // removedead node
+    DRIVER.controller.removeFailedNode(ozwnode.id)
+    
+}
+
 function nodeRemoved(nodeid) {
     // don't use splice here, nodeid equals to the index in the array
-    var node = this.client.nodes[nodeid]
+    var node = this.nodes[nodeid]
     if (node) {
-        this.client.nodes[nodeid] = null
+        this.nodes[nodeid] = null
     }
     debug('Node removed', nodeid)
 
     emitters.zwave.emit('nodeRemoved', node)
-
-    this.client.addEmptyNodes()
 }
 
 // Triggered when a node is added
 function nodeAdded(node) {
     let nodeId = node.id
     debug("add node ", nodeId)
-
-
-    DRIVER.client.addEmptyNodes()
+    if (!this.nodes[nodeid]) {
+        DRIVER.client.initNode(node)
+    }
     debug('Node added', nodeId )
     
 }
@@ -308,6 +305,7 @@ function valueAdded(node, valueId) {
                 metadata, metadata.value, ozwnode.id, getDeviceID(ozwnode))
         }
         
+        
         debug('ValueAdded: %s %s %s', value_uid, metadata.commandClassName, metadata.value)
         
 
@@ -348,7 +346,6 @@ function valueChanged(node, valueId) {
             ozwnode.secure = valueId.newValue
             emitters.zwave.emit('nodeStatus', ozwnode)
         }
-
     } catch (error) {
         debug(
             `Error while change value ${valueId.newValue} on ${ozwnode.id}: ${error.message}`
@@ -376,10 +373,6 @@ function nodeEvent(nodeid, evtcode) {
     emitters.zwave.emit('nodeSceneEvent', 'node', this.nodes[nodeid], evtcode)
 }
 
-function sceneEvent(nodeid, sceneCode) {
-    debug('scene event', nodeid, sceneCode)
-    emitters.zwave.emit('nodeSceneEvent', 'scene', this.nodes[nodeid], sceneCode)
-}
 
 function notification(nodeid, notif, help) {
     var ozwnode = this.client.nodes[nodeid]
@@ -709,6 +702,7 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
     DRIVER.client.nodes[nodeid].generic_device_class = ozwnode.deviceClass.generic
     DRIVER.client.nodes[nodeid].specific_device_class = ozwnode.deviceClass.specific
 
+
     debug('finished init node:', nodeid)
 }
 
@@ -731,6 +725,7 @@ ZwaveClient.prototype.addEmptyNodes = function () {
         }
     }
 }
+
 /**
  * Popolate node `groups` property by creating an array of groups `{text: <groupLabel>, value: <groupIndex>}`
  *
@@ -875,7 +870,7 @@ ZwaveClient.prototype.startInclusion = function (secure) {
             strategy: 0,
             forceSecurity: secure
         }
-        DRIVER.controller.beginInclusion(InclusionOptions)
+        DRIVER.controller.beginInclusion()
         debug("start Inclusion")
     }
 }

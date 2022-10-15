@@ -19,7 +19,7 @@ function writeconfig(zwaveclient, configs) {
         let valueid = config.valueid.split('-')
         let ozwnodeId = valueid[0]
         let valueId = {
-            "commandClass": valueid[1],
+            "commandClass": parseInt(valueid[1]),
             "endpoint": parseInt(valueid[2]),
             "property": parseInt(valueid[3])
         }
@@ -31,7 +31,7 @@ function writedata(zwaveclient, data) {
     let valueid = data.valueid.split('-')
     let ozwnodeId = valueid[0]
     let valueId = {
-        "commandClass": valueid[1],
+        "commandClass": parseInt(valueid[1]),
         "endpoint": parseInt(valueid[2]),
         "property": valueid[3],
     }
@@ -109,8 +109,8 @@ async function launchregistreddevice() {
                         global.connections.zwave = new OpenZWave({
                             logConfig: {
                                 enabled: false,
-                                level: 0
-                            },     // disable file logging (OZWLog.txt)
+                                level: "debug"
+                            },
                             ConsoleOutput: false, // enable console logging
                             NetworkKey: "0xed,0x66,0x77,0xc8,0xb8,0xac,0xbb,0x3c,0x94,0x85,0x4f,0xc6,0x52,0xca,0x1b,0x94",
                             port: portconfig,
