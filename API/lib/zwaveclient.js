@@ -58,9 +58,11 @@ const EVENTS = {
     },
     'controller':
     {
-        'node found': nodeAdded,
+        'node found': nodeFound,
         'node added': nodeAdded,
-        'node removed': nodeRemoved
+        'node removed': nodeRemoved,
+        'inclusion failed': inclusionFailed,
+        'exclusion failed': exclusionFailed
 
     },
     'node':
@@ -115,6 +117,10 @@ async function init(cfg) {
             serialAPIStarted: 10000
         },
         logConfig: cfg.logConfig,
+        preferences: cfg.preferences ||
+        {
+            'temperature': "Celsius" // degres by default
+        }
     } 
 
 
@@ -220,11 +226,44 @@ function nodeDead(ozwnode) {
     
 }
 
-function nodeRemoved(nodeid) {
+function inclusionFailed() {
+    this.emit('nogociate node',
+        {
+            'nodeId': null,
+            'type': 'Inclusion',
+            'status': 'Failed',
+            'msg': 'roll failed'
+        }
+    )
+}
+
+function exclusionFailed() {
+    this.emit('nogociate node',
+        {
+            'nodeId': null,
+            'type': 'Exclusion',
+            'status': 'Failed',
+            'msg': 'unroll failed'
+        }
+    )
+}
+
+function nodeRemoved(ozwnode) {
     // don't use splice here, nodeid equals to the index in the array
-    var node = this.nodes[nodeid]
+    var node = this.nodes[ozwnode.id]
     if (node) {
-        this.nodes[nodeid] = null
+        this.nodes[ozwnode.id] = null
+    }
+    if (this.exclusion) {
+        this.emit('nogociate node',
+            {
+                'nodeId': ozwnode.id,
+                'type': 'Exclusion',
+                'status': 'Success',
+                'msg': 'node has been remove'
+            }
+        )
+        this.exclusion = false
     }
     debug('Node removed', nodeid)
 
@@ -240,6 +279,17 @@ function nodeAdded(node) {
     }
     debug('Node added', nodeId )
     
+}
+
+// Triggered when a node is added
+function nodeFound(node) {
+    let nodeId = node.id
+    debug("add Found ", nodeId)
+    if (!this.nodes[nodeid]) {
+        DRIVER.client.initNode(node)
+    }
+    debug('Node Found', nodeId)
+
 }
 
 // Triggered after node added event when the node info are firstly loaded
@@ -437,25 +487,7 @@ function scanComplete() {
     
 }
 
-function controllerCommand(nodeid, state, errcode, help) {
-    var obj = {
-        nodeid: nodeid,
-        state: state,
-        errcode: errcode,
-        help: help.replace('ControllerCommand - ', '')
-    }
-    debug('controller command', obj)
 
-    this.cntStatus = obj.help
-
-    // NodeFailed
-    if (errcode === 0 && state === 10) {
-        nodeRemoved.call(this, nodeid)
-    }
-
-    //this.emitEvent('CONTROLLER_CMD', obj)
-    emitters.zwave.emit('command controller', obj)
-}
 
 // ------- Utils ------------------------
 
@@ -702,6 +734,15 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
     DRIVER.client.nodes[nodeid].generic_device_class = ozwnode.deviceClass.generic
     DRIVER.client.nodes[nodeid].specific_device_class = ozwnode.deviceClass.specific
 
+    if (DRIVER.client.inclusion) {
+        this.emit('nogociate node', {
+            'nodeId': nodeid,
+            'status': 'Complete',
+            'msg' : 'enrolling success'
+        })
+        DRIVER.client.inclusion = false
+    }
+
 
     debug('finished init node:', nodeid)
 }
@@ -849,8 +890,12 @@ ZwaveClient.prototype.getInfo = function () {
     return info
 }
 
-ZwaveClient.prototype.startInclusion = function (secure) {
-    if (DRIVER && DRIVER.controller && !DRIVER.client.closed && !DRIVER.client.inclusion) {
+ZwaveClient.prototype.startInclusion = async function (secure) {
+    if (DRIVER && DRIVER.controller
+        && !DRIVER.client.closed
+        && !DRIVER.client.inclusion
+        && DRIVER.client.scanComplete
+    ) {
         DRIVER.client.inclusion = true
         if (DRIVER.client.commandsTimeout) {
             clearTimeout(DRIVER.client.commandsTimeout)
@@ -860,7 +905,17 @@ ZwaveClient.prototype.startInclusion = function (secure) {
         DRIVER.client.commandsTimeout = setTimeout(
             () => {
                 DRIVER.controller.stopInclusion.bind(DRIVER.client)
-                DRIVER.client.inclusion = false
+                if (DRIVER.client.inclusion = true) { 
+                    this.emit('nogociate node',
+                        {
+                            'nodeId': null,
+                            'status': 'Cancelled',
+                            'type': 'Inclusion',
+                            'msg': 'no node to add'
+                        }
+                    )
+                    DRIVER.client.inclusion = false
+                }
                 debug("stop Inclusion")
             }
             ,
@@ -870,23 +925,55 @@ ZwaveClient.prototype.startInclusion = function (secure) {
             strategy: 0,
             forceSecurity: secure
         }
-        DRIVER.controller.beginInclusion()
+        await DRIVER.controller.beginInclusion()
         debug("start Inclusion")
+    } else {
+        this.emit('nogociate node',
+            {
+                'nodeId': null,
+                'type': 'Inclusion',
+                'status': 'Cancelled',
+                'msg' : 'not ready to enroll command'
+            }
+        )
     }
 }
 
 ZwaveClient.prototype.startExclusion = function () {
-    if (this.client && !this.closed) {
-        if (this.commandsTimeout) {
-            clearTimeout(this.commandsTimeout)
-            this.commandsTimeout = null
+    if ((DRIVER && DRIVER.controller
+        && !DRIVER.client.closed
+        && !DRIVER.client.inclusion
+        && DRIVER.client.scanComplete) {
+        if (DRIVER.client.commandsTimeout) {
+            clearTimeout(DRIVER.client.commandsTimeout)
+            DRIVER.client.commandsTimeout = null
         }
 
-        this.commandsTimeout = setTimeout(
-            this.driver.controller.stopExclusion.bind(this),
-            this.cfg.commandsTimeout * 1000 || 30000
+        DRIVER.client.commandsTimeout = setTimeout(
+            () => {
+                DRIVER.client.driver.controller.stopExclusion.bind(DRIVER.client)
+                this.emit('nogociate node',
+                    {
+                        'nodeId': null,
+                        'type': 'Exclusion',
+                        'status': 'Cancelled',
+                        'msg': 'no node to remove'
+                    }
+                )
+            },
+            DRIVER.client.cfg.commandsTimeout * 1000 || 30000
         )
         this.driver.controller.beginExclusion()
+        DRIVER.client.exclusion = true
+    } else {
+        this.emit('nogociate node',
+            {
+                'nodeId': null,
+                'type': 'Exclusion',
+                'status': 'Cancelled',
+                'msg': 'not ready to unroll command'
+            }
+        )
     }
 }
 
