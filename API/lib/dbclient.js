@@ -69,48 +69,13 @@ async function init(master) {
             //}
         })
 
-        emitters.zwave.on('command controller', (obj) => {
-            switch (true) {
-                case obj.help.includes('AddDevice'):
-                    switch (true) {
-                        case obj.help.includes('Canceled'):
-                            updatetaskstatus(self,'AddDevice','Canceled')
-                            break
-                        case obj.help.includes('Failed'):
-                            updatetaskstatus(self,'AddDevice', 'Failed')
-                            break
-                        case obj.help.includes('Completed'):
-                            if (obj.nodeid > 1 && obj.nodeid < 255) {
-                                updatetaskstatus(self, 'AddDevice', 'Completed')
-                                this.addedclient = true
-                            }
-                            break
-                        default:
-                    }
-                    break
-                case obj.help.includes('RemoveDevice'):
-                    switch (true) {
-                        case obj.help.includes('Canceled'):
-                            updatetaskstatus(self, 'RemoveDevice', 'Canceled')
-                            break
-                        case obj.help.includes('Failed'):
-                            updatetaskstatus(self, 'RemoveDevice', 'Failed')
-                            break
-                        case obj.help.includes('Completed'):
-                            if (obj.nodeid > 1 && obj.nodeid < 255) {
-                                updatetaskstatus(self, 'RemoveDevice', 'Completed')
-                                removeclient(self,obj.nodeid)
-                            }
-                            break
-                        default:
-                    }
-                    break
-                default:
-                    console.log('not device added notification ' + obj.help)
-            }
+        emitters.zwave.on('negociate node', function (obj) {
+            manageControllerSyncStatus(self,obj)
         })
 
     }}
+
+
 
 
 function createtable(self) {
@@ -127,6 +92,47 @@ function createtable(self) {
             'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
     })
 
+}
+
+function manageControllerSyncStatus(self, obj) {
+    switch (true) {
+        case obj.type.includes('Inclusion'):
+            switch (true) {
+                case obj.status.includes('Canceled'):
+                    updatetaskstatus(self, 'AddDevice', 'Canceled')
+                    break
+                case obj.status.includes('Failed'):
+                    updatetaskstatus(self, 'AddDevice', 'Failed')
+                    break
+                case obj.status.includes('Completed'):
+                    if (obj.nodeId > 1 && obj.nodeId < 255) {
+                        updatetaskstatus(self, 'AddDevice', 'Completed')
+                        this.addedclient = true
+                    }
+                    break
+                default:
+            }
+            break
+        case obj.type.includes('Exlusion'):
+            switch (true) {
+                case obj.status.includes('Canceled'):
+                    updatetaskstatus(self, 'RemoveDevice', 'Canceled')
+                    break
+                case obj.status.includes('Failed'):
+                    updatetaskstatus(self, 'RemoveDevice', 'Failed')
+                    break
+                case obj.status.includes('Completed'):
+                    if (obj.nodeId > 1 && obj.nodeId < 255) {
+                        updatetaskstatus(self, 'RemoveDevice', 'Completed')
+                        removeclient(self, obj.nodeId)
+                    }
+                    break
+                default:
+            }
+            break
+        default:
+            console.log('not device added notification ')
+    }
 }
 
 function updatetaskstatus(self, type, status, result=null) {
