@@ -19,7 +19,7 @@ import * as AsyncComputed from 'vue3-async-computed'
 
 const app = Vue.createApp(App)
 app.use(AsyncComputed)
-app.component("svg-icon", svgicon);
+app.component("svg-icon", svgicon)
 
 app.use(router)
 
@@ -30,6 +30,6 @@ app.use(svgicon, {
 });
 
 
-app.config.productionTip = true;
+app.config.productionTip = true
 
 app.mount('#app')

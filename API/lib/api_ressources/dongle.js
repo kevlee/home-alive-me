@@ -3,7 +3,7 @@ const reqlib = require('app-root-path').require
 const tools = reqlib('./lib/tools.js')
 const { v4: uuidv4 } = require('uuid')
 var result = ""
-const flatted = require('flatted')
+const util = require('util')
 
 function init(API) {
 
@@ -28,9 +28,9 @@ function init(API) {
     API.get('/modules/', async (req, res) => {
         let modulelist = {}
         if (global.connections && global.connections.zwave) {
-            modulelist = global.connections
+            modulelist = util.inspect(global.connections)
         }
-        res.status(200).send(modulelist)
+        res.status(200).setHeader('Content-Type', 'application/json').send(modulelist)
     })
 
     API.get('/usblist/', async (req, res) => {
