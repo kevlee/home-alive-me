@@ -1,35 +1,24 @@
-import * as Vue from 'vue'
+import Vue from 'vue'
 import App from './App.vue'
-
-import VueMaterial from "vue3-material"
-
-
-import * as Vuetify from 'vuetify'
+import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
-
 import router from './router.js'
-
-
-import svgicon from 'vue3-icon'
+import svgicon from 'vue-icon'
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
+import AsyncComputed from 'vue-async-computed'
 
-import * as AsyncComputed from 'vue3-async-computed'
-
-
-const app = Vue.createApp(App)
-app.use(AsyncComputed)
-app.component("svg-icon", svgicon)
-
-app.use(router)
-
-app.use(Vuetify)
-app.use(VueMaterial);
-app.use(svgicon, {
+Vue.use(Vuetify)
+Vue.use(AsyncComputed)
+Vue.use(router)
+Vue.use(svgicon, {
     classPrefix: 'AppIcon-',
 });
+Vue.component("svg-icon", svgicon)
+Vue.config.productionTip = true
 
-
-app.config.productionTip = true
-
-app.mount('#app')
+new Vue({
+    router: router,
+    render: h => h(App),
+    vuetify: new Vuetify(),
+}).$mount("#app");

@@ -1,12 +1,12 @@
 <template>
     <div>
-        <md-content v-for="(config,index) in configs">
-            <md-switch class="md-primary" :name="config.label"
+        <v-content v-for="(config,index) in configs">
+            <v-switch class="md-primary" :name="config.label"
                        v-if="isswtichonoff(config)"
                        v-model="dataset[config.label]"
-                       @change="loadnewconf(index)">{{config.label}}</md-switch>
-        </md-content>
-        <md-switch class="update" v-model="dataset['update']"></md-switch>
+                       @change="loadnewconf(index)">{{config.label}}</v-switch>
+        </v-content>
+        <v-switch class="update" v-model="dataset['update']"></v-switch>
     </div>
 </template>
 

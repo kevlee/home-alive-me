@@ -38,7 +38,7 @@
                                         showdeviceslist = false;
                                         showaddmodule = false;
                                         ">
-                        <md-icon>add</md-icon>
+                        <v-icon>add</v-icon>
                         <span class="md-list-item-text">Add device</span>
                         <adddevicestepper v-bind:showaddstepper="showaddstepper"
                                           @saved="showaddstepper = false"
@@ -48,7 +48,7 @@
                     <devicelist @open="showNavigation = false;" />
 
                     <v-list-item>
-                        <md-icon>delete</md-icon>
+                        <v-icon>delete</v-icon>
                         <span class="md-list-item-text">Remove device</span>
                     </v-list-item>
 
@@ -60,7 +60,7 @@
                                         showdeviceslist = false;
                                         showaddmodule = true;
                                         ">
-                        <md-icon>add</md-icon>
+                        <v-icon>add</v-icon>
                         <span class="md-list-item-text">Add module</span>
                         <addmodules v-bind:showaddmodule="showaddmodule"
                                     @saved="showaddmodule = false"
