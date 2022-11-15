@@ -274,7 +274,7 @@ function nodeRemoved(ozwnode) {
 function nodeAdded(node) {
     let nodeId = node.id
     debug("add node ", nodeId)
-    if (!this.nodes[nodeid]) {
+    if (!this.nodes[nodeId]) {
         DRIVER.client.initNode(node)
     }
     debug('Node added', nodeId )
@@ -351,12 +351,15 @@ function valueAdded(node, valueId) {
 
         // avoid changed value mesure to 0 on wake up device: to be check with not battery device
         if (ozwnode.status !== NODE_STATUS[3] || comclass !== 49 || valueId.endpoint !== 0) {
-            emitters.zwave.emit('value added', value_uid,
-                metadata, metadata.value, ozwnode.id, getDeviceID(ozwnode))
+            if (comclass !== 114) {
+                emitters.zwave.emit('value added', value_uid,
+                    metadata, metadata.value, ozwnode.id, getDeviceID(ozwnode))
+            }
         }
         
         
         debug('ValueAdded: %s %s %s', value_uid, metadata.commandClassName, metadata.value)
+        debug('value meta: %s', getDeviceID(ozwnode) )
         
 
     }
@@ -735,7 +738,7 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
     DRIVER.client.nodes[nodeid].specific_device_class = ozwnode.deviceClass.specific
 
     if (DRIVER.client.inclusion) {
-        this.emit('nogociate node', {
+        DRIVER.client.emit('nogociate node', {
             'nodeId': nodeid,
             'status': 'Complete',
             'msg' : 'enrolling success'

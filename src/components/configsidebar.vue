@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-row >
+        <v-row>
             <v-col align="end">
                 <v-btn icon
                        color="indigo accent-4"
@@ -32,18 +32,13 @@
                     <v-subheader>Devices</v-subheader>
                     <v-divider></v-divider>
 
-                    <v-list-item @click="
+                    <adddevicestepper @open="
                                         showaddstepper = true;
                                         showNavigation = false;
                                         showdeviceslist = false;
                                         showaddmodule = false;
                                         ">
-                        <v-icon>add</v-icon>
-                        <span class="md-list-item-text">Add device</span>
-                        <adddevicestepper v-bind:showaddstepper="showaddstepper"
-                                          @saved="showaddstepper = false"
-                                          @nodevice="showalert" />
-                    </v-list-item>
+                    </adddevicestepper>
 
                     <devicelist @open="showNavigation = false;" />
 

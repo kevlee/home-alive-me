@@ -1,6 +1,20 @@
 <template>
 
-    <v-dialog ref="diagcontent" class="md-scrollbar md-content diagcontent" :md-active.sync="showaddstepper" md-dialog-content :md-click-outside-to-close="false" @md-clicked-outside="close()">
+    <v-dialog class="diagcontent" scrollable v-model="dialog">
+
+        <template v-slot:activator="{ on, attrs }">
+            <v-list-item @click=""
+                         v-bind="attrs"
+                         v-on="on">
+                <v-list-item-icon>
+                    <v-icon>fas fa-plus</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    <v-list-item-title class="v-list-item-text">Add Device</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+        </template>
+
         <v-content class="scroller md-scrollbar">
             <v-dialog-content class="steppercontainer">
                 <v-steppers class="adddevicestepper md-alternative" :md-active-step.sync="currentstep" md-linear>
@@ -8,20 +22,20 @@
                         <devicetypeselector @type="settype" />
                         <div class="processbuttton">
                             <v-button class="md-raised md-primary"
-                                       @click.native="setDone('first', 'second');searchdevice()"
-                                       :disabled="!devicetype">
+                                      @click.native="setDone('first', 'second');searchdevice()"
+                                      :disabled="!devicetype">
                                 Next
                             </v-button>
                         </div>
                     </v-step>
                     <v-step id="second" md-label="Waiting Getway Response" :md-done.sync="second" :md-editable="false">
-                        <div id="progress"><md-progress-spinner v-if="spinner" md-mode="indeterminate"></md-progress-spinner></div>
+                        <div id="progress"><v-progress-spinner v-if="spinner" md-mode="indeterminate"></v-progress-spinner></div>
                     </v-step>
                     <v-step id="third" md-label="Configure Device" :md-editable="false">
                         <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
                         <div class="processbuttton">
                             <v-button class="md-raised md-primary"
-                                       @click="savenodeconfig();close()">
+                                      @click="savenodeconfig();close()">
                                 SAVE
                             </v-button>
                         </div>

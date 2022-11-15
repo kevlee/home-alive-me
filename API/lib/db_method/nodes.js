@@ -20,7 +20,7 @@ exports.addvalue = function addvalue(value_uid, value, commandClass , commandCla
             "ON CONFLICT(nodeuid,valueid) DO UPDATE SET " +
             "(label,value,typevalue,availablevalue) = " +
             "(EXCLUDED.label,EXCLUDED.value,EXCLUDED.typevalue,EXCLUDED.availablevalue) "
-        this.query(sql);
+        this.query(sql)
 
     } catch (error) {
         console.error(error);
@@ -58,10 +58,16 @@ exports.setnodetype = async function setnodetype(uid , type){
 
 exports.addclient = async function addclient(uid, nodeid, name) {
     // don't change databases if node exist
-    this.query("INSERT INTO nodes (nodeid,nodeuid,productname)" +
-        "values('" + nodeid + "', '" + uid + "', '" + name + "') " +
-        "ON CONFLICT(nodeuid) DO UPDATE SET " +
-        "(nodeid,nodeuid,productname) = " +
-        "(EXCLUDED.nodeid, EXCLUDED.nodeuid, EXCLUDED.productname) ")
+    try {
+        this.query("INSERT INTO nodes (nodeid,nodeuid,productname)" +
+            "values('" + nodeid + "', '" + uid + "', '" + name + "') " +
+            "ON CONFLICT(nodeuid) DO UPDATE SET " +
+            "(nodeid,nodeuid,productname) = " +
+            "(EXCLUDED.nodeid, EXCLUDED.nodeuid, EXCLUDED.productname) ")
+    } catch (error) {
+        console.error(error);
+        console.log(sql);
+    }
+    
 }
 
