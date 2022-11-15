@@ -379,7 +379,7 @@ function valueChanged(node, valueId) {
             debug('valueChanged: no such node: ' + ozwnode.id, 'error')
         } else {
             var oldst = valueId.prevValue
-            if (ozwnode.ready && oldst) {
+            if (ozwnode.ready && oldst != null) {
                 debug(
                     `zwave node ${ozwnode.id}: changed: ${value_id}:${metadata.label}:${oldst} -> ${valueId.newValue}`
                 )
