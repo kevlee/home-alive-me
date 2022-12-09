@@ -406,19 +406,12 @@ function valueChanged(node, valueId) {
     }
 }
 
-function valueRemoved(nodeid, comclass, instance, index) {
-    var ozwnode = this.client.nodes[nodeid]
-    var value_id = getValueID({
-        class_id: comclass,
-        instance: instance,
-        index: index
-    })
-    if (ozwnode.values[value_id]) {
-        delete ozwnode.values[value_id]
-        debug('ValueRemoved: %s from node %d', value_id, nodeid)
-    } else {
-        debug('ValueRemoved: no such node: ' + nodeid, 'error')
-    }
+function valueRemoved(node, valueId) {
+    var ozwnode = node
+    var comclass = valueId.commandClass
+    var metadata = getValueParam(ozwnode, valueId)
+    var value_id = getValueID(ozwnode.id, metadata)
+    //todo
 }
 
 function nodeEvent(nodeid, evtcode) {
@@ -738,7 +731,7 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
     DRIVER.client.nodes[nodeid].specific_device_class = ozwnode.deviceClass.specific
 
     if (DRIVER.client.inclusion) {
-        DRIVER.client.emit('nogociate node', {
+        emitters.zave.emit('nogociate node', {
             'nodeId': nodeid,
             'status': 'Complete',
             'msg' : 'enrolling success'
