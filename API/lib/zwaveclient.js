@@ -731,7 +731,7 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
     DRIVER.client.nodes[nodeid].specific_device_class = ozwnode.deviceClass.specific
 
     if (DRIVER.client.inclusion) {
-        emitters.zave.emit('nogociate node', {
+        emitters.zwave.emit(('nogociate node', {
             'nodeId': nodeid,
             'status': 'Complete',
             'msg' : 'enrolling success'
