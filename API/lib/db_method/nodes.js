@@ -10,9 +10,9 @@ exports.getnodes = async function () {
 exports.addvalue = function addvalue(value_uid, value, commandClass , commandClassName,type, uid , choices) {
     try {
         
-        let sql = 'INSERT INTO ' + COMCLASS[commandClass] +
-            ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
-            "($1,$2,$3,$4,$5,$6)"+
+        const sql = "INSERT INTO " + COMCLASS[commandClass] +
+            " (nodeuid,valueid,label,value,typevalue,availablevalue) values" +
+            " ($1,$2,$3,$4,$5,$6)" +
             " ON CONFLICT(nodeuid,valueid) DO UPDATE SET" +
             " (label,value,typevalue,availablevalue) =" +
             " (EXCLUDED.label,EXCLUDED.value,EXCLUDED.typevalue,EXCLUDED.availablevalue) "
@@ -23,7 +23,7 @@ exports.addvalue = function addvalue(value_uid, value, commandClass , commandCla
                 commandClassName,
                 value,
                 type,
-                choices
+                choices,
             ]
         this.query(sql,values)
 

@@ -91,17 +91,17 @@
         z-index: 1000;
     }
 
-    ::-webkit-scrollbar {
+    body::-webkit-scrollbar {
         width: 7px;
         display: none;
     }
 
-    ::-webkit-scrollbar-track {
+    body::-webkit-scrollbar-track {
         background: #e6e6e6;
         border-left: 1px solid #dadada;
     }
 
-    ::-webkit-scrollbar-thumb {
+    body::-webkit-scrollbar-thumb {
         background: #757575;
         border: solid 1px #e6e6e6;
         border-radius: 10px;

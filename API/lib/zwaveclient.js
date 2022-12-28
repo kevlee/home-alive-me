@@ -998,7 +998,11 @@ ZwaveClient.prototype.writeValue = function (nodeId, valueId, value) {
         && this.nodes[nodeId]
         && this.nodes[nodeId].ready) {
         try {
-            this.nodes[nodeId].setValue(valueId, value)
+            let value_cast = value
+            if (this.nodes[nodeId].getValueMetadata(valueId).type == "number") {
+                value_cast = parseInt(value)
+            }
+            this.nodes[nodeId].setValue(valueId, value_cast)
         } catch (error) {
             debug(
                 `Error while writing ${value} on ${valueId.value_id}: ${error.message}`

@@ -23,9 +23,9 @@ async function init(master) {
     this.addedclient = false
     this.db = new mysql.Pool({
         host: process.env.APP_MYSQL_HOST || "localhost",
-        user: process.env.MYSQL_USER || "zwave",
-        password: process.env.MYSQL_PASSWORD || "ppI3h4uwaz*UgT#s",
-        database: process.env.MYSQL_DATABASE || "homealiveme",
+        user: process.env.SQL_USER || "zwave",
+        password: process.env.SQL_PASSWORD || "ppI3h4uwaz*UgT#s",
+        database: process.env.SQL_DATABASE || "homealiveme",
         port: 5432,
         connectionLimit: 100, 
         multipleStatements: true

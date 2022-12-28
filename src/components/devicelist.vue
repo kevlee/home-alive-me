@@ -1,44 +1,46 @@
 <template>
-    <v-dialog class="devicelist" scrollable
-              v-model="dialog">
-        <template v-slot:activator="{ on, attrs }">
-            <v-list-item @click="emitopen()"
-                         v-bind="attrs"
-                         v-on="on">
-                <v-list-item-icon>
-                    <v-icon>fas fa-list</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                    <v-list-item-title class="v-list-item-text">Device list</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
-        </template>
-        <v-card class="scroller">
-            <v-data-table :headers="headers"
-                          :items="list"
-                          :expanded.sync="expanded"
-                          item-key="nodeuid"
-                          sort-by="nodeid"
-                          class="divicelist"
-                          show-expand
-                          height="100%"
-                          @item-expanded="clickrow($event.item)">
-                <template v-slot:top>
-                    <v-toolbar flat>
-                        <v-toolbar-title>Room List</v-toolbar-title>
-                        <v-spacer></v-spacer>
-                    </v-toolbar>
-                </template>
-                <template v-slot:expanded-item="{ headers, item }">
-                    <td :colspan="headers.length">
-                        <listnodeinfo v-bind:nodeinfo="item"
-                                      @editmetadata="fetchnodes" />
-                    </td>
-                </template>
-                <v-divider></v-divider>
-            </v-data-table>
-        </v-card>
-    </v-dialog>
+    <div class="devicelist">
+        <v-dialog content-class="devicelist" scrollable
+                  v-model="dialog">
+            <template v-slot:activator="{ on, attrs }">
+                <v-list-item @click="emitopen()"
+                             v-bind="attrs"
+                             v-on="on">
+                    <v-list-item-icon>
+                        <v-icon>fas fa-list</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title class="v-list-item-text">Device list</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </template>
+            <v-card class="scroller">
+                <v-data-table :headers="headers"
+                              :items="list"
+                              :expanded.sync="expanded"
+                              item-key="nodeuid"
+                              sort-by="nodeid"
+                              class="devicelist"
+                              show-expand
+                              height="100%"
+                              @item-expanded="clickrow($event.item)">
+                    <template v-slot:top>
+                        <v-toolbar flat>
+                            <v-toolbar-title>Room List</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                        </v-toolbar>
+                    </template>
+                    <template v-slot:expanded-item="{ headers, item }">
+                        <td :colspan="headers.length">
+                            <listnodeinfo v-bind:nodeinfo="item"
+                                          @editmetadata="fetchnodes" />
+                        </td>
+                    </template>
+                    <v-divider></v-divider>
+                </v-data-table>
+            </v-card>
+        </v-dialog>
+        </div>
 </template>
 
 <script>
@@ -131,7 +133,7 @@
         }
     }
 </script>
-<style scoped lang="scss">
+<style lang="scss">
 
     .scroller {
         overflow: auto;

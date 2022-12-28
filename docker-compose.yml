@@ -29,19 +29,19 @@ services:
    ham-network:
     ipv4_address: '192.168.2.3'
  ham-db:
-  image: yobasystems/alpine-mariadb
+  image: postgres:15-alpine
   container_name: ham-db
   restart: unless-stopped
   env_file:
    ./API/.env.production
   ports:
-   - 192.168.1.195:3306:3306
+   - 192.168.1.195:5432:5432
   expose:
    - 3306
   extra_hosts:
    - "gateway:192.168.2.1"
   volumes:
-   - ham-db:/var/lib/mysql
+   - ham-db:/var/lib/postgresql/data/
    - ./API/sql:/docker-entrypoint-initdb.d
   networks:
    ham-network:
@@ -52,7 +52,7 @@ services:
   env_file:
    ./API/.env.production
   volumes:
-   - ham-db:/var/lib/mysql
+   - ham-db:/var/lib/postgresql/data/pgdata
    - ./API/sql/migrate:/docker-entrypoint-initdb.d
   depends_on:
    - ham-db
