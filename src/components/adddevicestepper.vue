@@ -41,7 +41,7 @@
                             </div>
                         </v-stepper-content>
                         <v-stepper-content step="2">
-                            <div id="progress"><v-progress-spinner v-if="spinner" md-mode="indeterminate"></v-progress-spinner></div>
+                            <div id="progress"><v-progress-circular v-if="spinner" color="primary" indeterminate></v-progress-circular></div>
                         </v-stepper-content>
                         <v-stepper-content step="3">
                             <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>

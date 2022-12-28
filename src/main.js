@@ -7,10 +7,11 @@ import SvgIcon from 'vue-svgicon'
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
 import AsyncComputed from 'vue-async-computed'
+import VueRouter from 'vue-router'
 
 Vue.use(Vuetify)
 Vue.use(AsyncComputed)
-Vue.use(router)
+Vue.use(VueRouter)
 Vue.use(SvgIcon, {
     tagName: 'svgicon'
 });
