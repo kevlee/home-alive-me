@@ -1,5 +1,5 @@
   <template>
-    <div id="app">
+    <div id="app" class="app">
         <v-app>
             <background />
             <configsidebar />
@@ -16,7 +16,6 @@
             </v-bottom-navigation>
         </v-app>
     </div>
-
 </template>
 
 
@@ -72,6 +71,7 @@
     #app {
         margin: 0px;
         padding: 0px;
+        overflow: hidden;
     }
 
     body {
@@ -79,7 +79,6 @@
     }
 
     html.md-theme-default {
-        overflow-y: hidden;
     }
 
     #navbar {
@@ -93,7 +92,8 @@
     }
 
     ::-webkit-scrollbar {
-        width: 10px;
+        width: 7px;
+        display: none;
     }
 
     ::-webkit-scrollbar-track {

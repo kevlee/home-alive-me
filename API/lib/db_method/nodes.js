@@ -9,64 +9,82 @@ exports.getnodes = async function () {
 
 exports.addvalue = function addvalue(value_uid, value, commandClass , commandClassName,type, uid , choices) {
     try {
+        
         let sql = 'INSERT INTO ' + COMCLASS[commandClass] +
             ' (nodeuid,valueid,label,value,typevalue,availablevalue)  values ' +
-            "('" + uid +
-            "','" + value_uid +
-            "','" + commandClassName +
-            "','" + value +
-            "','" + type +
-            "','" + choices + "') " +
-            "ON CONFLICT(nodeuid,valueid) DO UPDATE SET " +
-            "(label,value,typevalue,availablevalue) = " +
-            "(EXCLUDED.label,EXCLUDED.value,EXCLUDED.typevalue,EXCLUDED.availablevalue) "
-        this.query(sql)
+            "($1,$2,$3,$4,$5,$6)"+
+            " ON CONFLICT(nodeuid,valueid) DO UPDATE SET" +
+            " (label,value,typevalue,availablevalue) =" +
+            " (EXCLUDED.label,EXCLUDED.value,EXCLUDED.typevalue,EXCLUDED.availablevalue) "
+        const values =
+            [
+                uid,
+                value_uid,
+                commandClassName,
+                value,
+                type,
+                choices
+            ]
+        this.query(sql,values)
 
     } catch (error) {
-        console.error(error);
-        console.log(comclass);
+        console.error(error)
+        console.log(comclass)
     }
 }
 
 exports.setnoderoom = async function setnoderoom(uid , roomName){
-    let sql = ''
     try {
-        let name = this.db.escape(roomName)
-        sql = 'UPDATE nodes' +
-            ' SET roomname = ' + name + 
-            " WHERE nodeuid = '" + uid + "'";
-        await this.query(sql);
+        
+        const sql = "UPDATE nodes" +
+            " SET roomname = $1" +
+            " WHERE nodeuid = $2"
+        const values =
+            [
+                roomName,
+                uid
+            ]
+        await this.query(sql,values)
     } catch (error) {
-        console.error(error);
-        console.log(sql);
+        console.error(error)
+        console.log(sql)
     }
 }
 
 exports.setnodetype = async function setnodetype(uid , type){
     let sql = ''
     try {
-        let name = this.db.escape(type)
         sql = 'UPDATE nodes' +
-            " SET type = '" + type.toLowerCase() + "'" + 
-            " WHERE nodeuid = '" + uid + "'";
-        await this.query(sql);
+            " SET type = $1" + 
+            " WHERE nodeuid = $2"
+        const values = [type.toLowerCase(), uid]
+        await this.query(sql,values)
     } catch (error) {
-        console.error(error);
-        console.log(sql);
+        console.error(error)
+        console.log(sql)
     }
 }
 
 exports.addclient = async function addclient(uid, nodeid, name) {
     // don't change databases if node exist
     try {
-        this.query("INSERT INTO nodes (nodeid,nodeuid,productname)" +
-            "values('" + nodeid + "', '" + uid + "', '" + name + "') " +
+        const sql =
+            "INSERT INTO nodes (nodeid,nodeuid,productname)" +
+            "values($1, $2, $3) " +
             "ON CONFLICT(nodeuid) DO UPDATE SET " +
             "(nodeid,nodeuid,productname) = " +
-            "(EXCLUDED.nodeid, EXCLUDED.nodeuid, EXCLUDED.productname) ")
+            "(EXCLUDED.nodeid, EXCLUDED.nodeuid, EXCLUDED.productname) "
+        const values =
+            [
+                nodeid,
+                uid,
+                name
+            ]
+        this.query(sql,values)
+        
     } catch (error) {
-        console.error(error);
-        console.log(sql);
+        console.error(error)
+        console.log(sql)
     }
     
 }

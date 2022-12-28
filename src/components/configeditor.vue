@@ -1,13 +1,18 @@
 <template>
-    <div>
-        <v-content v-for="(config,index) in configs">
-            <v-switch class="md-primary" :name="config.label"
-                       v-if="isswtichonoff(config)"
-                       v-model="dataset[config.label]"
-                       @change="loadnewconf(index)">{{config.label}}</v-switch>
-        </v-content>
-        <v-switch class="update" v-model="dataset['update']"></v-switch>
-    </div>
+    <v-container fluid>
+        <v-row v-for="(config,index) in configs">
+            <v-content>
+                <v-switch class="config" :name="config.label"
+                          v-if="isswtichonoff(config)"
+                          v-model="dataset[config.label]"
+                          @change="loadnewconf(index)"
+                          :label="config.label"
+                          >
+                </v-switch>
+            </v-content>
+    </v-row>
+    <v-switch class="update" v-model="dataset['update']"></v-switch>
+    </v-container>
 </template>
 
 <script>
@@ -36,5 +41,8 @@
 <style scoped>
     .update{
         display:none;
+    }
+    .config{
+        margin-left:20px;
     }
 </style>

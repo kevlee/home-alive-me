@@ -35,7 +35,14 @@ function init() {
 
 }
 
-init()
+try {
+    init()
+}
+catch (error) {
+    console.error(error)
+}
+
+
 
 
 

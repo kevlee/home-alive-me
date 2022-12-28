@@ -1,5 +1,5 @@
 <template>
-    <v-dialog scrollable
+    <v-dialog class="devicelist" scrollable
               v-model="dialog">
         <template v-slot:activator="{ on, attrs }">
             <v-list-item @click="emitopen()"
@@ -144,6 +144,20 @@
     }
     .v-data-table {
         height: 86%;
+    }
+    .devicelist::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .devicelist::-webkit-scrollbar-track {
+        background: #e6e6e6;
+        border-left: 1px solid #dadada;
+    }
+
+    .devicelist::-webkit-scrollbar-thumb {
+        background: #757575;
+        border: solid 1px #e6e6e6;
+        border-radius: 10px;
     }
 
 
