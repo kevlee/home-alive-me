@@ -1,21 +1,21 @@
 <template>
     <div class="typelist">
-        <md-button class="switch" @click="type = 'switch'; emitvalue('switch')">
+        <v-btn class="switch" @click="type = 'switch'; emitvalue('switch')">
             <div class="left">
-                <svgicon name="switchicon" class='switchicon'></svgicon>
+                <svgicon name="switchicon" class='switchicon'/>
             </div>
             <div class="right">
                 <span> Switch </span>
             </div>
-        </md-button>
-        <md-button class="shutter" @click="type = 'shutter'; emitvalue('shutter')">
+        </v-btn>
+        <v-btn class="shutter" @click="type = 'shutter'; emitvalue('shutter')">
             <div class="left">
-                <svgicon name="shuttericon" class='shuttericon'></svgicon>
+                <svgicon name="shuttericon" class='shuttericon'/>
             </div>
             <div class="right">
                 <span> Shutter </span>
             </div>
-        </md-button>
+        </v-btn>
     </div>
 </template>
 

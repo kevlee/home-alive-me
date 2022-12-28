@@ -1,7 +1,7 @@
 
 
 <template>
-    <svg-icon :path="switchicon" width="682.667" height="682.667" viewbox="0 0 512.000000 512.000000"></svg-icon>
+    <svgicon :path="switchicon" width="682.667" height="682.667" viewbox="0 0 512.000000 512.000000"></svgicon>
 </template>
 
 <script>

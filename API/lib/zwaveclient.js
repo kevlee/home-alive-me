@@ -842,7 +842,7 @@ ZwaveClient.prototype._setNodeName = async function (nodeid, name) {
 
     await jsonStore.put(store.nodes, this.zwcfg_nodes)
 
-    this.emit('nodeStatus', this.nodes[nodeid])
+    emitters.zwave.emit('nodeStatus', this.nodes[nodeid])
 
     return true
 }
@@ -865,7 +865,7 @@ ZwaveClient.prototype._setNodeLocation = async function (nodeid, loc) {
 
     await jsonStore.put(store.nodes, this.zwcfg_nodes)
 
-    this.emit('nodeStatus', this.nodes[nodeid])
+    emitters.zwave.emit('nodeStatus', this.nodes[nodeid])
 
     return true
 }
@@ -887,51 +887,55 @@ ZwaveClient.prototype.getInfo = function () {
 }
 
 ZwaveClient.prototype.startInclusion = async function (secure) {
-    if (DRIVER && DRIVER.controller
-        && !DRIVER.client.closed
-        && !DRIVER.client.inclusion
-        && DRIVER.client.scanComplete
-    ) {
-        DRIVER.client.inclusion = true
-        if (DRIVER.client.commandsTimeout) {
-            clearTimeout(DRIVER.client.commandsTimeout)
-            DRIVER.client.commandsTimeout = null
-        }
+    try {
+        if (DRIVER && DRIVER.controller
+            && !DRIVER.client.closed
+            && !DRIVER.client.inclusion
+            && DRIVER.client.scanComplete
+        ) {
+            DRIVER.client.inclusion = true
+            if (DRIVER.client.commandsTimeout) {
+                clearTimeout(DRIVER.client.commandsTimeout)
+                DRIVER.client.commandsTimeout = null
+            }
 
-        DRIVER.client.commandsTimeout = setTimeout(
-            () => {
-                DRIVER.controller.stopInclusion.bind(DRIVER.client)
-                if (DRIVER.client.inclusion = true) { 
-                    this.emit('nogociate node',
-                        {
-                            'nodeId': null,
-                            'status': 'Cancelled',
-                            'type': 'Inclusion',
-                            'msg': 'no node to add'
-                        }
-                    )
-                    DRIVER.client.inclusion = false
+            DRIVER.client.commandsTimeout = setTimeout(
+                () => {
+                    DRIVER.controller.stopInclusion.bind(DRIVER.client)
+                    if (DRIVER.client.inclusion = true) {
+                        emitters.zwave.emit('nogociate node',
+                            {
+                                'nodeId': null,
+                                'status': 'Cancelled',
+                                'type': 'Inclusion',
+                                'msg': 'no node to add'
+                            }
+                        )
+                        DRIVER.client.inclusion = false
+                    }
+                    debug("stop Inclusion")
                 }
-                debug("stop Inclusion")
+                ,
+                DRIVER.client.cfg.commandsTimeout * 1000 || 30000
+            )
+            let InclusionOptions = {
+                strategy: 0,
+                forceSecurity: secure
             }
-            ,
-            DRIVER.client.cfg.commandsTimeout * 1000 || 30000
-        )
-        let InclusionOptions = {
-            strategy: 0,
-            forceSecurity: secure
+            await DRIVER.controller.beginInclusion()
+            debug("start Inclusion")
+        } else {
+            emitters.zwave.emit('nogociate node',
+                {
+                    'nodeId': null,
+                    'type': 'Inclusion',
+                    'status': 'Cancelled',
+                    'msg': 'not ready to enroll command'
+                }
+            )
         }
-        await DRIVER.controller.beginInclusion()
-        debug("start Inclusion")
-    } else {
-        this.emit('nogociate node',
-            {
-                'nodeId': null,
-                'type': 'Inclusion',
-                'status': 'Cancelled',
-                'msg' : 'not ready to enroll command'
-            }
-        )
+    } catch (error) {
+        debug(error)
     }
 }
 
@@ -948,7 +952,7 @@ ZwaveClient.prototype.startExclusion = function () {
         DRIVER.client.commandsTimeout = setTimeout(
             () => {
                 DRIVER.client.driver.controller.stopExclusion.bind(DRIVER.client)
-                this.emit('nogociate node',
+                emitters.zwave.emit('nogociate node',
                     {
                         'nodeId': null,
                         'type': 'Exclusion',
@@ -962,7 +966,7 @@ ZwaveClient.prototype.startExclusion = function () {
         this.driver.controller.beginExclusion()
         DRIVER.client.exclusion = true
     } else {
-        this.emit('nogociate node',
+        emitters.zwave.emit('nogociate node',
             {
                 'nodeId': null,
                 'type': 'Exclusion',

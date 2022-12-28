@@ -211,29 +211,31 @@ DBClient.prototype.gettempstat = async function (_callback,param) {
 }
 
 DBClient.prototype.inittask = async function (_callback,uuid,type) {
-    let db = this.db
     let now = new Date().toISOString().slice(0, 19).replace('T', ' ')
     let sql = "INSERT INTO task (id,taskname,status,result,date) values " +
-        "('" + uuid + "','" + type + "','processing','{}','" + now + "')"
-    await db.query(sql)
+        "($1,$2,'processing','{}',$3)"
+    const values =
+        [
+            uuid,
+            type,
+            now
+        ]
+    await this.query(sql,values)
 }
 
 DBClient.prototype.gettaskstatus = async function (_callback, uuid) {
-    let db = this.db
-    let id = db.escape(uuid)
-    const sql = "SELECT * FROM task WHERE id =" + id 
-    let result = await this.query(sql)
+    const sql = "SELECT * FROM task WHERE id = $1"
+    const values = [uuid]
+    let result = await this.query(sql,values)
     _callback()
-    result[0].result = JSON.parse(result[0].result)
-    return result[0]
+    return result.rows[0]
 
 }
 
 DBClient.prototype.removetask = async function (_callback, uuid) {
-    let db = this.db
-    let id = db.escape(uuid)
-    const sql = "DELETE FROM task WHERE id =" + id
-    let result = await this.query(sql)
+    const sql = "DELETE FROM task WHERE id = $1"
+    const values = [uuid]
+    let result = await this.query(sql,values)
 
 }
 
@@ -250,7 +252,6 @@ DBClient.prototype.getcurtainlevel = async function (_callback, uuid) {
 }
 
 DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
-
     const sql = 'SELECT * FROM ' + COMCLASS[112] + ' WHERE nodeuid = $1'
     let result = await this.query(sql, [uuid])
     _callback()

@@ -3,7 +3,7 @@ import App from './App.vue'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import router from './router.js'
-import svgicon from 'vue-icon'
+import SvgIcon from 'vue-svgicon'
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
 import AsyncComputed from 'vue-async-computed'
@@ -11,10 +11,9 @@ import AsyncComputed from 'vue-async-computed'
 Vue.use(Vuetify)
 Vue.use(AsyncComputed)
 Vue.use(router)
-Vue.use(svgicon, {
-    classPrefix: 'AppIcon-',
+Vue.use(SvgIcon, {
+    tagName: 'svgicon'
 });
-Vue.component("svg-icon", svgicon)
 Vue.config.productionTip = true
 
 new Vue({

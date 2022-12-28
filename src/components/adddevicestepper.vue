@@ -15,34 +15,46 @@
             </v-list-item>
         </template>
 
-        <v-content class="scroller md-scrollbar">
-            <v-dialog-content class="steppercontainer">
-                <v-steppers class="adddevicestepper md-alternative" :md-active-step.sync="currentstep" md-linear>
-                    <v-step id="first" md-label="Choose Module Type" :md-done.sync="first" :md-editable="false">
-                        <devicetypeselector @type="settype" />
-                        <div class="processbuttton">
-                            <v-button class="md-raised md-primary"
-                                      @click.native="setDone('first', 'second');searchdevice()"
-                                      :disabled="!devicetype">
-                                Next
-                            </v-button>
-                        </div>
-                    </v-step>
-                    <v-step id="second" md-label="Waiting Getway Response" :md-done.sync="second" :md-editable="false">
-                        <div id="progress"><v-progress-spinner v-if="spinner" md-mode="indeterminate"></v-progress-spinner></div>
-                    </v-step>
-                    <v-step id="third" md-label="Configure Device" :md-editable="false">
-                        <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
-                        <div class="processbuttton">
-                            <v-button class="md-raised md-primary"
-                                      @click="savenodeconfig();close()">
-                                SAVE
-                            </v-button>
-                        </div>
-                    </v-step>
-                </v-steppers>
-            </v-dialog-content>
-        </v-content>
+        <v-main class="scroller steppercontainer">
+                <v-stepper class="adddevicestepper" v-model="currentstep">
+                    <v-stepper-header>
+                        <v-stepper-step id="first"
+                                        :complete="currentstep > 1"
+                                        step="1" />
+                        <v-divider />
+                        <v-stepper-step id="second"
+                                        :complete="currentstep > 2"
+                                        step="2" />
+                        <v-divider />
+                        <v-stepper-step id="third"
+                                        :complete="currentstep > 3"
+                                        step="3" />
+                    </v-stepper-header>
+                    <v-stepper-items>
+                        <v-stepper-content step="1">
+                            <devicetypeselector @type="settype" />
+                            <div class="processbuttton">
+                                <v-btn @click.native="currentstep = currentstep + 1 ;searchdevice()"
+                                       :disabled="!devicetype">
+                                    Next
+                                </v-btn>
+                            </div>
+                        </v-stepper-content>
+                        <v-stepper-content step="2">
+                            <div id="progress"><v-progress-spinner v-if="spinner" md-mode="indeterminate"></v-progress-spinner></div>
+                        </v-stepper-content>
+                        <v-stepper-content step="3">
+                            <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
+                            <div class="processbuttton">
+                                <v-btn class="md-raised md-primary"
+                                       @click="savenodeconfig();close()">
+                                    SAVE
+                                </v-btn>
+                            </div>
+                        </v-stepper-content>
+                    </v-stepper-items>
+                </v-stepper>
+            </v-main>
     </v-dialog>
 </template>
 
@@ -57,11 +69,12 @@
             devicetype: null,
             node_uid: null,
             configs: null,
-            currentstep: 'first',
+            currentstep: 1,
             first: false,
             second: false,
             Third: false,
             newconfig: { 'update': true },
+            dialog: false,
         }
     }
 
