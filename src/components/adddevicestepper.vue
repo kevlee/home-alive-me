@@ -1,5 +1,4 @@
 <template>
-
     <v-dialog class="diagcontent" scrollable v-model="dialog">
 
         <template v-slot:activator="{ on, attrs }">
@@ -35,6 +34,7 @@
                             <devicetypeselector @type="settype" />
                             <div class="processbuttton">
                                 <v-btn @click.native="currentstep = currentstep + 1 ;searchdevice()"
+                                       color="primary"
                                        :disabled="!devicetype">
                                     Next
                                 </v-btn>
@@ -46,7 +46,8 @@
                         <v-stepper-content step="3">
                             <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
                             <div class="processbuttton">
-                                <v-btn class="md-raised md-primary"
+                                <v-btn class="save"
+                                       color="primary"
                                        @click="savenodeconfig();close()">
                                     SAVE
                                 </v-btn>
@@ -168,6 +169,17 @@
         overflow: auto;
         z-index: 1200;
     }
-
+    .diagcontent::-webkit-scrollbar {
+        width: 7px;
+    }
+    .diagcontent::-webkit-scrollbar-track {
+        background: #e6e6e6;
+        border-left: 1px solid #dadada;
+    }
+    .diagcontent::-webkit-scrollbar-thumb {
+        background: #757575;
+        border: solid 1px #e6e6e6;
+        border-radius: 10px;
+    }
 
 </style>
