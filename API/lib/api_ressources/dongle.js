@@ -3,7 +3,8 @@ const reqlib = require('app-root-path').require
 const tools = reqlib('./lib/tools.js')
 const { v4: uuidv4 } = require('uuid')
 var result = ""
-const util = require('util')
+const { parse, stringify, toJSON, fromJSON } = require('flatted')
+const { json } = require("json")
 
 function init(API) {
 
@@ -28,8 +29,10 @@ function init(API) {
     API.get('/modules/', async (req, res) => {
         let modulelist = {}
         if (global.connections && global.connections.zwave) {
-            modulelist = util.inspect(global.connections)
+            let connections = global.connections
+            modulelist = JSON.stringify(connections.zwave.cfg)
         }
+        
         res.status(200).setHeader('Content-Type', 'application/json').send(modulelist)
     })
 

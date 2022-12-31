@@ -2,7 +2,7 @@
     <div class="typelist">
         <v-btn class="switch" @click="type = 'switch'; emitvalue('switch')">
             <div class="left">
-                <svgicon name="switchicon" class='switchicon'/>
+                <svgicon icon="switchicon" class='switchicon'/>
             </div>
             <div class="right">
                 <span> Switch </span>
@@ -10,7 +10,7 @@
         </v-btn>
         <v-btn class="shutter" @click="type = 'shutter'; emitvalue('shutter')">
             <div class="left">
-                <svgicon name="shuttericon" class='shuttericon'/>
+                <svgicon icon="shuttericon" class='shuttericon'/>
             </div>
             <div class="right">
                 <span> Shutter </span>

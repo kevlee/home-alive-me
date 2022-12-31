@@ -189,17 +189,15 @@ DBClient.prototype.addtemplog = async function (_callback) {
 }
 
 DBClient.prototype.gettempstat = async function (_callback,param) {
-    let db = this.db
-    let id = db.escape(param.nodeuid)
     let sql
     let sql_result = {}
-    
-    if (!id)
-        sql = 'SELECT *  FROM Temperature'
+    const values = [param.nodeuid]
+    if (!param.nodeuid)
+        sql = "SELECT *  FROM Temperature"
     else
-        sql = 'SELECT *  FROM Temperature WHERE nodeuid =' + id
+        sql = "SELECT *  FROM Temperature WHERE nodeuid = $1"
 
-    let result = await this.query(sql)
+    let result = await this.query(sql,values)
     for (var i of result.rows) {
         sql_result = Object.assign({}, i)
         struct.push({
