@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "rooms" (
 
 --add in node table the room location
 ALTER TABLE "nodes" ADD COLUMN IF NOT EXISTS "roomname" varchar(255);
-ALTER TABLE "node" ALTER COLUMN nodeuid TYPE varchar(60)
+ALTER TABLE "nodes" ALTER COLUMN nodeuid TYPE varchar(60)
 ALTER TABLE "nodes" ADD CONSTRAINT "nodes_ibfk_1" FOREIGN KEY("roomname") REFERENCES "rooms" ("name")
  ON DELETE SET NULL
  ON UPDATE CASCADE;

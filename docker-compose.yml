@@ -42,7 +42,9 @@ services:
    - "gateway:192.168.2.1"
   volumes:
    - ham-db:/var/lib/postgresql/data/
-   - ./API/sql:/docker-entrypoint-initdb.d
+   - ./API/sql/homealivemedb.sql:/docker-entrypoint-initdb.d/1-homealivemedb.sql
+   - ./API/sql/migrate/migrate-1.1.0.sql:/docker-entrypoint-initdb.d/2-migrate-1.1.0.sql
+   - ./API/sql/user.sql:/docker-entrypoint-initdb.d/3-user.sql
   networks:
    ham-network:
     ipv4_address: '192.168.2.4'

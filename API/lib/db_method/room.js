@@ -6,10 +6,10 @@
 exports.addroom = async function (name) {
         // don't change databases if room name exist
 
-    let sql = "INSERT INTO rooms (name)  values (^$1)" +
-        " ON DUPLICATE KEY UPDATE name = $1"
-        const values = [roomname]
-        await this.query(sql, values)
+    let sql = "INSERT INTO rooms (id,name)  values (DEFAULT,$1)" +
+        " ON CONFLICT (id,name) DO UPDATE SET name = $1"
+    const values = [name]
+    await this.query(sql, values)
 }
 
 /**
@@ -19,7 +19,7 @@ exports.addroom = async function (name) {
 exports.getroom = async function (id) {
 
     const sql = "SELECT * from rooms WHERE id=$1"
-    const values = [id_room]
+    const values = [id]
     let result = await this.query(sql,values)
     return result.rows
 }
@@ -40,8 +40,8 @@ exports.updateroom = async function (id, name) {
     const sql = "UPDATE rooms SET name=$1 WHERE id=$2"
     const values =
         [
-            roomname,
-            id_room
+            name,
+            id
         ]
     let result = await this.query(sql.values)
     return result.rows;
