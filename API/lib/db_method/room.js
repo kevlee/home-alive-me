@@ -5,11 +5,11 @@
 
 exports.addroom = async function (name) {
         // don't change databases if room name exist
-        let db = this.db
-        let roomname = db.escape(name)
-        let sql = "INSERT INTO rooms (name)  values (" + roomname +
-            ") ON DUPLICATE KEY UPDATE name = " + roomname
-        await this.query(sql);
+
+    let sql = "INSERT INTO rooms (id,name)  values (DEFAULT,$1)" +
+        " ON CONFLICT (id,name) DO UPDATE SET name = $1"
+    const values = [name]
+    await this.query(sql, values)
 }
 
 /**
@@ -17,17 +17,17 @@ exports.addroom = async function (name) {
  * @param {number} id
  */
 exports.getroom = async function (id) {
-    let db = this.db
-    let id_room = db.escape(id)
-    let sql = "SELECT * from rooms WHERE id=" + id_room
-    let result = await this.query(sql)
-    return result;
+
+    const sql = "SELECT * from rooms WHERE id=$1"
+    const values = [id]
+    let result = await this.query(sql,values)
+    return result.rows
 }
 
 exports.getrooms = async function () {
-    let sql = "SELECT * from rooms"
+    const sql = "SELECT * from rooms"
     let result = await this.query(sql)
-    return result;
+    return result.rows
 }
 
 /**
@@ -36,12 +36,15 @@ exports.getrooms = async function () {
  * @param {string} name
  */
 exports.updateroom = async function (id, name) {
-    let db = this.db
-    let id_room = db.escape(id)
-    let roomname = db.escape(name)
-    let sql = "UPDATE rooms SET name=" + roomname + " WHERE id=" + id_room
-    let result = await this.query(sql)
-    return result;
+
+    const sql = "UPDATE rooms SET name=$1 WHERE id=$2"
+    const values =
+        [
+            name,
+            id
+        ]
+    let result = await this.query(sql.values)
+    return result.rows;
 }
 
 /**
@@ -49,9 +52,9 @@ exports.updateroom = async function (id, name) {
  * @param {string} name
  */
 exports.removeroom = async function(name) {
-    let db = this.db;
-    let id = db.escape(name);
-    const sql = "DELETE FROM rooms WHERE name = " + "'" + name + "'";
-    let result = await this.query(sql);
+
+    const sql = "DELETE FROM rooms WHERE name = $1";
+    const values = [name]
+    let result = await this.query(sql,values);
 }
 

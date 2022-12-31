@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-row >
+        <v-row>
             <v-col align="end">
                 <v-btn icon
                        color="indigo accent-4"
@@ -13,64 +13,57 @@
                     <v-icon>fas fa-bars</v-icon>
                 </v-btn>
             </v-col>
-            <v-navigation-drawer width="30%"
-                                 v-model="showNavigation"
-                                 absolute
-                                 right
-                                 temporary>
-                <v-toolbar class="md-transparent">
-                    <span class="md-title">Configuration</span>
-                </v-toolbar>
-
-                <v-list>
-
-                    <v-subheader>Rooms</v-subheader>
-                    <v-divider></v-divider>
-
-                    <roomlist @open="showNavigation = false;" />
-
-                    <v-subheader>Devices</v-subheader>
-                    <v-divider></v-divider>
-
-                    <v-list-item @click="
-                                        showaddstepper = true;
-                                        showNavigation = false;
-                                        showdeviceslist = false;
-                                        showaddmodule = false;
-                                        ">
-                        <md-icon>add</md-icon>
-                        <span class="md-list-item-text">Add device</span>
-                        <adddevicestepper v-bind:showaddstepper="showaddstepper"
-                                          @saved="showaddstepper = false"
-                                          @nodevice="showalert" />
-                    </v-list-item>
-
-                    <devicelist @open="showNavigation = false;" />
-
-                    <v-list-item>
-                        <md-icon>delete</md-icon>
-                        <span class="md-list-item-text">Remove device</span>
-                    </v-list-item>
-
-                    <v-subheader>Modules</v-subheader>
-                    <v-divider></v-divider>
-                    <v-list-item @click="
-                                        showaddstepper = false;
-                                        showNavigation = false;
-                                        showdeviceslist = false;
-                                        showaddmodule = true;
-                                        ">
-                        <md-icon>add</md-icon>
-                        <span class="md-list-item-text">Add module</span>
-                        <addmodules v-bind:showaddmodule="showaddmodule"
-                                    @saved="showaddmodule = false"
-                                    @closed="showaddmodule = false" />
-                    </v-list-item>
-
-
-                </v-list>
-            </v-navigation-drawer>
         </v-row>
+        <v-navigation-drawer width="30%"
+                                v-model="showNavigation"
+                                absolute
+                                right
+                                temporary>
+            <v-toolbar class="md-transparent">
+                <span class="md-title">Configuration</span>
+            </v-toolbar>
+
+            <v-list>
+
+                <v-subheader>Rooms</v-subheader>
+                <v-divider></v-divider>
+
+                <roomlist @open="showNavigation = false;" />
+
+                <v-subheader>Devices</v-subheader>
+                <v-divider></v-divider>
+
+                <adddevicestepper @open="
+                                    showaddstepper = true;
+                                    showNavigation = false;
+                                    showdeviceslist = false;
+                                    showaddmodule = false;
+                                    ">
+                </adddevicestepper>
+
+                <devicelist @open="showNavigation = false;" />
+
+                <v-list-item>
+                    <v-icon>delete</v-icon>
+                    <span class="md-list-item-text">Remove device</span>
+                </v-list-item>
+
+                <v-subheader>Modules</v-subheader>
+                <v-divider></v-divider>
+                <v-list-item @click="
+                                    showaddstepper = false;
+                                    showNavigation = false;
+                                    showdeviceslist = false;
+                                    showaddmodule = true;
+                                    ">
+                    <v-icon>add</v-icon>
+                    <span class="md-list-item-text">Add module</span>
+                    <addmodules v-bind:showaddmodule="showaddmodule"
+                                @saved="showaddmodule = false"
+                                @closed="showaddmodule = false" />
+                </v-list-item>
+            </v-list>
+        </v-navigation-drawer>
     </v-container>
 </template>
 

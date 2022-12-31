@@ -1,22 +1,28 @@
 <template>
-    <div class="typelist">
-        <md-button class="switch" @click="type = 'switch'; emitvalue('switch')">
-            <div class="left">
-                <svgicon name="switchicon" class='switchicon'></svgicon>
-            </div>
-            <div class="right">
-                <span> Switch </span>
-            </div>
-        </md-button>
-        <md-button class="shutter" @click="type = 'shutter'; emitvalue('shutter')">
-            <div class="left">
-                <svgicon name="shuttericon" class='shuttericon'></svgicon>
-            </div>
-            <div class="right">
-                <span> Shutter </span>
-            </div>
-        </md-button>
-    </div>
+    <v-container fluid>
+        <v-row>
+            <v-col>
+                <v-btn class="switch" height="fit-content" @click="type = 'switch'; emitvalue('switch')">
+                    <div class="left">
+                        <svgicon icon="switchicon" class='switchicon' />
+                    </div>
+                    <div class="right">
+                        <span> Switch </span>
+                    </div>
+                </v-btn>
+            </v-col>
+            <v-col>
+                <v-btn class="shutter" height="fit-content" @click="type = 'shutter'; emitvalue('shutter')">
+                    <div class="left">
+                        <svgicon icon="shuttericon" class='shuttericon' />
+                    </div>
+                    <div class="right">
+                        <span> Shutter </span>
+                    </div>
+                </v-btn>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
@@ -46,7 +52,6 @@
     .typelist {
         display: flex;
         flex: 1 0 auto;
-        flex-direction: raw;
         flex-wrap: nowrap;
         max-height: 40vh;
         max-width: 80vh;
@@ -59,13 +64,11 @@
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
-        height: 25vh;
     }
     .shutter {
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
-        height: 25vh;
         background-color: none;
     }
    

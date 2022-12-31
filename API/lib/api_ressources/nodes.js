@@ -6,7 +6,7 @@ const {
   v4: uuidv4,
 } = require('uuid');
 
-function init(API,connections) {
+function init(API) {
 
 
     API.post('/adddevice/', async (req, res) => {
@@ -15,7 +15,7 @@ function init(API,connections) {
             global.devicetype = req.body.type
             let uuid = uuidv4()
             res.status(200).json({ 'msg': 'start enrolling', 'task_id': uuid })
-            connections.zwave.startInclusion(true)
+            global.connections.zwave.startInclusion()
             result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "AddDevice")
         } else {
             res.status(400).send({ error: 'no type in query' })
@@ -26,7 +26,7 @@ function init(API,connections) {
         let DBClient = new (reqlib('./lib/dbclient.js'))(null)
         let uuid = uuidv4()
         res.status(200).send({ 'msg': 'start removed', 'task_id': uuid })
-        connections.zwave.startExclusion(true)
+        global.connections.zwave.startExclusion(true)
         result = await DBClient.inittask(() => { DBClient.closeconnection() }, uuid, "RemoveDevice")
     })
 
@@ -64,8 +64,8 @@ function init(API,connections) {
 
     API.post('/nodes/:uuid/data/', async (req, res) => {
         if (req.params.uuid) {
-            tools.writedata(connections.zwave, req.body)
-            res.status(200)
+            tools.writedata(global.connections.zwave, req.body)
+            res.status(200).json("OK")
         } else {
             res.status(400).send({ error: 'no uuid in query' })
         }
@@ -74,8 +74,8 @@ function init(API,connections) {
 
     API.post('/nodes/:uuid/config/', async (req, res) => {
         if (req.params.uuid) {
-            tools.writeconfig(connections.zwave,req.body)
-            res.status(200)
+            tools.writeconfig(global.connections.zwave,req.body)
+            res.status(200).json("OK")
         } else {
             res.status(400).send({ error: 'no uuid in query' })
         }

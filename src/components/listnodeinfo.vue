@@ -43,19 +43,21 @@
                     </v-container>
                 </v-form>
                 <div class="processbuttton">
-                    <md-button class="md-raised md-primary save"
-                               @click="savenode()">
+                    <v-btn depressed
+                           color="primary"
+                           @click="savenode()">
                         SAVE
-                    </md-button>
+                    </v-btn>
                 </div>
             </v-tab-item>
             <v-tab-item key="tab-home">
                 <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
                 <div class="processbuttton">
-                    <md-button class="md-raised md-primary save"
-                               @click="savenodeconfig()">
+                    <v-btn    depressed
+                              color="primary"
+                              @click="savenodeconfig()">
                         SAVE
-                    </md-button>
+                    </v-btn>
                 </div>
             </v-tab-item>
         </v-tabs-items>
@@ -97,14 +99,6 @@
         asyncComputed: {
             configs: async function () {
                 let nodeconfigs = await tools.fetchconfig(this.nodeinfo.nodeuid)
-                for (var config in nodeconfigs) {
-                    var label = nodeconfigs[config].label
-                    if (nodeconfigs[config].value == nodeconfigs[config].availablevalue[1]) {
-                        this.newconfig[label] = true
-                    } else {
-                        this.newconfig[label] = false
-                    }
-                }
                 return nodeconfigs
             },
             data: async function () {
@@ -144,6 +138,8 @@
             changelvl(value) {
                 this.lvl = value
                 this.curtainlvl.value = this.matchinglvl[value]
+                this.curtainlvl["valueid"] = this.curtainlvl["valueid"].replace("currentValue", "targetValue")
+                this.curtainlvl["label"] = this.curtainlvl["label"].replace("Current value", "Target value")
                 if (!this.delay) {
                     this.delay = setTimeout(() => {
                         tools.senddata(this.curtainlvl, this.nodeinfo.nodeuid)

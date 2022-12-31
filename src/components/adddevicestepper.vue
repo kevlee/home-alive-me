@@ -1,35 +1,62 @@
 <template>
+    <v-dialog class="diagcontent" scrollable v-model="dialog">
 
-    <md-dialog ref="diagcontent" class="md-scrollbar md-content diagcontent" :md-active.sync="showaddstepper" md-dialog-content :md-click-outside-to-close="false" @md-clicked-outside="close()">
-        <md-content class="scroller md-scrollbar">
-            <md-dialog-content class="steppercontainer">
-                <md-steppers class="adddevicestepper md-alternative" :md-active-step.sync="currentstep" md-linear>
-                    <md-step id="first" md-label="Choose Module Type" :md-done.sync="first" :md-editable="false">
-                        <devicetypeselector @type="settype" />
-                        <div class="processbuttton">
-                            <md-button class="md-raised md-primary"
-                                       @click.native="setDone('first', 'second');searchdevice()"
+        <template v-slot:activator="{ on, attrs }">
+            <v-list-item @click=""
+                         v-bind="attrs"
+                         v-on="on">
+                <v-list-item-icon>
+                    <v-icon>fas fa-plus</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    <v-list-item-title class="v-list-item-text">Add Device</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+        </template>
+
+        <v-main class="scroller steppercontainer">
+                <v-stepper class="adddevicestepper" v-model="currentstep">
+                    <v-stepper-header>
+                        <v-stepper-step id="first"
+                                        :complete="currentstep > 1"
+                                        step="1" />
+                        <v-divider />
+                        <v-stepper-step id="second"
+                                        :complete="currentstep > 2"
+                                        step="2" />
+                        <v-divider />
+                        <v-stepper-step id="third"
+                                        :complete="currentstep > 3"
+                                        step="3" />
+                    </v-stepper-header>
+                    <v-stepper-items>
+                        <v-stepper-content step="1">
+                            <devicetypeselector @type="settype" />
+                            <div class="processbuttton">
+                                <v-btn @click.native="currentstep = currentstep + 1 ;searchdevice()"
+                                       color="primary"
                                        :disabled="!devicetype">
-                                Next
-                            </md-button>
-                        </div>
-                    </md-step>
-                    <md-step id="second" md-label="Waiting Getway Response" :md-done.sync="second" :md-editable="false">
-                        <div id="progress"><md-progress-spinner v-if="spinner" md-mode="indeterminate"></md-progress-spinner></div>
-                    </md-step>
-                    <md-step id="third" md-label="Configure Device" :md-editable="false">
-                        <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
-                        <div class="processbuttton">
-                            <md-button class="md-raised md-primary"
+                                    Next
+                                </v-btn>
+                            </div>
+                        </v-stepper-content>
+                        <v-stepper-content step="2">
+                            <div id="progress"><v-progress-circular v-if="spinner" color="primary" indeterminate></v-progress-circular></div>
+                        </v-stepper-content>
+                        <v-stepper-content step="3">
+                            <configeditor v-bind:configs="configs" v-bind:dataset="newconfig"></configeditor>
+                            <div class="processbuttton">
+                                <v-btn class="save"
+                                       color="primary"
                                        @click="savenodeconfig();close()">
-                                SAVE
-                            </md-button>
-                        </div>
-                    </md-step>
-                </md-steppers>
-            </md-dialog-content>
-        </md-content>
-    </md-dialog>
+                                    SAVE
+                                </v-btn>
+                            </div>
+                        </v-stepper-content>
+                    </v-stepper-items>
+                </v-stepper>
+            </v-main>
+    </v-dialog>
 </template>
 
 <script>
@@ -43,11 +70,12 @@
             devicetype: null,
             node_uid: null,
             configs: null,
-            currentstep: 'first',
+            currentstep: 1,
             first: false,
             second: false,
             Third: false,
             newconfig: { 'update': true },
+            dialog: false,
         }
     }
 
@@ -141,6 +169,17 @@
         overflow: auto;
         z-index: 1200;
     }
-
+    .diagcontent::-webkit-scrollbar {
+        width: 7px;
+    }
+    .diagcontent::-webkit-scrollbar-track {
+        background: #e6e6e6;
+        border-left: 1px solid #dadada;
+    }
+    .diagcontent::-webkit-scrollbar-thumb {
+        background: #757575;
+        border: solid 1px #e6e6e6;
+        border-radius: 10px;
+    }
 
 </style>
