@@ -2,7 +2,7 @@
     <v-container fluid>
         <v-row>
             <v-col>
-                <v-btn class="switch" height="fit-content" @click="type = 'switch'; emitvalue('switch')">
+                <v-btn class="switch typelist" height="fit-content" @click="type = 'switch'; emitvalue('switch')">
                     <div class="left">
                         <svgicon icon="switchicon" class='switchicon' />
                     </div>
@@ -12,12 +12,22 @@
                 </v-btn>
             </v-col>
             <v-col>
-                <v-btn class="shutter" height="fit-content" @click="type = 'shutter'; emitvalue('shutter')">
+                <v-btn class="shutter typelist" height="fit-content" @click="type = 'shutter'; emitvalue('shutter')">
                     <div class="left">
                         <svgicon icon="shuttericon" class='shuttericon' />
                     </div>
                     <div class="right">
                         <span> Shutter </span>
+                    </div>
+                </v-btn>
+            </v-col>
+            <v-col>
+                <v-btn class="tempsensor typelist" height="fit-content" @click="type = 'tempsensor'; emitvalue('tempsensor')">
+                    <div class="left">
+                        <v-icon class='tempsensoricon'>fas fa-temperature-half</v-icon>
+                    </div>
+                    <div class="right">
+                        <span> Tempsensor </span>
                     </div>
                 </v-btn>
             </v-col>
@@ -34,8 +44,8 @@
         name: 'devicetypeselector',
         methods: {
             emitvalue(type) {
-                Object.entries(document.getElementsByClassName('typelist')[0].childNodes).forEach(([key, children]) => {
-                    if (children.className && children.className.includes('md-button')) {
+                Object.entries(document.getElementsByClassName('typelist')).forEach(([key, children]) => {
+                    if (children.className && children.className.includes('typelist')) {
                         children.style.backgroundColor = 'unset'
                         
                     }
@@ -73,6 +83,16 @@
     }
    
     .shuttericon {
+        height: 15vh;
+    }
+    .tempsensor {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        background-color: none;
+    }
+
+    .tempsensoricon {
         height: 15vh;
     }
     .right {

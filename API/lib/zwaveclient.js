@@ -157,7 +157,7 @@ async function init(cfg) {
     this.devices = {}
     this.ozwConfig = {}
     this.healTimeout = null
-
+    
     Object.keys(EVENTS.driver).forEach(function (evt) {
         onEvent.bind(DRIVER,evt)
         DRIVER.on(evt, EVENTS.driver[evt].bind(DRIVER))
@@ -265,7 +265,6 @@ function nodeRemoved(ozwnode) {
         )
         this.exclusion = false
     }
-    debug('Node removed', nodeid)
 
     emitters.zwave.emit('nodeRemoved', node)
 }
@@ -315,10 +314,7 @@ function nodeAvailable(ozwnode) {
 function nodeReady(node) {
     DRIVER.client.nodes[node.id] = {}
     if (node) {
-        // When a node is added 'on fly' it never triggers 'node available'
-        if (node.ready) {
-            DRIVER.client.initNode(node)
-        }
+        DRIVER.client.initNode(node)
         emitters.zwave.emit('node ready', node)
         debug(
             'node %d ready: %s - %s (%s)',
@@ -359,6 +355,7 @@ function valueAdded(node, valueId) {
         
         
         debug('ValueAdded: %s %s %s', value_uid, metadata.commandClassName, metadata.value)
+        console.log(DRIVER.controller.nodes)
         debug('value meta: %s', getDeviceID(ozwnode) )
         
 
@@ -703,6 +700,7 @@ ZwaveClient.prototype.initNode = async function (ozwnode) {
         let value =  getValueParam(ozwnode, valueid)
         let value_uid =  getValueID(ozwnode.id, valueid)
         if (value !== null) {
+            debug('value to add ', value_uid, value.value)
             emitters.zwave.emit('value added', value_uid,
                 value, value.value , ozwnode.id, getDeviceID(ozwnode))
         }
@@ -891,7 +889,6 @@ ZwaveClient.prototype.startInclusion = async function (secure) {
         if (DRIVER && DRIVER.controller
             && !DRIVER.client.closed
             && !DRIVER.client.inclusion
-            && DRIVER.client.scanComplete
         ) {
             DRIVER.client.inclusion = true
             if (DRIVER.client.commandsTimeout) {
