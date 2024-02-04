@@ -55,7 +55,7 @@
             portlist: [],
             moduletype: null,
             port: null,
-            items: ["zwave"],
+            items: ["zwave","zigbee"],
             valid: false,
             requireaddmodule: false,
         }

@@ -9,19 +9,24 @@ const { json } = require("json")
 function init(API) {
 
     API.post('/addmodule/', async (req, res) => {
-        if (req.body.port && req.body.type) {
-            let { err, portconfig, type, connection } = await tools.setport(req.body.type, req.body.port, process.platform, global.connections)
-            if (!err) {
-                let DBClient = new (reqlib('./lib/dbclient.js'))(null)
-                await DBClient.setport(req.body.type, req.body.port)
-                DBClient.closeconnection()
-                console.log(global.connections)
+        try {
+            if (req.body.port && req.body.type) {
+                console.log(req.body)
+                let { err, portconfig, type, connection } = await tools.setport(req.body.type, req.body.port, process.platform, global.connections)
+                if (!err) {
+                    let DBClient = new (reqlib('./lib/dbclient.js'))(null)
+                    await DBClient.setport(req.body.type, req.body.port)
+                    DBClient.closeconnection()
+                    console.log(global.connections)
+                } else {
+                    res.status(400).send({ error: err })
+                }
+                res.status(200).json(process.platform)
             } else {
-                res.status(400).send({ error: err })
+                res.status(400).send({ error: 'missing param' })
             }
-            res.status(200).json(process.platform)
-        } else {
-            res.status(400).send({ error: 'missing param' })
+        } catch (error) {
+            res.status(400).send({ error: error })
         }
     })
 

@@ -1485,6 +1485,7 @@
     <Content Include="config\config\zwp\PA-100.xml" />
     <Content Include="config\config\zwp\WD-100.xml" />
     <Content Include="config\config\zwscene.xsd" />
+    <Content Include="config\config_zigbee\backup.json" />
     <Content Include="Dockerfile">
       <SubType>Code</SubType>
     </Content>
@@ -1523,6 +1524,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="lib\tools.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="lib\zigbeeclient.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="package.json" />
@@ -1770,6 +1774,7 @@
     <Folder Include="config\config\zooz\" />
     <Folder Include="config\config\zwave.me\" />
     <Folder Include="config\config\zwp\" />
+    <Folder Include="config\config_zigbee\" />
     <Folder Include="lib\" />
     <Folder Include="hooks\" />
     <Folder Include="lib\api_ressources\" />
