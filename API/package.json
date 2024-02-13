@@ -28,6 +28,7 @@
     "util": "0.12.4",
     "uuidv4": "^6.2.13",
     "zigbee-herdsman": "0.33.7",
+    "zigbee-herdsman-converters": "^18.30.0",
     "zwave-js": "6.6.3"
   }
 }

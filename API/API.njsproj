@@ -1486,6 +1486,7 @@
     <Content Include="config\config\zwp\WD-100.xml" />
     <Content Include="config\config\zwscene.xsd" />
     <Content Include="config\config_zigbee\backup.json" />
+    <Content Include="config\config_zigbee\device.db" />
     <Content Include="Dockerfile">
       <SubType>Code</SubType>
     </Content>
