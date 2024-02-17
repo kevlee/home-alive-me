@@ -7,9 +7,11 @@ const { Controller } = require('zigbee-herdsman')
 const { Device } = require("zigbee-herdsman/dist/controller/model")
 const zhc = require('zigbee-herdsman-converters')
 var emitters = require('./globalemitters')
+const fs = require('fs')
 
 
 var connected = false
+var options = {}
 
 
 // event
@@ -53,7 +55,7 @@ async function init(cfg) {
 
     try {
         console.log("Intiate zigbee")
-        const options = {
+        options = {
             serialPort: {
                 adapter: 'ezsp',
                 path: cfg.serialPort
@@ -233,6 +235,15 @@ ZigbeeClient.prototype.connect = async function () {
                 onEvent.bind(DRIVER.adapter, evt)
                 DRIVER.adapter.on(evt, EVENTS.adapter[evt].bind(DRIVER.adapter))
             })
+
+            const filestr = await fs.readFileSync(options.databasePath).toString().split('\n')
+            var module = {}
+            filestr.forEach(m => {
+                const parsed = JSON.parse(m)
+                module[parsed.id] = parsed
+            })
+            console.log(module)
+            exit(0)
 
         } else {
             DRIVER.debug.log('Client already connected to', this.cfg.port)
