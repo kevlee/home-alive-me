@@ -69,16 +69,16 @@ exports.addclient = async function addclient(uid, nodeid, name) {
     // don't change databases if node exist
     try {
         const sql =
-            "INSERT INTO nodes (nodeid,nodeuid,productname)" +
+            "INSERT INTO nodes (nodeuid,productname, connection)" +
             "values($1, $2, $3) " +
             "ON CONFLICT(nodeuid) DO UPDATE SET " +
-            "(nodeid,nodeuid,productname) = " +
-            "(EXCLUDED.nodeid, EXCLUDED.nodeuid, EXCLUDED.productname) "
+            "(nodeuid,productname,connection) = " +
+            "(EXCLUDED.nodeuid, EXCLUDED.productname, EXCLUDED.connection) "
         const values =
             [
-                nodeid,
                 uid,
-                name
+                name,
+                "zwave"
             ]
         this.query(sql,values)
         
@@ -87,5 +87,30 @@ exports.addclient = async function addclient(uid, nodeid, name) {
         console.log(sql)
     }
     
+}
+
+exports.addzigbeenode = async function addzigbeenode(zbnode) {
+    // don't change databases if node exist
+    console.log("add node to db")
+    try {
+        const sql =
+            "INSERT INTO nodes (nodeuid,productname,connection)" +
+            "values($1, $2, $3) " +
+            "ON CONFLICT(nodeuid) DO UPDATE SET " +
+            "(nodeuid,productname,connection) = " +
+            "(EXCLUDED.nodeuid, EXCLUDED.productname, EXCLUDED.connection) "
+        const values =
+            [
+                zbnode.id + '-' + zbnode.manufId + '-' + zbnode.nwkAddr,
+                zbnode.manufName,
+                "zigbee"
+            ]
+        this.query(sql, values)
+
+    } catch (error) {
+        console.error(error)
+        console.log(sql)
+    }
+
 }
 

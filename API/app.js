@@ -5,6 +5,7 @@
 const OpenZWave = require('./lib/zwaveclient')
 
 var DBClient
+var launch=0
 var task
 const api = new (require('./lib/api.js'))
 const tools = require('./lib/tools.js')
@@ -20,15 +21,35 @@ function init() {
 
    
     emitters.zwave.on('zwave connection', function (zwave) {
-        if (DBClient) DBClient.closeconnection()
-        DBClient = new (require('./lib/dbclient.js'))(true)
+        if (launch == 0) {
+            if (DBClient) DBClient.closeconnection()
+            DBClient = new (require('./lib/dbclient.js'))(true)
+            launch = 1
+        }
         global.connections.zwave = zwave
+    })
+
+    emitters.zigbee.on('zigbee connection', function (zigbee) {
+        if(launch == 0) {
+            if (DBClient) DBClient.closeconnection()
+            DBClient = new (require('./lib/dbclient.js'))(true)
+            launch = 1
+        }
+        global.connections.zigbee = zigbee
     })
 
     
 
     emitters.zwave.on('scan complete', function (zwave) {
-        task = new (require('./lib/task.js'))
+        if (!task) {
+            task = new (require('./lib/task.js'))
+        }
+    })
+
+    emitters.zigbee.on('scan complete', function (zwave) {
+        if (!task) {
+            task = new (require('./lib/task.js'))
+        }
     })
 
     

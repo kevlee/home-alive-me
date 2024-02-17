@@ -73,6 +73,13 @@ async function init(master) {
             manageControllerSyncStatus(self,obj)
         })
 
+        emitters.zigbee.on('node loaded', function (zbnode) {
+            self.addzigbeenode(zbnode)
+        })
+
+        emitters.zigbee.on('scan completed', function (zbnode) {
+        })
+
     }}
 
 
@@ -162,6 +169,9 @@ DBClient.prototype.setnoderoom = nodes.setnoderoom
 DBClient.prototype.setnodetype = nodes.setnodetype
 DBClient.prototype.addvalue = nodes.addvalue
 DBClient.prototype.addclient = nodes.addclient
+
+/***************** NODES ZIGBEE MANAGEMENT *******************/
+DBClient.prototype.addzigbeenode = nodes.addzigbeenode
 
 DBClient.prototype.addtemplog = async function (_callback) {
     let db = this.db

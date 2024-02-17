@@ -12,6 +12,7 @@ const fs = require('fs')
 
 var connected = false
 var options = {}
+var nodes = {}
 
 
 // event
@@ -135,7 +136,7 @@ async function message(msg) {
         var device = await zhc.findByDevice(msg.device)
         //set time on tuya
         if (device && device.hasOwnProperty("toZigbee")) {
-            console.log(device)
+            //console.log(device)
         }
         if (msg.type === 'commandMcuSyncTime' && msg.cluster === 'manuSpecificTuya') {
 
@@ -157,25 +158,22 @@ async function message(msg) {
         }
     }
 
-    if (msg.type != "commandDataReport") {
-        console.log(msg)
+
+    if (device
+        && device.hasOwnProperty("fromZigbee")
+        && device.fromZigbee[0].type.includes(msg.type)) {
+        const meta = {
+            message: { ...msg },
+            device: device,
+            mapped: device
+        }
+
+        let value = await device.fromZigbee[0].convert(device, msg, null, device.options, meta)
+        nodes[msg.device.ID]["data"] = Object.assign({}, nodes[msg.device.ID]["data"], value)
+        console.log(nodes)
+        emitters.zigbee.emit("data change", nodes[msg.device.ID],device, value)
     }
 
-    if (device && msg.data.hasOwnProperty("dpValues")) {
-
-        let value = await device.fromZigbee[0].convert(device, msg, msg.data, device.options, msg)
-        console.log(Object.keys(value)[0])
-        //console.log(device.exposes)
-        let expose = device.exposes.find((i) => i["name"] == Object.keys(value)[0])
-        console.log(value[Object.keys(value)[0]] + ' ' + expose['unit'] ) 
-    }
-
-    if (msg.type == "commandDataReport") {
-        //console.log(msg)
-        //console.log(device)
-        //console.log(device.meta.tuyaDatapoints[0])
-        console.log(await device.fromZigbee[0].convert(device, msg, msg.data, device.options, msg))
-    }
 
 }
 
@@ -224,8 +222,8 @@ function convertDecimalValueTo2ByteHexArray(value) {
 ZigbeeClient.prototype.connect = async function () {
     try {
         if (!this.connected) {
-            console.log('Connecting to', this.cfg.serialPort)
             await DRIVER.start()
+            emitters.zigbee.emit("zigbee connection", this)
             this.connected = true
             Object.keys(EVENTS.adapter).forEach(function (evt) {
                 onEvent.bind(DRIVER, evt)
@@ -237,14 +235,12 @@ ZigbeeClient.prototype.connect = async function () {
             })
 
             const filestr = await fs.readFileSync(options.databasePath).toString().split('\n')
-            var module = {}
             filestr.forEach(m => {
                 const parsed = JSON.parse(m)
-                module[parsed.id] = parsed
+                nodes[parsed.id] = parsed
+                emitters.zigbee.emit("node loaded", parsed)
             })
-            console.log(module)
-            exit(0)
-
+            emitters.zigbee.emit("scan completed", this)
         } else {
             DRIVER.debug.log('Client already connected to', this.cfg.port)
         }
