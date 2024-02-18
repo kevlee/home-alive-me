@@ -5,7 +5,7 @@ var mysql = require('pg')
 const util = require('util')
 const { addclient, removeclient } = require("./db_method/zwavenode")
 var reqlib = require('app-root-path').require
-const { COMCLASS } = require("./classcom")
+const { COMCLASS, ZIGBEECOMCLASS } = require("./classcom")
 var emitters = reqlib('./lib/globalemitters')
 const room = require("./db_method/room")
 const nodes = require("./db_method/nodes")
@@ -74,10 +74,16 @@ async function init(master) {
         })
 
         emitters.zigbee.on('node loaded', function (zbnode) {
-            self.addzigbeenode(zbnode)
+            if (zbnode != 1) {
+                self.addzigbeenode(zbnode)
+            }
         })
 
         emitters.zigbee.on('scan completed', function (zbnode) {
+        })
+
+        emitters.zigbee.on("data change", function (zbnode, device, value) {
+            self.addzigbeedata(zbnode,device,value)
         })
 
     }}
@@ -89,6 +95,18 @@ function createtable(self) {
 
     Object.keys(COMCLASS).forEach(function (id) {
         self.db.query('CREATE TABLE IF NOT EXISTS ' + COMCLASS[id] +
+            '(nodeuid VARCHAR(60) NOT NULL,' +
+            'valueid VARCHAR(60) NOT NULL,' +
+            'label TEXT DEFAULT NULL,' +
+            'value TEXT DEFAULT NULL,' +
+            'typevalue TEXT DEFAULT NULL,' +
+            'availablevalue JSON DEFAULT NULL,' +
+            'PRIMARY KEY (nodeuid,valueid), ' +
+            'FOREIGN KEY (nodeuid) REFERENCES nodes(nodeuid) ON DELETE CASCADE)')
+    })
+
+    Object.keys(ZIGBEECOMCLASS).forEach(function (id) {
+        self.db.query('CREATE TABLE IF NOT EXISTS ' + ZIGBEECOMCLASS[id] +
             '(nodeuid VARCHAR(60) NOT NULL,' +
             'valueid VARCHAR(60) NOT NULL,' +
             'label TEXT DEFAULT NULL,' +
@@ -172,6 +190,7 @@ DBClient.prototype.addclient = nodes.addclient
 
 /***************** NODES ZIGBEE MANAGEMENT *******************/
 DBClient.prototype.addzigbeenode = nodes.addzigbeenode
+DBClient.prototype.addzigbeedata = nodes.addzigbeedata
 
 DBClient.prototype.addtemplog = async function (_callback) {
     let db = this.db
@@ -260,8 +279,18 @@ DBClient.prototype.getcurtainlevel = async function (_callback, uuid) {
 }
 
 DBClient.prototype.getnodeconfig = async function (_callback, uuid) {
-    const sql = 'SELECT * FROM ' + COMCLASS[112] + ' WHERE nodeuid = $1'
+    let sql = 'SELECT * FROM nodes WHERE nodeuid = $1'
     let result = await this.query(sql, [uuid])
+    let connection_type = result.rows[0].connection
+    if (connection_type == "zwave") {
+        sql = 'SELECT * FROM ' + COMCLASS[112] + ' WHERE nodeuid = $1'
+        result = await this.query(sql, [uuid])
+    }
+
+    if (connection_type == "zigbee") {
+        sql = 'SELECT * FROM ' + ZIGBEECOMCLASS[3] + ' WHERE nodeuid = $1'
+        result = await this.query(sql, [uuid])
+    }
     _callback()
     //for (var row in result.rows) {
     //result.rows[row].availablevalue = JSON.parse(result.rows[row].availablevalue)

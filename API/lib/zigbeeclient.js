@@ -138,8 +138,8 @@ async function message(msg) {
         if (device && device.hasOwnProperty("toZigbee")) {
             //console.log(device)
         }
+        // sync time Tuya
         if (msg.type === 'commandMcuSyncTime' && msg.cluster === 'manuSpecificTuya') {
-
             try {
                 const offset = 0;
                 const utcTime = Math.round(((new Date()).getTime() - offset) / 1000);
@@ -169,8 +169,11 @@ async function message(msg) {
         }
 
         let value = await device.fromZigbee[0].convert(device, msg, null, device.options, meta)
+        const e = device.exposes.find((i) => i["property"] === Object.keys(value)[0])
+        value["meta"] = e
+        value["value"] = value[Object.keys(value)[0]]
         nodes[msg.device.ID]["data"] = Object.assign({}, nodes[msg.device.ID]["data"], value)
-        console.log(nodes)
+        console.log(value)
         emitters.zigbee.emit("data change", nodes[msg.device.ID],device, value)
     }
 

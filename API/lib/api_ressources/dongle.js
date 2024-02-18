@@ -34,8 +34,10 @@ function init(API) {
     API.get('/modules/', async (req, res) => {
         let modulelist = {}
         if (global.connections && global.connections.zwave) {
-            let connections = global.connections
-            modulelist = JSON.stringify(connections.zwave.cfg)
+            modulelist = JSON.stringify(global.connections.zwave.cfg)
+        }
+        if (global.connections && global.connections.zigbee) {
+            modulelist = JSON.stringify(global.connections.zigbee.cfg)
         }
         
         res.status(200).setHeader('Content-Type', 'application/json').send(modulelist)

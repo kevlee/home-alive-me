@@ -1,4 +1,4 @@
-﻿const { COMCLASS } = require("../classcom");
+﻿const { COMCLASS, ZIGBEECOMCLASS } = require("../classcom");
 
 
 exports.getnodes = async function () {
@@ -91,7 +91,6 @@ exports.addclient = async function addclient(uid, nodeid, name) {
 
 exports.addzigbeenode = async function addzigbeenode(zbnode) {
     // don't change databases if node exist
-    console.log("add node to db")
     try {
         const sql =
             "INSERT INTO nodes (nodeuid,productname,connection)" +
@@ -104,6 +103,38 @@ exports.addzigbeenode = async function addzigbeenode(zbnode) {
                 zbnode.id + '-' + zbnode.manufId + '-' + zbnode.nwkAddr,
                 zbnode.manufName,
                 "zigbee"
+            ]
+        this.query(sql, values)
+
+    } catch (error) {
+        console.error(error)
+        console.log(sql)
+    }
+
+}
+
+exports.addzigbeedata = async function addzigbeedata(zbnode,device,value) {
+    // don't change databases if node exist
+    try {
+        const sql = "INSERT INTO " + ZIGBEECOMCLASS[value.meta.access] +
+            " (nodeuid,valueid,label,value,typevalue,availablevalue) values" +
+            " ($1,$2,$3,$4,$5,$6)" +
+            " ON CONFLICT(nodeuid,valueid) DO UPDATE SET" +
+            " (label,value,typevalue,availablevalue) =" +
+            " (EXCLUDED.label,EXCLUDED.value,EXCLUDED.typevalue,EXCLUDED.availablevalue) "
+        const values =
+            [
+                zbnode.id + '-' + zbnode.manufId + '-' + zbnode.nwkAddr,
+                value.meta.property,
+                value.meta.property,
+                value.value,
+                typeof(value.value),
+                {
+                    choices: value.meta.values,
+                    min: value.meta.value_min,
+                    max: value.meta.value_max,
+                    step: value.meta.value_step
+                },
             ]
         this.query(sql, values)
 

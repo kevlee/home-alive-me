@@ -74,7 +74,7 @@ function init(API) {
 
     API.post('/nodes/:uuid/config/', async (req, res) => {
         if (req.params.uuid) {
-            tools.writeconfig(global.connections.zwave,req.body)
+            tools.writeconfig(global.connections,req.body)
             res.status(200).json("OK")
         } else {
             res.status(400).send({ error: 'no uuid in query' })
