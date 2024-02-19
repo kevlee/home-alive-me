@@ -12,7 +12,7 @@ const fs = require('fs')
 
 var connected = false
 var options = {}
-var nodes = {}
+
 
 
 // event
@@ -67,12 +67,13 @@ async function init(cfg) {
         }
         console.log(options)
         DRIVER = new Controller(options, cfg.logConfig.debug)
-
+        DRIVER["nodes"] = {}
 
         Object.keys(EVENTS.controller).forEach(function (evt) {
             onEvent.bind(DRIVER, evt)
             DRIVER.on(evt, EVENTS.controller[evt].bind(DRIVER))
         })
+
 
 
     } catch (error) {
@@ -134,6 +135,10 @@ async function message(msg) {
 
     if (msg) {
         var device = await zhc.findByDevice(msg.device)
+
+        if (DRIVER.nodes[msg.device.ID] && !DRIVER.nodes[msg.device.ID].hasOwnProperty("device")) {
+            DRIVER.nodes[msg.device.ID]=Object.assign({}, DRIVER.nodes[msg.device.ID], { zhcdevice: device },)
+        }
         //set time on tuya
         if (device && device.hasOwnProperty("toZigbee")) {
             //console.log(device)
@@ -172,9 +177,10 @@ async function message(msg) {
         const e = device.exposes.find((i) => i["property"] === Object.keys(value)[0])
         value["meta"] = e
         value["value"] = value[Object.keys(value)[0]]
-        nodes[msg.device.ID]["data"] = Object.assign({}, nodes[msg.device.ID]["data"], value)
-        console.log(value)
-        emitters.zigbee.emit("data change", nodes[msg.device.ID],device, value)
+        DRIVER.nodes[msg.device.ID]["data"] = Object.assign({}, DRIVER.nodes[msg.device.ID]["data"], value)
+        if (value.meta && value.value) {
+            emitters.zigbee.emit("data change", DRIVER.nodes[msg.device.ID], device, value)
+        }
     }
 
 
@@ -238,9 +244,15 @@ ZigbeeClient.prototype.connect = async function () {
             })
 
             const filestr = await fs.readFileSync(options.databasePath).toString().split('\n')
-            filestr.forEach(m => {
+            filestr.forEach(async (m) => {
                 const parsed = JSON.parse(m)
-                nodes[parsed.id] = parsed
+                DRIVER.nodes[parsed.id] = parsed
+                const zhdevice = DRIVER.getDeviceByIeeeAddr(DRIVER.nodes[parsed.id].ieeeAddr)
+                const zhcdevice = await zhc.findByDevice(zhdevice)
+                //if (parsed.id != 1 && zhcdevice.hasOwnProperty('configure') ) {
+                //    await zhcdevice.configure(zhdevice, DRIVER.nodes[1].endpoints['1'], null)
+                //}
+                
                 emitters.zigbee.emit("node loaded", parsed)
             })
             emitters.zigbee.emit("scan completed", this)
@@ -262,6 +274,49 @@ ZigbeeClient.prototype.startInclusion = async function () {
         console.log(error)
     }
 
+}
+
+ZigbeeClient.prototype.writeValue = async function (nodeId, config, value) {
+    let id = nodeId.split('-')
+    if (this.connected
+        && DRIVER.nodes[id[0]]) {
+        try {
+            const zhdevice = await DRIVER.getDeviceByIeeeAddr(DRIVER.nodes[id[0]].ieeeAddr)
+            const zhcdevice = await zhc.findByDevice(zhdevice)
+            zhdevice.meta.configured = zhc.getConfigureKey(zhcdevice);
+            console.log(zhdevice)
+            if (zhcdevice.hasOwnProperty("toZigbee")
+                && zhcdevice.toZigbee[0].key.find((i) => i == config.valueid)) {
+                var message = {}
+                message[config.valueid] = value
+                const meta = {
+                    endpoint_name: config.valueid,
+                    message: {... message },
+                    mapped: zhcdevice,
+                    device: zhdevice,
+                    options: {
+                        legacy: false,
+                        friendly_name: '0xa4c138124b10f08f',
+                        ID: '0xa4c138124b10f08f'
+                   }
+                }
+                await zhcdevice.configure(meta.device, DRIVER.nodes[1].endpoints[0], null)
+                console.log(await zhcdevice.toZigbee[0].convertSet(
+                    meta.device.endpoints[0],
+                    config.valueid,
+                    config,
+                    meta
+                ))
+
+                
+
+            }
+        } catch (error) {
+            console.log(
+                `Error while writing ${value} on ${nodeId}: ${error.message}`
+            )
+        }
+    }
 }
 
 /* const meta = {

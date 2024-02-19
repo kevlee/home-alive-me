@@ -14,17 +14,26 @@ var config = {
     ConfigPath: './config/config/'
 }
 
-function writeconfig(zwaveclient, configs) {
-    
-    for (var [index, config] of Object.entries(configs)) {
-        let valueid = config.valueid.split('-')
-        let ozwnodeId = valueid[0]
-        let valueId = {
-            "commandClass": parseInt(valueid[1]),
-            "endpoint": parseInt(valueid[2]),
-            "property": parseInt(valueid[3])
+function writeconfig(connection, data) {
+    let configs = data.configs
+    if (data.connection == "zwave") { 
+        for (var [index, config] of Object.entries(configs)) {
+            let valueid = config.valueid.split('-')
+            let ozwnodeId = valueid[0]
+            let valueId = {
+                "commandClass": parseInt(valueid[1]),
+                "endpoint": parseInt(valueid[2]),
+                "property": parseInt(valueid[3])
+            }
+            connection.zwaveclient.writeValue(ozwnodeId, valueId, config.value)
         }
-        zwaveclient.writeValue(ozwnodeId, valueId, config.value)
+    }
+
+    if (data.connection == "zigbee") {
+        for (var [index, config] of Object.entries(configs)) {
+            let zbnodeId = config.nodeuid
+            connection.zigbee.writeValue(zbnodeId, config, config.value)
+        }
     }
 }
 

@@ -153,7 +153,7 @@
                 
             },
             async savenodeconfig() {
-                await tools.sendconfig(this.configs, this.nodeinfo.nodeuid)
+                await tools.sendconfig(this.configs, this.nodeinfo)
             },
             async savenode() {
                 await tools.setnoderoom(this.nodeinfo.nodeuid , this.moduleroom)
