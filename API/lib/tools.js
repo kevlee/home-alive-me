@@ -14,7 +14,7 @@ var config = {
     ConfigPath: './config/config/'
 }
 
-function writeconfig(connection, data) {
+async function writeconfig(connection, data) {
     let configs = data.configs
     if (data.connection == "zwave") { 
         for (var [index, config] of Object.entries(configs)) {
@@ -32,6 +32,10 @@ function writeconfig(connection, data) {
     if (data.connection == "zigbee") {
         for (var [index, config] of Object.entries(configs)) {
             let zbnodeId = config.nodeuid
+            if (index == 0) {
+                await connection.zigbee.interview(zbnodeId)
+            }
+           
             connection.zigbee.writeValue(zbnodeId, config, config.value)
         }
     }

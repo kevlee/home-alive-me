@@ -108,7 +108,7 @@ async function deviceJoined(msg) {
 }
 
 async function deviceInterview(data) {
-    console.log("interview")
+    console.log("interview: " + data)
 }
 
 async function adapterDisconnected(data) {
@@ -116,6 +116,7 @@ async function adapterDisconnected(data) {
 
 async function deviceAnnounce(data) {
     var device = await zhc.findByDevice(msg.device)
+    console.log("device Annonce")
 }
 
 async function deviceNetworkAddressChanged(data) {
@@ -125,26 +126,38 @@ async function deviceLeave(data) {
 }
 
 async function lastSeenChanged(data) {
-    if (data.reason == "messageEmitted") {
-        const device = zhc.findByDevice(data.device)
-        
+    if (data.reason != "messageEmitted"
+        && DRIVER.nodes[data.device.ID].hasOwnProperty("meta")
+        && DRIVER.nodes[data.device.ID].meta.hasOwnProperty("message")
+    ) {
+        let data_to_send = DRIVER.nodes[data.device.ID].meta
+        DRIVER.nodes[data.device.ID].meta = {}
+
+            await data_to_send.mapped.toZigbee[0].convertSet(
+                data_to_send.device.endpoints[0],
+                data_to_send.config.valueid,
+                data_to_send.config,
+                data_to_send
+            )
     }
 }
 
 async function message(msg) {
+    console.log(msg.type)
 
     if (msg) {
         var device = await zhc.findByDevice(msg.device)
-
+ 
         if (DRIVER.nodes[msg.device.ID] && !DRIVER.nodes[msg.device.ID].hasOwnProperty("device")) {
             DRIVER.nodes[msg.device.ID]=Object.assign({}, DRIVER.nodes[msg.device.ID], { zhcdevice: device },)
         }
+        //DRIVER.nodes[msg.device.ID].lastSeen = now
         //set time on tuya
         if (device && device.hasOwnProperty("toZigbee")) {
             //console.log(device)
         }
         // sync time Tuya
-        if (msg.type === 'commandMcuSyncTime' && msg.cluster === 'manuSpecificTuya') {
+        if (msg.type === 'commandMcuSyncTime' && msg.cluster === 'manuSpecificTuya') { 
             try {
                 const offset = 0;
                 const utcTime = Math.round(((new Date()).getTime() - offset) / 1000);
@@ -283,30 +296,50 @@ ZigbeeClient.prototype.writeValue = async function (nodeId, config, value) {
         try {
             const zhdevice = await DRIVER.getDeviceByIeeeAddr(DRIVER.nodes[id[0]].ieeeAddr)
             const zhcdevice = await zhc.findByDevice(zhdevice)
-            zhdevice.meta.configured = zhc.getConfigureKey(zhcdevice);
-            console.log(zhdevice)
+            zhdevice.meta.configured = zhc.getConfigureKey(zhcdevice)
             if (zhcdevice.hasOwnProperty("toZigbee")
                 && zhcdevice.toZigbee[0].key.find((i) => i == config.valueid)) {
                 var message = {}
-                message[config.valueid] = value
+                switch (config.typevalue) {
+                    case 'number':
+                        message[config.valueid] = parseInt(value)
+                        break
+                    case 'string':
+                        message[config.valueid] = value.toString()
+                    default:
+                }
+                
                 const meta = {
                     endpoint_name: config.valueid,
                     message: {... message },
                     mapped: zhcdevice,
                     device: zhdevice,
+                    config : config,
                     options: {
                         legacy: false,
-                        friendly_name: '0xa4c138124b10f08f',
-                        ID: '0xa4c138124b10f08f'
+                        friendly_name: DRIVER.nodes[id[0]].ieeeAddr,
+                        ID: DRIVER.nodes[id[0]].ieeeAddr
                    }
                 }
-                await zhcdevice.configure(meta.device, DRIVER.nodes[1].endpoints[0], null)
-                console.log(await zhcdevice.toZigbee[0].convertSet(
-                    meta.device.endpoints[0],
-                    config.valueid,
-                    config,
-                    meta
-                ))
+
+                if (zhdevice.powerSource != 'Battery') {
+
+                    await zhcdevice.toZigbee[0].convertSet(
+                        meta.device.endpoints[0],
+                        meta.config.valueid,
+                        meta.config,
+                        meta
+                    )
+                } else {
+                    if (DRIVER.nodes[id[0]].meta.hasOwnProperty("message")) {
+                        DRIVER.nodes[id[0]].meta.message = {
+                            ...DRIVER.nodes[id[0]].meta.message,
+                            ...message
+                        }
+                    } else {
+                        DRIVER.nodes[id[0]].meta = meta
+                    }
+                }
 
                 
 
@@ -314,6 +347,22 @@ ZigbeeClient.prototype.writeValue = async function (nodeId, config, value) {
         } catch (error) {
             console.log(
                 `Error while writing ${value} on ${nodeId}: ${error.message}`
+            )
+        }
+    }
+}
+
+ZigbeeClient.prototype.interview = async function (nodeId) {
+    let id = nodeId.split('-')
+    if (this.connected
+        && DRIVER.nodes[id[0]]) {
+        try {
+            const zhdevice = await DRIVER.getDeviceByIeeeAddr(DRIVER.nodes[id[0]].ieeeAddr)
+            zhdevice.interview()
+            
+        } catch (error) {
+            console.log(
+                `Error while interview ${nodeId}: ${error.message}`
             )
         }
     }
